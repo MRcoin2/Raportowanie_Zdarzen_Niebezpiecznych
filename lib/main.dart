@@ -127,9 +127,6 @@ class MyHomePage extends StatefulWidget {
 
 
 class _MyHomePageState extends State<MyHomePage> {
-
-  final _formKey = GlobalKey<FormState>();
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -142,10 +139,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   padding: const EdgeInsets.only(top:18.0, bottom: 18.0),
                   child: Card(
                     child: SizedBox(
-                      width: MediaQuery.of(context).size.height/MediaQuery.of(context).size.width<1?MediaQuery.of(context).size.width*0.66:double.infinity,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: MainForm(),
+                      width: MediaQuery.of(context).size.height/MediaQuery.of(context).size.width<1?MediaQuery.of(context).size.width*0.50:double.infinity,
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: MainForm(),
+                        ),
                       ),
                     ),
                   ),
