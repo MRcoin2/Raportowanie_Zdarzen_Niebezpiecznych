@@ -11,6 +11,30 @@ class MainForm extends StatefulWidget {
 class _MainFormState extends State<MainForm> {
   final _formKey = GlobalKey<FormState>();
 
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _surnameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _dateController = TextEditingController();
+  final TextEditingController _timeController = TextEditingController();
+  final TextEditingController _placeController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _affiliationController = TextEditingController();
+  final TextEditingController _otherCategoryController =
+      TextEditingController();
+  late String status;
+  List<String> categories = [
+    "napaść na kuratora (słowna)",
+    "napaść na kuratora (fizyczna)",
+    "pogryzienie przez zwierzę",
+    "zniszczenie ubrania",
+    "zniszczenie mienia (np uszkodzenie samochodu)",
+    "wypadek podczas wykonywania czynności służbowych (np złamanie, zasłabnięcie)",
+    "zarażenie się chorobą",
+    "groźby pod adresem kuratora",
+    "inne...",
+  ];
+  bool isCategoryOther = false;
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -28,6 +52,7 @@ class _MainFormState extends State<MainForm> {
                 children: [
                   Expanded(
                     child: MainFormField(
+                      controller: _nameController,
                       labelText: "Imię",
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -39,6 +64,7 @@ class _MainFormState extends State<MainForm> {
                   ),
                   Expanded(
                     child: MainFormField(
+                      controller: _surnameController,
                       labelText: "Nazwisko",
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -51,6 +77,7 @@ class _MainFormState extends State<MainForm> {
                 ],
               ),
               MainFormField(
+                controller: _emailController,
                 labelText: "E-mail służbowy",
                 validator: (value) {
                   if (value == null ||
@@ -61,6 +88,45 @@ class _MainFormState extends State<MainForm> {
                   return null;
                 },
               ),
+              MainFormField(
+                controller: _affiliationController,
+                labelText: "Nazwa sądu i zespołu kuratorskiego",
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Proszę wprowadzić nazwę sądu i zespołu kuratorskiego';
+                  }
+                  return null;
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: DropdownButtonFormField(
+                  items: const [
+                    DropdownMenuItem(
+                      value: "Kurator zawodowy",
+                      child: Text("Kurator zawodowy"),
+                    ),
+                    DropdownMenuItem(
+                      value: "Kurator społeczny",
+                      child: Text("Kurator społeczny"),
+                    ),
+                  ],
+                  decoration: const InputDecoration(
+                    labelText: "Status kuratora",
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Proszę wybrać status';
+                    }
+                    return null;
+                  },
+                  onChanged: (value) {
+                    setState(() {
+                      status = value!;
+                    });
+                  },
+                ),
+              ),
             ],
           ),
           const Text(
@@ -70,11 +136,18 @@ class _MainFormState extends State<MainForm> {
             children: [
               Row(
                 children: [
-                  Expanded(child: DatePickerFormField()),
-                  Expanded(child: TimePickerFormField()),
+                  Expanded(
+                      child: DatePickerFormField(
+                    dateController: _dateController,
+                  )),
+                  Expanded(
+                      child: TimePickerFormField(
+                    timeController: _timeController,
+                  )),
                 ],
               ),
               MainFormField(
+                controller: _placeController,
                 labelText: "Miejsce zdarzenia",
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -83,8 +156,69 @@ class _MainFormState extends State<MainForm> {
                   return null;
                 },
               ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: DropdownButtonFormField(
+                        items: [
+                          ...categories.map((category) => DropdownMenuItem(
+                              value: category,
+                              child: Text(
+                                category,
+                                style: const TextStyle(
+                                    overflow: TextOverflow.ellipsis),
+                              )))
+                        ],
+                        decoration: const InputDecoration(
+                          labelText: "Kategoria zdarzenia",
+                          hintStyle: TextStyle(overflow: TextOverflow.ellipsis),
+                        ),
+                        isExpanded: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Proszę wybrać kategorię zdarzenia';
+                          }
+                          if (value == "inne...") {
+                            return null;
+                          }
+                          _otherCategoryController.text = value;
+                          return null;
+                        },
+                        onChanged: (value) {
+                          setState(() {
+                            status = value!;
+                            if (value == "inne...") {
+                              isCategoryOther = true;
+                            } else {
+                              isCategoryOther = false;
+                            }
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  isCategoryOther
+                      ? Expanded(
+                          child: MainFormField(
+                            controller: _otherCategoryController,
+                            labelText: "Inna kategoria zdarzenia",
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Proszę wprowadzić inną kategorię zdarzenia';
+                              }
+                              return null;
+                            },
+                          ),
+                        )
+                      : Container(),
+                ],
+              ),
               MainFormField(
+                controller: _descriptionController,
                 labelText: "Opis zdarzenia",
+                maxLines: 5,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Proszę wprowadzić opis zdarzenia';
@@ -104,7 +238,7 @@ class _MainFormState extends State<MainForm> {
                   );
                 }
               },
-              child: Text("Wyślij"),
+              child: const Text("Wyślij"),
             ),
           ),
         ],
@@ -115,11 +249,16 @@ class _MainFormState extends State<MainForm> {
 
 class MainFormField extends StatefulWidget {
   final String labelText;
-
   final String? Function(String?) validator;
+  final TextEditingController controller;
+  final int? maxLines;
 
   const MainFormField(
-      {super.key, required this.labelText, required this.validator});
+      {super.key,
+      required this.labelText,
+      required this.validator,
+      required this.controller,
+      this.maxLines});
 
   @override
   State<MainFormField> createState() => _MainFormFieldState();
@@ -131,10 +270,13 @@ class _MainFormFieldState extends State<MainFormField> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
+        maxLines: widget.maxLines ?? 1,
         decoration: InputDecoration(
           labelText: widget.labelText,
+          hintStyle: const TextStyle(overflow: TextOverflow.clip),
         ),
         validator: widget.validator,
+        controller: widget.controller,
       ),
     );
   }
@@ -142,7 +284,9 @@ class _MainFormFieldState extends State<MainFormField> {
 
 // form field that on click displays a date picker dialog and fills itself with the selected date
 class DatePickerFormField extends StatefulWidget {
-  const DatePickerFormField({super.key});
+  final TextEditingController dateController;
+
+  const DatePickerFormField({super.key, required this.dateController});
 
   @override
   State<DatePickerFormField> createState() => _DatePickerFormFieldState();
@@ -160,12 +304,11 @@ class _DatePickerFormFieldState extends State<DatePickerFormField> {
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
-        _dateController.text = DateFormat('dd.MM.yyyy').format(selectedDate);
+        widget.dateController.text =
+            DateFormat('dd.MM.yyyy').format(selectedDate);
       });
     }
   }
-
-  TextEditingController _dateController = TextEditingController(text: "");
 
   @override
   Widget build(BuildContext context) {
@@ -176,9 +319,10 @@ class _DatePickerFormFieldState extends State<DatePickerFormField> {
         children: [
           Expanded(
             child: TextFormField(
-              controller: _dateController,
+              controller: widget.dateController,
               decoration: const InputDecoration(
                 labelText: "Data zdarzenia",
+                hintStyle: TextStyle(overflow: TextOverflow.ellipsis),
                 hintText: "DD.MM.RRRR",
               ),
               validator: (value) {
@@ -193,7 +337,6 @@ class _DatePickerFormFieldState extends State<DatePickerFormField> {
                 } catch (e) {
                   return 'Proszę wprowadzić datę w formacie DD.MM.RRRR';
                 }
-                ;
                 if (DateFormat('dd.mm.yyyy')
                     .parseStrict(value)
                     .isAfter(DateTime.now())) {
@@ -209,7 +352,7 @@ class _DatePickerFormFieldState extends State<DatePickerFormField> {
           ),
           IconButton(
             onPressed: () => _selectDate(context),
-            icon: Icon(Icons.calendar_month),
+            icon: const Icon(Icons.calendar_month),
           ),
         ],
       ),
@@ -219,7 +362,9 @@ class _DatePickerFormFieldState extends State<DatePickerFormField> {
 
 // form field that on click displays a time picker dialog and fills itself with the selected time
 class TimePickerFormField extends StatefulWidget {
-  const TimePickerFormField({super.key});
+  final TextEditingController timeController;
+
+  const TimePickerFormField({super.key, required this.timeController});
 
   @override
   State<TimePickerFormField> createState() => _TimePickerFormFieldState();
@@ -242,13 +387,11 @@ class _TimePickerFormFieldState extends State<TimePickerFormField> {
     if (picked != null && picked != selectedTime) {
       setState(() {
         selectedTime = picked;
-        _timeController.text = DateFormat('HH:mm')
+        widget.timeController.text = DateFormat('HH:mm')
             .format(DateTime(0, 0, 0, selectedTime.hour, selectedTime.minute));
       });
     }
   }
-
-  TextEditingController _timeController = TextEditingController(text: "");
 
   @override
   Widget build(BuildContext context) {
@@ -259,9 +402,10 @@ class _TimePickerFormFieldState extends State<TimePickerFormField> {
         children: [
           Expanded(
             child: TextFormField(
-              controller: _timeController,
+              controller: widget.timeController,
               decoration: const InputDecoration(
                 labelText: "Godzina zdarzenia",
+                hintStyle: TextStyle(overflow: TextOverflow.ellipsis),
                 hintText: "GG:MM",
               ),
               validator: (value) {
@@ -281,7 +425,7 @@ class _TimePickerFormFieldState extends State<TimePickerFormField> {
           ),
           IconButton(
             onPressed: () => _selectTime(context),
-            icon: Icon(Icons.access_time),
+            icon: const Icon(Icons.access_time),
           ),
         ],
       ),

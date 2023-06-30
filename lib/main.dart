@@ -1,7 +1,14 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form.dart';
-void main() {
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
+
+Future<void> main() async {
+  await Firebase.initializeApp(
+  options: DefaultFirebaseOptions.currentPlatform,
+);
   runApp(const MyApp());
 }
 
@@ -140,9 +147,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Card(
                     child: SizedBox(
                       width: MediaQuery.of(context).size.height/MediaQuery.of(context).size.width<1?MediaQuery.of(context).size.width*0.50:double.infinity,
-                      child: Center(
+                      child: const Center(
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: EdgeInsets.all(8.0),
                           child: MainForm(),
                         ),
                       ),
