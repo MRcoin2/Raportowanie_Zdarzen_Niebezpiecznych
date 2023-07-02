@@ -138,25 +138,31 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [Text("Raportowanie Zdarzeń Niebezpiecznych", style: Theme.of(context).textTheme.headlineLarge,),
-                Padding(
-                  padding: const EdgeInsets.only(top:18.0, bottom: 18.0),
-                  child: Card(
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.height/MediaQuery.of(context).size.width<1?MediaQuery.of(context).size.width*0.50:double.infinity,
-                      child: const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: MainForm(),
+        body: SingleChildScrollView(
+          child: SizedBox(
+            width: double.infinity,
+            child: Center(
+              child: Column(
+                children: [Text("Raportowanie Zdarzeń Niebezpiecznych", style: Theme.of(context).textTheme.headlineLarge,),
+                  Padding(
+                    padding: const EdgeInsets.only(top:18.0, bottom: 18.0),
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top:8.0, bottom: 8.0, left: 18.0, right: 18.0),
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.height/MediaQuery.of(context).size.width<1?MediaQuery.of(context).size.width*0.50:double.infinity,
+                          child: const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: MainForm(),
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
