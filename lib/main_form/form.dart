@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:raportowanie_zdarzen_niebezpiecznych/authentication/auth_dialog.dart';
 
 class MainForm extends StatefulWidget {
   const MainForm({super.key});
@@ -35,6 +36,14 @@ class _MainFormState extends State<MainForm> {
   ];
   bool isCategoryOther = false;
 
+  Future<void> _dialogBuilder(BuildContext context, String email) {
+    return showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+      return AuthDialog(email: email);
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -76,17 +85,23 @@ class _MainFormState extends State<MainForm> {
                   ),
                 ],
               ),
-              MainFormField(
-                controller: _emailController,
-                labelText: "E-mail służbowy",
-                validator: (value) {
-                  if (value == null ||
-                      value.isEmpty ||
-                      !RegExp(r'^.*\..*@.*\.s.*\.gov\.pl$').hasMatch(value)) {
-                    return 'Proszę wprowadzić poprawny e-mail kończący się na @*.s*.gov.pl';
-                  }
-                  return null;
-                },
+              Row(
+                children: [
+                  Expanded(
+                    child: MainFormField(
+                      controller: _emailController,
+                      labelText: "E-mail służbowy",
+                      validator: (value) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            !RegExp(r'^.*\..*@.*\.s.*\.gov\.pl$').hasMatch(value)) {
+                          return 'Proszę wprowadzić poprawny e-mail kończący się na @*.s*.gov.pl';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),ElevatedButton(onPressed: ()=>_dialogBuilder(context, _emailController.text), child: Text("zwerfikuj"))
+                ],
               ),
               MainFormField(
                 controller: _affiliationController,
