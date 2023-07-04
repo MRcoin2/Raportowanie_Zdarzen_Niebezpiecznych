@@ -43,6 +43,7 @@ dependencies:
   mailer: ^6.0.1
   email_otp: ^2.0.1
   email_auth: ^1.0.0
+  flutter_verification_code: ^1.1.6
 
 dev_dependencies:
   flutter_test:
