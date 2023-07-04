@@ -11,7 +11,10 @@ class MainForm extends StatefulWidget {
 
 class _MainFormState extends State<MainForm> {
   final _formKey = GlobalKey<FormState>();
+  final _emailKey = GlobalKey<FormFieldState>();
 
+  bool _verificationStatus = false;
+  String lastVerifiedEmail = "";
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _surnameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -37,13 +40,20 @@ class _MainFormState extends State<MainForm> {
   bool isCategoryOther = false;
 
   Future<void> _dialogBuilder(BuildContext context, String email) {
-    return showDialog<void>(
+    return showDialog(
         context: context,
         builder: (BuildContext context) {
-      return AuthDialog(email: email);
+          return AuthDialog(email: email);
+        }).then((verificationStatus) {
+      setState(() {
+        _verificationStatus = verificationStatus;
+        if (_verificationStatus) {
+          lastVerifiedEmail = email;
+        }
+      });
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -52,8 +62,9 @@ class _MainFormState extends State<MainForm> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          const Text(
+          Text(
             'Dane osobowe:',
+            style: Theme.of(context).textTheme.titleMedium,
           ),
           Column(
             children: [
@@ -89,18 +100,48 @@ class _MainFormState extends State<MainForm> {
                 children: [
                   Expanded(
                     child: MainFormField(
+                      formKey: _emailKey,
+                      sufixIcon: _verificationStatus
+                          ? Icon(Icons.how_to_reg)
+                          : Icon(Icons.person_off),
                       controller: _emailController,
                       labelText: "E-mail służbowy",
                       validator: (value) {
+                        if (lastVerifiedEmail != _emailController.text &&
+                            lastVerifiedEmail.isNotEmpty) {
+                          _verificationStatus = false;
+                          return 'Proszę zweryfikować e-mail';
+                        }
                         if (value == null ||
                             value.isEmpty ||
-                            !RegExp(r'^.*\..*@.*\.s.*\.gov\.pl$').hasMatch(value)) {
+                            !RegExp(r'^.*\..*@.*\.s.*\.gov\.pl$')
+                                .hasMatch(value)) {
                           return 'Proszę wprowadzić poprawny e-mail kończący się na @*.s*.gov.pl';
+                        } else if (!_verificationStatus) {
+                          return 'Proszę zweryfikować e-mail';
                         }
                         return null;
                       },
                     ),
-                  ),ElevatedButton(onPressed: ()=>_dialogBuilder(context, _emailController.text), child: Text("zwerfikuj"))
+                  ),
+                  !_verificationStatus
+                      ? ElevatedButton(
+                          style: ButtonStyle(
+                              elevation: MaterialStateProperty.all(4)),
+                          onPressed: () {
+                            if (_emailKey.currentState!.isValid) {
+                              _dialogBuilder(context, _emailController.text);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                      "Proszę wprowadzić poprawny e-mail kończący się na @*.s*.gov.pl"),
+                                ),
+                              );
+                            }
+                          },
+                          child: Text("zwerfikuj"))
+                      : Container(),
                 ],
               ),
               MainFormField(
@@ -144,8 +185,9 @@ class _MainFormState extends State<MainForm> {
               ),
             ],
           ),
-          const Text(
+          Text(
             'Dane zdarzenia:',
+            style: Theme.of(context).textTheme.titleMedium,
           ),
           Column(
             children: [
@@ -267,13 +309,17 @@ class MainFormField extends StatefulWidget {
   final String? Function(String?) validator;
   final TextEditingController controller;
   final int? maxLines;
+  final GlobalKey? formKey;
+  final Icon? sufixIcon;
 
   const MainFormField(
       {super.key,
       required this.labelText,
       required this.validator,
       required this.controller,
-      this.maxLines});
+      this.maxLines,
+      GlobalKey? this.formKey,
+      Icon? this.sufixIcon});
 
   @override
   State<MainFormField> createState() => _MainFormFieldState();
@@ -285,9 +331,12 @@ class _MainFormFieldState extends State<MainFormField> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: TextFormField(
+        key: widget.formKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         maxLines: widget.maxLines ?? 1,
         decoration: InputDecoration(
           labelText: widget.labelText,
+          suffixIcon: widget.sufixIcon,
           hintStyle: const TextStyle(overflow: TextOverflow.clip),
         ),
         validator: widget.validator,

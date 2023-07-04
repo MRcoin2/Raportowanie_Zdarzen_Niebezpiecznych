@@ -1,13 +1,42 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_verification_code/flutter_verification_code.dart';
-
-const API_URL = "https://rosowski.me";
+import 'package:http/http.dart' as http;
+import 'secrets/api_key.dart';
 
 enum codeInputStatus {
   inputting,
   pendingVerification,
   verificationSuccess,
   verificationFailure
+}
+
+Future<bool> verifyCode(String code, String email) async {
+  //make a POST request to API_URL/verify-otp with the email and code in the data of the https request
+  //if the response is 200, return true, else return false
+  var response = await http
+      .post(Uri.parse('${API_URL}/verify-otp'),
+          body: json.encode({
+            'api_key': API_KEY,
+            'email': email,
+            'otp': code}));
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+}
+
+Future sendCode(String email) async {
+  //make a POST request to API_URL/send-otp with the email in the data of the https request
+  //if the response is 200, return true, else return false
+  var response = await http.post(Uri.parse('${API_URL}/send-otp'),
+      body: json.encode({"email": email, "api_key": API_KEY, "otp_length": 4}));
+  if (response.statusCode == 200) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 class AuthDialog extends StatefulWidget {
@@ -22,11 +51,13 @@ class AuthDialog extends StatefulWidget {
 class _AuthDialogState extends State<AuthDialog> {
   String _code = "";
   bool _onEditing = true;
+  bool _verified = false;
   codeInputStatus _status = codeInputStatus.inputting;
 
   @override
   void initState() {
-    // TODO: make a call to the api to send a verification code
+    //send the code to the user's email on dialog creation
+    sendCode(widget.email);
     super.initState();
   }
 
@@ -36,19 +67,25 @@ class _AuthDialogState extends State<AuthDialog> {
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Builder(
-          //todo scrap this, make rest api on a remote server that also serves as a mailserver and send the verification email from there. SETUP HTTPS FOR SECURITY OF THE OTP
           builder: (context) {
             if (_status == codeInputStatus.pendingVerification) {
               return FutureBuilder(
-                future: Future.delayed(Duration(seconds: 3)),//TODO make a call to the api to verify the code
-                builder: (context,snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done)
+                future: verifyCode(_code, widget.email).then((value) {
+                  if (value) {
+                    _verified = true;
+                    _status = codeInputStatus.verificationSuccess;
+                  } else {
+                    _status = codeInputStatus.verificationFailure;
+                  }
+                }),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
                     return FutureBuilder(
                       future: Future.delayed(const Duration(seconds: 2)),
                       builder: (context, snapshot) {
                         // close dialog when email is verified
                         if (snapshot.connectionState == ConnectionState.done) {
-                          Navigator.of(context).pop();
+                          Navigator.of(context).pop(_verified);
                         }
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -58,19 +95,19 @@ class _AuthDialogState extends State<AuthDialog> {
                               _status == codeInputStatus.verificationSuccess
                                   ? const Text("E-mail zweryfikowano.")
                                   : const Text(
-                                  "Nie udało się zweryfikować tożsamości"),
+                                      "Nie udało się zweryfikować tożsamości"),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: _status ==
-                                    codeInputStatus.verificationSuccess
+                                        codeInputStatus.verificationSuccess
                                     ? const Icon(Icons.check_circle_outline,
-                                    size: 48.0, color: Colors.green)
-                                    : const Icon(Icons.no_accounts,
-                                    size: 48.0, color: Colors.redAccent),
+                                        size: 48.0, color: Colors.green)
+                                    : Icon(Icons.no_accounts,
+                                        size: 48.0, color: Theme.of(context).colorScheme.error),
                               ),
                               ElevatedButton(
                                   onPressed: () {
-                                    Navigator.of(context).pop("ok");
+                                    Navigator.of(context).pop(_verified);
                                   },
                                   child: const Text("ok")),
                             ],
@@ -78,14 +115,13 @@ class _AuthDialogState extends State<AuthDialog> {
                         );
                       },
                     );
-                  else {
+                  } else {
                     return const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                              "Weryfikowanie kodu..."),
+                          Text("Weryfikowanie kodu..."),
                           Padding(
                             padding: EdgeInsets.all(8.0),
                             child: CircularProgressIndicator(),
@@ -94,7 +130,8 @@ class _AuthDialogState extends State<AuthDialog> {
                       ),
                     );
                   }
-                });
+                },
+              );
             } else {
               return Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -131,7 +168,7 @@ class _AuthDialogState extends State<AuthDialog> {
                     ),
                     ElevatedButton(
                         onPressed: () {
-                          Navigator.of(context).pop("cancel");
+                          Navigator.of(context).pop(_verified);
                         },
                         child: const Text("cancel")),
                   ],

@@ -143,10 +143,14 @@ class _MyHomePageState extends State<MyHomePage> {
             width: double.infinity,
             child: Center(
               child: Column(
-                children: [Text("Raportowanie Zdarzeń Niebezpiecznych", style: Theme.of(context).textTheme.headlineLarge,),
+                children: [Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text("Raportowanie Zdarzeń Niebezpiecznych", style: Theme.of(context).textTheme.headlineLarge,),
+                ),
                   Padding(
                     padding: const EdgeInsets.only(top:18.0, bottom: 18.0),
                     child: Card(
+                      elevation: 2,
                       child: Padding(
                         padding: const EdgeInsets.only(top:8.0, bottom: 8.0, left: 18.0, right: 18.0),
                         child: SizedBox(
