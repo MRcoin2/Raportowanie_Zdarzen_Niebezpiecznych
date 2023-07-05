@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_verification_code/flutter_verification_code.dart';
 import 'package:http/http.dart' as http;
 import 'secrets/api_key.dart';
 
@@ -14,17 +13,13 @@ enum codeInputStatus {
 Future<bool> verifyCode(String code, String email) async {
   //make a POST request to API_URL/verify-otp with the email and code in the data of the https request
   //if the response is 200, return true, else return false
-  var response = await http
-      .post(Uri.parse('${API_URL}/verify-otp'),
-          body: json.encode({
-            'api_key': API_KEY,
-            'email': email,
-            'otp': code}));
-    if (response.statusCode == 200) {
-      return true;
-    } else {
-      return false;
-    }
+  var response = await http.post(Uri.parse('${API_URL}/verify-otp'),
+      body: json.encode({'api_key': API_KEY, 'email': email, 'otp': code}));
+  if (response.statusCode == 200) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 Future sendCode(String email) async {
@@ -50,9 +45,9 @@ class AuthDialog extends StatefulWidget {
 
 class _AuthDialogState extends State<AuthDialog> {
   String _code = "";
-  bool _onEditing = true;
   bool _verified = false;
   codeInputStatus _status = codeInputStatus.inputting;
+  TextEditingController _codeController = TextEditingController();
 
   @override
   void initState() {
@@ -103,7 +98,10 @@ class _AuthDialogState extends State<AuthDialog> {
                                     ? const Icon(Icons.check_circle_outline,
                                         size: 48.0, color: Colors.green)
                                     : Icon(Icons.no_accounts,
-                                        size: 48.0, color: Theme.of(context).colorScheme.error),
+                                        size: 48.0,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .error),
                               ),
                               ElevatedButton(
                                   onPressed: () {
@@ -138,39 +136,58 @@ class _AuthDialogState extends State<AuthDialog> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
-                        "Wpisz kod wysłany na podanego maila aby potwierdzić swoją tożsamość."),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: VerificationCode(
-                        textStyle: const TextStyle(fontSize: 20.0),
+                      child: Text(
+                        "Wpisz kod wysłany na podanego maila aby potwierdzić swoją tożsamość.",
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextFormField(
+                        controller: _codeController,
+                        decoration: const InputDecoration(
+                          labelText: "Kod",
+                          constraints: BoxConstraints(maxWidth: 200.0),
+                        ),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
                         keyboardType: TextInputType.number,
-                        underlineColor: Colors.amber,
-                        // If this is null it will use primaryColor: Colors.red from Theme
-                        length: 4,
-                        cursorColor: Colors.blue,
-                        // If this is null it will default to the ambient
-                        // clearAll is NOT required, you can delete it
-                        // takes any widget, so you can implement your design
-                        onCompleted: (String value) {
+                        maxLength: 4,
+                        onEditingComplete: () {
                           setState(() {
-                            _code = value;
+                            _code = _codeController.text;
                             _status = codeInputStatus.pendingVerification;
                           });
                         },
-                        onEditing: (bool value) {
-                          setState(() {
-                            _onEditing = value;
-                          });
-                          if (!_onEditing) FocusScope.of(context).unfocus();
-                        },
                       ),
                     ),
-                    ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pop(_verified);
-                        },
-                        child: const Text("cancel")),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: FilledButton(
+                              onPressed: () {
+                                setState(() {
+                                  _code = _codeController.text;
+                                  _status = codeInputStatus.pendingVerification;
+                                });
+                              },
+                              child: const Text("Zweryfikuj")),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop(_verified);
+                              },
+                              child: const Text("anuluj")),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               );

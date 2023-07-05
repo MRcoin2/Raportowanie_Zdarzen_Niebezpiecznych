@@ -165,7 +165,7 @@ class _MainFormState extends State<MainForm> {
                               elevation: MaterialStateProperty.all(4)),
                           onPressed: () {
                             if (RegExp(r'^.*\..*@.*\.s.*\.gov\.pl$')
-                                .hasMatch(_emailController.text)) {
+                                .hasMatch(_emailController.text)||true) { // TODO remove true when done testing
                               _authDialogBuilder(
                                   context, _emailController.text);
                             } else {
