@@ -47,6 +47,9 @@ dependencies:
   http: ^0.13.6
   flutter_localization: ^0.1.12
   cloud_firestore: ^4.8.2
+  desktop_drop: ^0.4.1
+  image_picker: any
+  firebase_storage: ^11.2.4
 
 dev_dependencies:
   flutter_test:
