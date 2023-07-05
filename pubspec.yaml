@@ -46,6 +46,7 @@ dependencies:
   flutter_verification_code: ^1.1.6
   http: ^0.13.6
   flutter_localization: ^0.1.12
+  cloud_firestore: ^4.8.2
 
 dev_dependencies:
   flutter_test:

@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/authentication/auth_dialog.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form_fields.dart';
 
@@ -16,11 +18,13 @@ class _MainFormState extends State<MainForm> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _surnameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _affiliationController = TextEditingController();
+
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _timeController = TextEditingController();
   final TextEditingController _placeController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _affiliationController = TextEditingController();
   final TextEditingController _otherCategoryController =
       TextEditingController();
   late String _chosenStatus;
@@ -54,6 +58,35 @@ class _MainFormState extends State<MainForm> {
         }
       });
     });
+  }
+
+  void _submitForm() {
+    Map<String, dynamic> submission = {
+      "submission timestamp": DateTime.now(),
+      "personal data": {
+        "name": _nameController.text,
+        "surname": _surnameController.text,
+        "email": _emailController.text,
+        "phone": _phoneController.text,
+        "affiliation": _affiliationController.text,
+        "status": _chosenStatus,
+      },
+      "event data": {
+        //parse date and time to DateTime
+        "event timestamp": DateFormat('dd.MM.yyyy hh:mm').parse("${_dateController.text} ${_timeController.text}"),
+        "date": _dateController.text,
+        "time": _timeController.text,
+        "place": _placeController.text,
+        "category": _chosenCategory == "inne..."
+            ? _otherCategoryController.text
+            : _chosenCategory,
+        "description": _descriptionController.text,
+      },
+    };
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    db.collection("submissions").add(submission).then((value) {
+      print(value.id);
+    }); //TODO add images to storage
   }
 
   @override
@@ -131,8 +164,10 @@ class _MainFormState extends State<MainForm> {
                           style: ButtonStyle(
                               elevation: MaterialStateProperty.all(4)),
                           onPressed: () {
-                            if (_emailKey.currentState!.isValid) {
-                              _authDialogBuilder(context, _emailController.text);
+                            if (RegExp(r'^.*\..*@.*\.s.*\.gov\.pl$')
+                                .hasMatch(_emailController.text)) {
+                              _authDialogBuilder(
+                                  context, _emailController.text);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
@@ -145,6 +180,16 @@ class _MainFormState extends State<MainForm> {
                           child: Text("zwerfikuj"))
                       : Container(),
                 ],
+              ),
+              MainFormField(
+                controller: _phoneController,
+                labelText: "Numer Telefonu (opcjonalnie)",
+                validator: (value) {
+                  if (!value!.isEmpty && !RegExp(r'^\d{9}$').hasMatch(value)) {
+                    return 'Proszę wprowadzić poprawny numer telefonu lub nie wprowadzać nic';
+                  }
+                  return null;
+                },
               ),
               MainFormField(
                 controller: _affiliationController,
@@ -295,6 +340,7 @@ class _MainFormState extends State<MainForm> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Przetwarzanie danych...')),
                   );
+                  _submitForm();
                 }
               },
               child: const Text("Wyślij"),
