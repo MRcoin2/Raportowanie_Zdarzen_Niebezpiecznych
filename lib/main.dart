@@ -1,8 +1,10 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/admin_panel.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'authentication/admin_login_page.dart';
 import 'firebase_options.dart';
 
 
@@ -118,8 +120,12 @@ class MyApp extends StatelessWidget {
         // fontFamily: GoogleFonts.notoSans().fontFamily,
       ),
       themeMode: ThemeMode.system,
-
-      home: const MyHomePage(title: 'Raportowanie Zdarzeń Niebezpiecznych'),
+      routes: {
+        '/': (context) => const FormPage(title: 'Raportowanie Zdarzeń Niebezpiecznych'),
+        '/admin-login': (context) => const AdminLoginPage(),
+        '/admin-panel': (context) => const AdminPanelPage(),
+      },
+      initialRoute: '/',
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate
       ],
@@ -130,17 +136,17 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class FormPage extends StatefulWidget {
+  const FormPage({super.key, required this.title});
 
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<FormPage> createState() => _FormPageState();
 }
 
 
-class _MyHomePageState extends State<MyHomePage> {
+class _FormPageState extends State<FormPage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
