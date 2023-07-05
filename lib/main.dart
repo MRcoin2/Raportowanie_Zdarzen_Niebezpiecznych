@@ -1,6 +1,7 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 // import 'package:firebase_core/firebase_core.dart';
 // import 'firebase_options.dart';
 
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Raportowanie Zdarzeń Niebezpiecznych',
       theme: FlexThemeData.light(
         colors: const FlexSchemeColor(
           primary: Color(0xff1145a4),
@@ -118,7 +119,13 @@ class MyApp extends StatelessWidget {
       ),
       themeMode: ThemeMode.system,
 
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Raportowanie Zdarzeń Niebezpiecznych'),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate
+      ],
+      supportedLocales: [
+        const Locale('pl')
+      ],
     );
   }
 }
