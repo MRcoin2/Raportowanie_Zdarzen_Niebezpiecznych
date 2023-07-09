@@ -316,7 +316,8 @@ class _MainFormState extends State<MainForm> {
                 child: OutlinedButton(
                   onPressed: () {
                     _picker
-                        .pickImage(source: ImageSource.gallery, imageQuality: 50)
+                        .pickImage(
+                            source: ImageSource.gallery, imageQuality: 50)
                         .then((file) {
                       if (file != null) {
                         setState(() {
@@ -356,29 +357,30 @@ class _MainFormState extends State<MainForm> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Przetwarzanie danych...')),
                   );
-                  submitForm({
-                    "submission timestamp": DateTime.now(),
-                    "personal data": {
-                      "name": _nameController.text,
-                      "surname": _surnameController.text,
-                      "email": _emailController.text,
-                      "phone": _phoneController.text,
-                      "affiliation": _affiliationController.text,
-                      "status": _chosenStatus,
-                    },
-                    "event data": {
-                      //parse date and time to DateTime
-                      "event timestamp": DateFormat('dd.MM.yyyy hh:mm').parse(
-                          "${_dateController.text} ${_timeController.text}"),
-                      "date": _dateController.text,
-                      "time": _timeController.text,
-                      "place": _placeController.text,
-                      "category": _chosenCategory == "inne..."
-                          ? _otherCategoryController.text
-                          : _chosenCategory,
-                      "description": _descriptionController.text,
-                    },
-                  }, _images);
+                  submitForm(
+                      Submission(
+                          id: "",
+                          submissionTimestamp: DateTime.now(),
+                          personalData: {
+                            "name": _nameController.text,
+                            "surname": _surnameController.text,
+                            "phone": _phoneController.text,
+                            "email": _emailController.text,
+                            "affiliation": _affiliationController.text,
+                            "status": _chosenStatus,
+                          },
+                          eventData: {
+                            "event timestamp": DateFormat('dd.MM.yyyy hh:mm').parse(
+                                "${_dateController.text} ${_timeController.text}"),
+                            "date": _dateController.text,
+                            "time": _timeController.text,
+                            "place": _placeController.text,
+                            "category": _chosenCategory == "inne..."
+                                ? _otherCategoryController.text
+                                : _chosenCategory,
+                            "description": _descriptionController.text,
+                          }).toMap(),
+                      _images);
                 }
               },
               child: const Text("Wyślij"),
