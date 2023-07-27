@@ -15,34 +15,20 @@ void submitForm(Map<String, dynamic> formData, List<XFile> images) {
   });
 }
 
-// {
-// "submission timestamp": DateTime.now(),
-// "personal data": {
-// "name": _nameController.text,
-// "surname": _surnameController.text,
-// "email": _emailController.text,
-// "phone": _phoneController.text,
-// "affiliation": _affiliationController.text,
-// "status": _chosenStatus,
-// },
-// "event data": {
-// //parse date and time to DateTime
-// "event timestamp": DateFormat('dd.MM.yyyy hh:mm').parse(
-// "${_dateController.text} ${_timeController.text}"),
-// "date": _dateController.text,
-// "time": _timeController.text,
-// "place": _placeController.text,
-// "category": _chosenCategory == "inne..."
-// ? _otherCategoryController.text
-//     : _chosenCategory,
-// "description": _descriptionController.text,
-// },
-// class based on the above map
 class Submission {
   final String id;
   final DateTime submissionTimestamp;
   final Map<String, dynamic> personalData;
   final Map<String, dynamic> eventData;
+
+  void deleteFromDatabase() {
+    FirebaseFirestore.instance.collection("submissions").doc(id).delete();
+    FirebaseStorage.instance.ref().child("images/$id").listAll().then((value) {
+      for (var item in value.items) {
+        item.delete();
+      }
+    });
+  }
 
   Submission(
       {required this.id,

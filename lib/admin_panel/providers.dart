@@ -1,25 +1,77 @@
+import 'dart:collection';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../main_form/database_communication.dart';
 
-class SelectionManager extends ChangeNotifier {
-  Map<int, String> _selected = {};
+class DataAndSelectionManager extends ChangeNotifier {
+  //Data
+  List<Submission> _submissions = [];
 
-  Map<int, String> get selected => _selected;
+  UnmodifiableListView<Submission> get submissions => UnmodifiableListView(_submissions);
 
-  void addSelection(int index, String id) {
-    _selected[index] = id;
+  Future fetchSubmissions() async {
+    //TODO handle limit and load more
+    if (_submissions.isNotEmpty) {
+      return false;
+    }
+    await FirebaseFirestore.instance
+        .collection("submissions")
+        .orderBy("submission timestamp", descending: true)
+        .limit(100)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        _submissions.add(Submission(
+            id: doc.id,
+            submissionTimestamp: DateTime.fromMillisecondsSinceEpoch(
+                data["submission timestamp"].seconds * 1000),
+            personalData: data["personal data"],
+            eventData: data["event data"]));
+      });
+      notifyListeners();
+      return true;
+    });
+  }
+
+  // Selections
+  Map<int, Submission> _selected = {};
+
+  UnmodifiableMapView<int, Submission> get selected => UnmodifiableMapView(_selected);
+
+  bool isEverythingSelected = false;
+
+  void _updateSelectionStatus() {
+    if (_selected.length == _submissions.length) {
+      isEverythingSelected = true;
+    } else {
+      isEverythingSelected = false;
+    }
+  }
+
+  void toggleSelectAll() {
+    if (_selected.length == _submissions.length) { //
+      _selected.clear();
+    } else {
+      _selected.clear();
+      for (int i = 0; i < _submissions.length; i++) {
+        _selected[i] = _submissions[i];
+      }
+    }
+    _updateSelectionStatus();
     notifyListeners();
   }
 
-  void toggleSelection(int index, String id) {
+  void toggleSelection(int index, Submission submission) {
     if (_selected.containsKey(index)) {
       _selected.remove(index);
     } else {
-      _selected[index] = id;
+      _selected[index] = submission;
     }
+    _updateSelectionStatus();
     notifyListeners();
   }
 
@@ -29,48 +81,7 @@ class SelectionManager extends ChangeNotifier {
 
   void clearSelection() {
     _selected.clear();
+    _updateSelectionStatus();
     notifyListeners();
   }
-}
-
-// provider for getting the data from the database from firestore /submissions/ collection and storing it in a list
-class SubmissionData extends ChangeNotifier {
-  List<Submission> _submissions = [];
-
-  List<Submission> get submissions => _submissions;
-
-  Future fetchSubmissions() async {
-    //TODO handle limit and load more
-    await FirebaseFirestore.instance
-        .collection("submissions")
-        .orderBy("submission timestamp", descending: true)
-        .limit(5)
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        _submissions.add(Submission(
-            id: doc.id,
-            submissionTimestamp: DateTime.fromMillisecondsSinceEpoch(data["submission timestamp"].seconds * 1000),
-            personalData: data["personal data"],
-            eventData: data["event data"]));
-      });
-      notifyListeners();
-      return true;
-    });
-  }
-
-  Future deleteSubmissions(List<String> ids) async {
-    for (var id in ids) {
-      await FirebaseFirestore.instance
-          .collection("submissions")
-          .doc(id)
-          .delete();
-    }
-    _submissions.removeWhere((element) => ids.contains(element.id));
-    notifyListeners();
-  }
-
-  //declare fields visible in the debugger
-
 }

@@ -16,8 +16,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => SelectionManager()),
-        ChangeNotifierProvider(create: (context) => SubmissionData()),
+        ChangeNotifierProvider(create: (context) => DataAndSelectionManager()),
       ],
       child: FutureBuilder<User?>(
         future: FirebaseAuth.instance.authStateChanges().first,

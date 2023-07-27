@@ -6,7 +6,6 @@ import '../main_form/database_communication.dart';
 
 class SubmissionListElement extends StatefulWidget {
   late final int index;
-  late final Submission submission;
 
   SubmissionListElement({super.key, required this.index});
 
@@ -15,10 +14,17 @@ class SubmissionListElement extends StatefulWidget {
 }
 
 class _SubmissionListElementState extends State<SubmissionListElement> {
+  late Submission submission;
+
+  @override
+  void initState() {
+    super.initState();
+    submission =
+        context.read<DataAndSelectionManager>().submissions[widget.index];
+  }
+
   @override
   Widget build(BuildContext context) {
-    widget.submission =
-        context.read<SubmissionData>().submissions[widget.index];
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -31,15 +37,15 @@ class _SubmissionListElementState extends State<SubmissionListElement> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    widget.submission.eventData['category'],
+                    submission.eventData['category'],
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   Text(
-                    widget.submission.eventData['date'].toString(),
+                    submission.eventData['date'].toString(),
                     style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                   Text(
-                    widget.submission.eventData['description'],
+                    submission.eventData['description'],
                     style: TextStyle(fontSize: 12, color: Colors.grey),
                     softWrap: true,
                     overflow: TextOverflow.ellipsis,
@@ -65,18 +71,17 @@ class _SubmissionListElementState extends State<SubmissionListElement> {
                       IconButton(
                           onPressed: () {
                             //TODO add a confirmation dialog
-                            context
-                                .read<SubmissionData>()
-                                .deleteSubmissions([widget.submission.id]);
+                            submission.deleteFromDatabase();
                           },
                           icon: Icon(Icons.delete_outline)),
                       IconButton(
                           onPressed: () {
-                            context.read<SelectionManager>().toggleSelection(
-                                widget.index, widget.submission.id);
+                            context
+                                .read<DataAndSelectionManager>()
+                                .toggleSelection(widget.index, submission);
                           },
                           icon: context
-                                  .watch<SelectionManager>()
+                                  .watch<DataAndSelectionManager>()
                                   .isSelected(widget.index)
                               ? Icon(Icons.check_box_outlined)
                               : Icon(Icons.check_box_outline_blank)),
@@ -134,25 +139,33 @@ class _TopMenuBarState extends State<TopMenuBar> {
                       ),
                       IconButton(
                         onPressed: () {
-                          print(context
-                              .read<SelectionManager>()
+                          context
+                              .read<DataAndSelectionManager>()
                               .selected
                               .values
-                              .toList());
-                          context.read<SubmissionData>().deleteSubmissions(
-                              context
-                                  .read<SelectionManager>()
-                                  .selected
-                                  .values
-                                  .toList());
-                          context.read<SelectionManager>().clearSelection();
+                              .toList()
+                              .forEach((submission) {
+                            submission.deleteFromDatabase();
+                          });
+                          context
+                              .read<DataAndSelectionManager>()
+                              .clearSelection();
                         },
                         icon: Icon(Icons.delete_sweep_outlined),
                         tooltip: "Usuń wszystkie zaznaczone",
                       ),
                       IconButton(
-                        onPressed: () {},
-                        icon: Icon(Icons.check_box_outline_blank),
+                        onPressed: () {
+                          // read data from SubmissionData and pass it to SelectionManager to select all
+                          context
+                              .read<DataAndSelectionManager>()
+                              .toggleSelectAll();
+                        },
+                        icon: context
+                                .watch<DataAndSelectionManager>()
+                                .isEverythingSelected
+                            ? Icon(Icons.check_box_outlined)
+                            : Icon(Icons.check_box_outline_blank),
                         tooltip: "Zaznacz wszystkie",
                       ),
                     ],
