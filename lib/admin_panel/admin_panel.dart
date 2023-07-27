@@ -33,6 +33,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
             // User is signed in, show admin panel
             return Scaffold(
               appBar: AppBar(
+                forceMaterialTransparency: true,
                 title: Text('Admin Panel'),
                 actions: [
                   ElevatedButton(
@@ -46,49 +47,75 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                 ],
               ),
               body: Center(
-                  child: Column(
-                children: [
-                  //logout button
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const SideMenuBar(),
+                    Column(
+                      children: [
+                        //logout button
 
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width /
-                                MediaQuery.of(context).size.height >
-                            1
-                        ? MediaQuery.of(context).size.width * 0.50
-                        : double.infinity,
-                    child: TopMenuBar(),
-                  ),
-                  FutureBuilder(
-                      future: context.read<SubmissionData>().fetchSubmissions(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        }
-                        return Consumer<SubmissionData>(
-                          builder: (context, submissionData, child) {
-                            return SizedBox(
-                            height: 500,
-                            width: MediaQuery.of(context).size.width /
-                                        MediaQuery.of(context).size.height >
-                                    1
-                                ? MediaQuery.of(context).size.width * 0.50
-                                : double.infinity,
-                            child:
-                                ListView.builder(itemBuilder: (context, index) {
-                              print(index);
-                              if (index < context.read<SubmissionData>().submissions.length) {
-                                return SubmissionListElement(
-                                  index: index,
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width /
+                                      MediaQuery.of(context).size.height >
+                                  1
+                              ? MediaQuery.of(context).size.width * 0.250
+                              : double.infinity,
+                          child: TopMenuBar(),
+                        ),
+                        FutureBuilder(
+                          future: context
+                              .read<DataAndSelectionManager>()
+                              .fetchSubmissions(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const CircularProgressIndicator();
+                            }
+                            return Consumer<DataAndSelectionManager>(
+                              builder: (context, submissionData, child) {
+                                return Expanded(
+                                  child: SizedBox(
+                                    width: MediaQuery.of(context).size.width /
+                                                MediaQuery.of(context)
+                                                    .size
+                                                    .height >
+                                            1
+                                        ? MediaQuery.of(context).size.width *
+                                            0.250
+                                        : double.infinity,
+                                    child: ListView.builder(
+                                      itemBuilder: (context, index) {
+                                        print(index);
+                                        if (index <
+                                            context
+                                                .read<DataAndSelectionManager>()
+                                                .submissions
+                                                .length) {
+                                          return SubmissionListElement(
+                                            index: index,
+                                          );
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ),
                                 );
-                              }
-                              return null;
-                            }),
-                          );}
-                        );
-                      }),
-                ],
-              )),
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                    Expanded(
+                        child: Card(
+                      child: Column(children: [
+                        Text("test"),//Todo make a display of selected submission
+                      ]),
+                    )),
+                  ],
+                ),
+              ),
             );
           }
         },

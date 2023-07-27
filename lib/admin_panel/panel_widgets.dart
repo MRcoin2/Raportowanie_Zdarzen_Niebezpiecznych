@@ -39,6 +39,9 @@ class _SubmissionListElementState extends State<SubmissionListElement> {
                   Text(
                     submission.eventData['category'],
                     style: Theme.of(context).textTheme.titleLarge,
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
                   ),
                   Text(
                     submission.eventData['date'].toString(),
@@ -174,6 +177,52 @@ class _TopMenuBarState extends State<TopMenuBar> {
               ),
             )
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class SideMenuBar extends StatelessWidget {
+  const SideMenuBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.25,
+      child: Card(
+        child: Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              ListTile(
+                leading: Icon(Icons.home_outlined),
+                title: Text("Strona główna"),
+                onTap: () {},
+              ),
+              ListTile(
+                leading: Icon(Icons.document_scanner_outlined),
+                title: Text("Generowanie raportu"),
+                onTap: () {},
+              ),Padding(padding: EdgeInsets.only(top: 8)),
+              ListTile(
+                leading: Icon(Icons.archive_outlined),
+                title: Text("Archiwum"),
+                onTap: () {},
+              ),
+              ListTile(
+                leading: Icon(Icons.delete_outline),
+                title: Text("Kosz"),
+                onTap: () {},
+              ),
+              ListTile(
+                leading: Icon(Icons.settings_outlined),
+                title: Text("Ustawienia"),
+                onTap: () {},
+              ),
+
+            ],
+          ),
         ),
       ),
     );
