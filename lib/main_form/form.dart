@@ -321,7 +321,6 @@ class _MainFormState extends State<MainForm> {
                         .then((file) {
                       if (file != null) {
                         setState(() {
-                          //check if the file is an image and if it is, add it to the list
                           _images.add(file);
                           _images.forEach((element) {
                             print(element.name);

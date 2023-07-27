@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-void submitForm(Map<String, dynamic> formData, List<XFile> images) {
+Future<void> submitForm(Map<String, dynamic> formData, List<XFile> images) async {
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  await _auth.signInAnonymously();
   FirebaseFirestore db = FirebaseFirestore.instance;
   final storageRef = FirebaseStorage.instance.ref();
   db.collection("submissions").add(formData).then((docReference) async {
@@ -43,6 +46,7 @@ class Submission {
       "event data": eventData,
     };
   }
+
 
 }
 
