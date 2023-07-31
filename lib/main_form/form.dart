@@ -357,9 +357,9 @@ class _MainFormState extends State<MainForm> {
                     const SnackBar(content: Text('Przetwarzanie danych...')),
                   );
                   submitForm(
-                      Submission(
+                      Report(
                           id: "",
-                          submissionTimestamp: DateTime.now(),
+                          reportTimestamp: DateTime.now(),
                           personalData: {
                             "name": _nameController.text,
                             "surname": _surnameController.text,
@@ -368,12 +368,12 @@ class _MainFormState extends State<MainForm> {
                             "affiliation": _affiliationController.text,
                             "status": _chosenStatus,
                           },
-                          eventData: {
-                            "event timestamp": DateFormat('dd.MM.yyyy hh:mm').parse(
+                          incidentData: {
+                            "incident timestamp": DateFormat('dd.MM.yyyy hh:mm').parse(
                                 "${_dateController.text} ${_timeController.text}"),
                             "date": _dateController.text,
                             "time": _timeController.text,
-                            "place": _placeController.text,
+                            "location": _placeController.text,
                             "category": _chosenCategory == "inne..."
                                 ? _otherCategoryController.text
                                 : _chosenCategory,

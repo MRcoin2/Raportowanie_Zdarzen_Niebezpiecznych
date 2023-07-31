@@ -4,16 +4,16 @@ import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/providers.dart'
 
 import '../main_form/database_communication.dart';
 
-class SubmissionListElement extends StatefulWidget {
-  late final Submission submission;
+class ReportListElement extends StatefulWidget {
+  late final Report report;
 
-  SubmissionListElement({super.key, required this.submission});
+  ReportListElement({super.key, required this.report});
 
   @override
-  State<SubmissionListElement> createState() => _SubmissionListElementState();
+  State<ReportListElement> createState() => _ReportListElementState();
 }
 
-class _SubmissionListElementState extends State<SubmissionListElement> {
+class _ReportListElementState extends State<ReportListElement> {
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -28,18 +28,18 @@ class _SubmissionListElementState extends State<SubmissionListElement> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    widget.submission.eventData['category'],
+                    widget.report.incidentData['category'],
                     style: Theme.of(context).textTheme.titleLarge,
                     softWrap: true,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
                   ),
                   Text(
-                    widget.submission.eventData['date'].toString(),
+                    widget.report.incidentData['date'].toString(),
                     style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                   Text(
-                    widget.submission.eventData['description'],
+                    widget.report.incidentData['description'],
                     style: TextStyle(fontSize: 12, color: Colors.grey),
                     softWrap: true,
                     overflow: TextOverflow.ellipsis,
@@ -67,18 +67,18 @@ class _SubmissionListElementState extends State<SubmissionListElement> {
                             //TODO add a confirmation dialog
                             context
                                 .read<DataAndSelectionManager>()
-                                .deleteSubmission(widget.submission);
+                                .deleteReport(widget.report);
                           },
                           icon: Icon(Icons.delete_outline)),
                       IconButton(
                           onPressed: () {
                             context
                                 .read<DataAndSelectionManager>()
-                                .toggleSelection(widget.submission);
+                                .toggleSelection(widget.report);
                           },
                           icon: context
                                   .watch<DataAndSelectionManager>()
-                                  .isSelected(widget.submission)
+                                  .isSelected(widget.report)
                               ? Icon(Icons.check_box_outlined)
                               : Icon(Icons.check_box_outline_blank)),
                     ],
@@ -144,7 +144,6 @@ class _TopMenuBarState extends State<TopMenuBar> {
                       ),
                       IconButton(
                         onPressed: () {
-                          // read data from SubmissionData and pass it to SelectionManager to select all
                           context
                               .read<DataAndSelectionManager>()
                               .toggleSelectAll();
@@ -214,10 +213,10 @@ class SideMenuBar extends StatelessWidget {
   }
 }
 
-class SubmissionDisplayCard extends StatelessWidget {
-  final Submission submission;
+class ReportDisplayCard extends StatelessWidget {
+  final Report report;
 
-  const SubmissionDisplayCard(this.submission, {super.key});
+  const ReportDisplayCard(this.report, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -228,31 +227,31 @@ class SubmissionDisplayCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              submission.eventData['category']??'',
+              report.incidentData['category']??'',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             Text(
-              submission.eventData['date']??'',
+              report.incidentData['date']??'',
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
             Text(
-              submission.eventData['description']??'',
+              report.incidentData['description']??'',
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
             Text(
-              submission.eventData['location']??'',
+              report.incidentData['location']??'',
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
             Text(
-              submission.personalData['name']??'',
+              report.personalData['name']??'',
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
             Text(
-              submission.personalData['email']??'',
+              report.personalData['email']??'',
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
             Text(
-              submission.personalData['phone']??'',
+              report.personalData['phone']??'',
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],

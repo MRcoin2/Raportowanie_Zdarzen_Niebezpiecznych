@@ -11,7 +11,7 @@ Future<void> submitForm(
   }
   FirebaseFirestore db = FirebaseFirestore.instance;
   final storageRef = FirebaseStorage.instance.ref();
-  db.collection("submissions").add(formData).then((docReference) async {
+  db.collection("reports").add(formData).then((docReference) async {
     print(docReference.id);
     for (var image in images) {
       storageRef
@@ -24,14 +24,14 @@ Future<void> submitForm(
   });
 }
 
-class Submission {
+class Report {
   final String id;
-  final DateTime submissionTimestamp;
+  final DateTime reportTimestamp;
   final Map<String, dynamic> personalData;
-  final Map<String, dynamic> eventData;
+  final Map<String, dynamic> incidentData;
 
   void deleteFromDatabase() {
-    FirebaseFirestore.instance.collection("submissions").doc(id).delete();
+    FirebaseFirestore.instance.collection("reports").doc(id).delete();
     FirebaseStorage.instance.ref().child("images/$id").listAll().then((value) {
       for (var item in value.items) {
         item.delete();
@@ -39,17 +39,17 @@ class Submission {
     });
   }
 
-  Submission(
+  Report(
       {required this.id,
-      required this.submissionTimestamp,
+      required this.reportTimestamp,
       required this.personalData,
-      required this.eventData});
+      required this.incidentData});
 
   Map<String, dynamic> toMap() {
     return {
-      "submission timestamp": submissionTimestamp,
+      "report timestamp": reportTimestamp,
       "personal data": personalData,
-      "event data": eventData,
+      "event data": incidentData,
     };
   }
 }
@@ -93,28 +93,28 @@ class PersonalData {
   }
 }
 
-class EventData {
-  final DateTime eventTimestamp;
+class IncidentData {
+  final DateTime incidentTimestamp;
   final String date;
   final String time;
-  final String place;
+  final String location;
   final String category;
   final String description;
 
-  EventData(
-      {required this.eventTimestamp,
+  IncidentData(
+      {required this.incidentTimestamp,
       required this.date,
       required this.time,
-      required this.place,
+      required this.location,
       required this.category,
       required this.description});
 
   Map<String, dynamic> fromMap(Map<String, dynamic> map) {
     return {
-      "event timestamp": map["event timestamp"],
+      "incident timestamp": map["incident timestamp"],
       "date": map["date"],
       "time": map["time"],
-      "place": map["place"],
+      "location": map["location"],
       "category": map["category"],
       "description": map["description"],
     };
@@ -122,10 +122,10 @@ class EventData {
 
   Map<String, dynamic> toMap() {
     return {
-      "event timestamp": eventTimestamp,
+      "incident timestamp": incidentTimestamp,
       "date": date,
       "time": time,
-      "place": place,
+      "location": location,
       "category": category,
       "description": description,
     };

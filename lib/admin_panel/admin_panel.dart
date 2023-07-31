@@ -50,7 +50,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                 child: FutureBuilder(
                   future: context
                       .read<DataAndSelectionManager>()
-                      .fetchSubmissions(),
+                      .fetchReports(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const CircularProgressIndicator();
@@ -72,7 +72,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                               child: TopMenuBar(),
                             ),
                             Consumer<DataAndSelectionManager>(
-                              builder: (context, submissionData, child) {
+                              builder: (context, reportData, child) {
                                 return Expanded(
                                   child: SizedBox(
                                     height: MediaQuery.of(context).size.height,
@@ -90,12 +90,12 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                                         if (index <
                                             context
                                                 .read<DataAndSelectionManager>()
-                                                .submissions
+                                                .reports
                                                 .length) {
-                                          return SubmissionListElement(
-                                            submission: context
+                                          return ReportListElement(
+                                            report: context
                                                 .read<DataAndSelectionManager>()
-                                                .submissions[index],
+                                                .reports[index],
                                           );
                                         }
                                         return null;
@@ -108,10 +108,10 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                           ],
                         ),
                         Expanded(child:
-                            Consumer(builder: (context, submissionData, _) {
-                          return SubmissionDisplayCard(context
+                            Consumer(builder: (context, reportData, _) {
+                          return ReportDisplayCard(context
                               .read<DataAndSelectionManager>()
-                              .submissions[0]);
+                              .reports[0]);
                         })),
                       ],
                     );
