@@ -3,9 +3,12 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-Future<void> submitForm(Map<String, dynamic> formData, List<XFile> images) async {
+Future<void> submitForm(
+    Map<String, dynamic> formData, List<XFile> images) async {
   FirebaseAuth _auth = FirebaseAuth.instance;
-  await _auth.signInAnonymously();
+  if (_auth.currentUser == null) {
+    await _auth.signInAnonymously();
+  }
   FirebaseFirestore db = FirebaseFirestore.instance;
   final storageRef = FirebaseStorage.instance.ref();
   db.collection("submissions").add(formData).then((docReference) async {
@@ -14,6 +17,9 @@ Future<void> submitForm(Map<String, dynamic> formData, List<XFile> images) async
       storageRef
           .child("images/${docReference.id}/${image.name}")
           .putData((await image.readAsBytes()));
+    }
+    if (_auth.currentUser?.isAnonymous ?? false) {
+      _auth.currentUser?.delete();
     }
   });
 }
@@ -35,7 +41,7 @@ class Submission {
 
   Submission(
       {required this.id,
-        required this.submissionTimestamp,
+      required this.submissionTimestamp,
       required this.personalData,
       required this.eventData});
 
@@ -46,8 +52,6 @@ class Submission {
       "event data": eventData,
     };
   }
-
-
 }
 
 class PersonalData {
@@ -87,7 +91,6 @@ class PersonalData {
       "status": status,
     };
   }
-
 }
 
 class EventData {

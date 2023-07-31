@@ -5,24 +5,15 @@ import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/providers.dart'
 import '../main_form/database_communication.dart';
 
 class SubmissionListElement extends StatefulWidget {
-  late final int index;
+  late final Submission submission;
 
-  SubmissionListElement({super.key, required this.index});
+  SubmissionListElement({super.key, required this.submission});
 
   @override
   State<SubmissionListElement> createState() => _SubmissionListElementState();
 }
 
 class _SubmissionListElementState extends State<SubmissionListElement> {
-  late Submission submission;
-
-  @override
-  void initState() {
-    super.initState();
-    submission =
-        context.read<DataAndSelectionManager>().submissions[widget.index];
-  }
-
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -37,18 +28,18 @@ class _SubmissionListElementState extends State<SubmissionListElement> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    submission.eventData['category'],
+                    widget.submission.eventData['category'],
                     style: Theme.of(context).textTheme.titleLarge,
                     softWrap: true,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
                   ),
                   Text(
-                    submission.eventData['date'].toString(),
+                    widget.submission.eventData['date'].toString(),
                     style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                   Text(
-                    submission.eventData['description'],
+                    widget.submission.eventData['description'],
                     style: TextStyle(fontSize: 12, color: Colors.grey),
                     softWrap: true,
                     overflow: TextOverflow.ellipsis,
@@ -74,18 +65,20 @@ class _SubmissionListElementState extends State<SubmissionListElement> {
                       IconButton(
                           onPressed: () {
                             //TODO add a confirmation dialog
-                            submission.deleteFromDatabase();
+                            context
+                                .read<DataAndSelectionManager>()
+                                .deleteSubmission(widget.submission);
                           },
                           icon: Icon(Icons.delete_outline)),
                       IconButton(
                           onPressed: () {
                             context
                                 .read<DataAndSelectionManager>()
-                                .toggleSelection(widget.index, submission);
+                                .toggleSelection(widget.submission);
                           },
                           icon: context
                                   .watch<DataAndSelectionManager>()
-                                  .isSelected(widget.index)
+                                  .isSelected(widget.submission)
                               ? Icon(Icons.check_box_outlined)
                               : Icon(Icons.check_box_outline_blank)),
                     ],
@@ -144,15 +137,7 @@ class _TopMenuBarState extends State<TopMenuBar> {
                         onPressed: () {
                           context
                               .read<DataAndSelectionManager>()
-                              .selected
-                              .values
-                              .toList()
-                              .forEach((submission) {
-                            submission.deleteFromDatabase();
-                          });
-                          context
-                              .read<DataAndSelectionManager>()
-                              .clearSelection();
+                              .deleteSelected();
                         },
                         icon: Icon(Icons.delete_sweep_outlined),
                         tooltip: "Usuń wszystkie zaznaczone",
@@ -204,7 +189,8 @@ class SideMenuBar extends StatelessWidget {
                 leading: Icon(Icons.document_scanner_outlined),
                 title: Text("Generowanie raportu"),
                 onTap: () {},
-              ),Padding(padding: EdgeInsets.only(top: 8)),
+              ),
+              Padding(padding: EdgeInsets.only(top: 8)),
               ListTile(
                 leading: Icon(Icons.archive_outlined),
                 title: Text("Archiwum"),
@@ -220,9 +206,56 @@ class SideMenuBar extends StatelessWidget {
                 title: Text("Ustawienia"),
                 onTap: () {},
               ),
-
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class SubmissionDisplayCard extends StatelessWidget {
+  final Submission submission;
+
+  const SubmissionDisplayCard(this.submission, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              submission.eventData['category']??'',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            Text(
+              submission.eventData['date']??'',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            Text(
+              submission.eventData['description']??'',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            Text(
+              submission.eventData['location']??'',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            Text(
+              submission.personalData['name']??'',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            Text(
+              submission.personalData['email']??'',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            Text(
+              submission.personalData['phone']??'',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+          ],
         ),
       ),
     );

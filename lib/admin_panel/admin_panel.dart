@@ -23,7 +23,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return CircularProgressIndicator();
-          } else if (snapshot.data == null) {
+          } else if (snapshot.data == null || snapshot.data!.isAnonymous) {
             // No user is signed in, redirect to login page
             WidgetsBinding.instance.addPostFrameCallback((_) {
               Navigator.of(context).pushReplacementNamed('/admin-login');
@@ -47,35 +47,35 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                 ],
               ),
               body: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const SideMenuBar(),
-                    Column(
+                child: FutureBuilder(
+                  future: context
+                      .read<DataAndSelectionManager>()
+                      .fetchSubmissions(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    }
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        //logout button
+                        const SideMenuBar(),
+                        Column(
+                          children: [
+                            //logout button
 
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width /
-                                      MediaQuery.of(context).size.height >
-                                  1
-                              ? MediaQuery.of(context).size.width * 0.250
-                              : double.infinity,
-                          child: TopMenuBar(),
-                        ),
-                        FutureBuilder(
-                          future: context
-                              .read<DataAndSelectionManager>()
-                              .fetchSubmissions(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const CircularProgressIndicator();
-                            }
-                            return Consumer<DataAndSelectionManager>(
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width /
+                                          MediaQuery.of(context).size.height >
+                                      1
+                                  ? MediaQuery.of(context).size.width * 0.250
+                                  : double.infinity,
+                              child: TopMenuBar(),
+                            ),
+                            Consumer<DataAndSelectionManager>(
                               builder: (context, submissionData, child) {
                                 return Expanded(
                                   child: SizedBox(
+                                    height: MediaQuery.of(context).size.height,
                                     width: MediaQuery.of(context).size.width /
                                                 MediaQuery.of(context)
                                                     .size
@@ -93,7 +93,9 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                                                 .submissions
                                                 .length) {
                                           return SubmissionListElement(
-                                            index: index,
+                                            submission: context
+                                                .read<DataAndSelectionManager>()
+                                                .submissions[index],
                                           );
                                         }
                                         return null;
@@ -102,18 +104,18 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                                   ),
                                 );
                               },
-                            );
-                          },
+                            ),
+                          ],
                         ),
+                        Expanded(child:
+                            Consumer(builder: (context, submissionData, _) {
+                          return SubmissionDisplayCard(context
+                              .read<DataAndSelectionManager>()
+                              .submissions[0]);
+                        })),
                       ],
-                    ),
-                    Expanded(
-                        child: Card(
-                      child: Column(children: [
-                        Text("test"),//Todo make a display of selected submission
-                      ]),
-                    )),
-                  ],
+                    );
+                  },
                 ),
               ),
             );
