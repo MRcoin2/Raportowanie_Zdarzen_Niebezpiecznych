@@ -1,5 +1,4 @@
 import 'dart:collection';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +9,7 @@ class DataAndSelectionManager extends ChangeNotifier {
   //Data
   List<Report> _reports = [];
 
-  UnmodifiableListView<Report> get reports =>
-      UnmodifiableListView(_reports);
+  UnmodifiableListView<Report> get reports => UnmodifiableListView(_reports);
 
   Future fetchReports({refresh = false}) async {
     //TODO handle limit and load more
@@ -30,7 +28,7 @@ class DataAndSelectionManager extends ChangeNotifier {
               reportTimestamp: DateTime.fromMillisecondsSinceEpoch(
                   data["report timestamp"].seconds * 1000),
               personalData: data["personal data"],
-              incidentData: data["event data"]));
+              incidentData: data["incident data"]));
         });
         notifyListeners();
         return true;
@@ -38,68 +36,87 @@ class DataAndSelectionManager extends ChangeNotifier {
     } else {
       notifyListeners();
       return false;
-    }}
-
-    // Selections
-    List< Report> _selected = [];
-
-    UnmodifiableListView<Report> get selected =>
-        UnmodifiableListView(_selected);
-
-    bool isEverythingSelected = false;
-
-    void _updateSelectionStatus() {
-      if (_selected.length == _reports.length) {
-        isEverythingSelected = true;
-      } else {
-        isEverythingSelected = false;
-      }
-    }
-
-    void toggleSelectAll() {
-      if (_selected.length == _reports.length) { //
-        _selected.clear();
-      } else {
-        _selected.clear();
-        for (int i = 0; i < _reports.length; i++) {
-          _selected[i] = _reports[i];
-        }
-      }
-      _updateSelectionStatus();
-      notifyListeners();
-    }
-
-    void toggleSelection(Report report) {
-      if (_selected.contains(report)) {
-        _selected.removeWhere((value) => value == report);
-      } else {
-        _selected.add(report);
-      }
-      _updateSelectionStatus();
-      notifyListeners();
-    }
-
-    bool isSelected(Report report) {
-      return _selected.contains(report);
-    }
-
-    void deleteReport(Report report){
-      report.deleteFromDatabase();
-      _reports.remove(report);
-      _updateSelectionStatus();
-      notifyListeners();
-    }
-    void deleteSelected() {
-      for (var report in _selected) {
-        deleteReport(report);
-      }
-      _selected.clear();
-      _updateSelectionStatus();
-      notifyListeners();
-    }
-    void clearSelections() {
-      _selected.clear();
-      _updateSelectionStatus();
-      notifyListeners();
     }
   }
+
+  // Selections
+  List<Report> _selected = [];
+
+  UnmodifiableListView<Report> get selected => UnmodifiableListView(_selected);
+
+  bool isEverythingSelected = false;
+
+  void _updateSelectionStatus() {
+    if (_selected.length == _reports.length) {
+      isEverythingSelected = true;
+    } else {
+      isEverythingSelected = false;
+    }
+  }
+
+  void toggleSelectAll() {
+    if (_selected.length == _reports.length) {
+      _selected.clear();
+    } else {
+      _selected.clear();
+      _selected.addAll(_reports);
+    }
+    _updateSelectionStatus();
+    notifyListeners();
+  }
+
+  void toggleSelection(Report report) {
+    if (_selected.contains(report)) {
+      _selected.removeWhere((value) => value == report);
+    } else {
+      _selected.add(report);
+    }
+    _updateSelectionStatus();
+    notifyListeners();
+  }
+
+  bool isSelected(Report report) {
+    return _selected.contains(report);
+  }
+
+  void deleteReport(Report report) {
+    report.deleteFromDatabase();
+    _reports.remove(report);
+    _updateSelectionStatus();
+    notifyListeners();
+  }
+
+  void deleteSelected() {
+    for (var report in _selected) {
+      deleteReport(report);
+    }
+    _selected.clear();
+    _updateSelectionStatus();
+    notifyListeners();
+  }
+
+  void clearSelections() {
+    _selected.clear();
+    _updateSelectionStatus();
+    notifyListeners();
+  }
+
+  //highlighted
+
+  Report? _highlighted;
+
+  Report? get highlighted => _highlighted;
+
+  void toggleHighlight(Report report) {
+    if (isHighlighted(report)) {
+      _highlighted = null;
+    } else {
+      _highlighted = report;
+    }
+    notifyListeners();
+  }
+
+  bool isHighlighted(Report report) {
+    return _highlighted == report;
+  }
+}

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pdf_generation.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/providers.dart';
 
 import '../main_form/database_communication.dart';
@@ -16,77 +17,83 @@ class ReportListElement extends StatefulWidget {
 class _ReportListElementState extends State<ReportListElement> {
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    widget.report.incidentData['category'],
-                    style: Theme.of(context).textTheme.titleLarge,
-                    softWrap: true,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
-                  ),
-                  Text(
-                    widget.report.incidentData['date'].toString(),
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                  Text(
-                    widget.report.incidentData['description'],
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
-                    softWrap: true,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
-                  )
-                ],
+    return GestureDetector(
+      onTap: () {
+        context.read<DataAndSelectionManager>().toggleHighlight(widget.report);
+      },
+      child: Card(
+        elevation:  context.read<DataAndSelectionManager>().isHighlighted(widget.report)? 5 : 2,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      widget.report.incidentData['category'],
+                      style: Theme.of(context).textTheme.titleLarge,
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ),
+                    Text(
+                      widget.report.incidentData['date'].toString(),
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                    Text(
+                      widget.report.incidentData['description'],
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    )
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      IconButton(
-                          onPressed: () {
-                            //TODO implement archiving
-                          },
-                          icon: Icon(Icons.archive_outlined)),
-                      IconButton(
-                          onPressed: () {
-                            //TODO add a confirmation dialog
-                            context
-                                .read<DataAndSelectionManager>()
-                                .deleteReport(widget.report);
-                          },
-                          icon: Icon(Icons.delete_outline)),
-                      IconButton(
-                          onPressed: () {
-                            context
-                                .read<DataAndSelectionManager>()
-                                .toggleSelection(widget.report);
-                          },
-                          icon: context
-                                  .watch<DataAndSelectionManager>()
-                                  .isSelected(widget.report)
-                              ? Icon(Icons.check_box_outlined)
-                              : Icon(Icons.check_box_outline_blank)),
-                    ],
-                  )
-                ],
-              ),
-            )
-          ],
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                            onPressed: () {
+                              //TODO implement archiving
+                            },
+                            icon: Icon(Icons.archive_outlined)),
+                        IconButton(
+                            onPressed: () {
+                              //TODO add a confirmation dialog
+                              context
+                                  .read<DataAndSelectionManager>()
+                                  .deleteReport(widget.report);
+                            },
+                            icon: Icon(Icons.delete_outline)),
+                        IconButton(
+                            onPressed: () {
+                              context
+                                  .read<DataAndSelectionManager>()
+                                  .toggleSelection(widget.report);
+                            },
+                            icon: context
+                                    .watch<DataAndSelectionManager>()
+                                    .isSelected(widget.report)
+                                ? Icon(Icons.check_box_outlined)
+                                : Icon(Icons.check_box_outline_blank)),
+                      ],
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -187,7 +194,9 @@ class SideMenuBar extends StatelessWidget {
               ListTile(
                 leading: Icon(Icons.document_scanner_outlined),
                 title: Text("Generowanie raportu"),
-                onTap: () {},
+                onTap: () {
+                  printReport(context.read<DataAndSelectionManager>().highlighted!);
+                },
               ),
               Padding(padding: EdgeInsets.only(top: 8)),
               ListTile(

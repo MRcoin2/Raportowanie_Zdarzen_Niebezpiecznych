@@ -52,6 +52,9 @@ dependencies:
   firebase_storage: ^11.2.4
   provider: ^6.0.5
   dyn_mouse_scroll: ^1.0.7
+  printing: ^5.11.0
+  htmltopdfwidgets: ^0.0.8+1
+  flutter_html_to_pdf: ^0.7.0
 
 dev_dependencies:
   flutter_test:

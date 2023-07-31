@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/panel_widgets.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/providers.dart';
 
+import '../main_form/database_communication.dart';
+
 class AdminPanelPage extends StatefulWidget {
   const AdminPanelPage({super.key});
 
@@ -48,9 +50,8 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
               ),
               body: Center(
                 child: FutureBuilder(
-                  future: context
-                      .read<DataAndSelectionManager>()
-                      .fetchReports(),
+                  future:
+                      context.read<DataAndSelectionManager>().fetchReports(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const CircularProgressIndicator();
@@ -107,12 +108,19 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                             ),
                           ],
                         ),
-                        Expanded(child:
-                            Consumer(builder: (context, reportData, _) {
-                          return ReportDisplayCard(context
-                              .read<DataAndSelectionManager>()
-                              .reports[0]);
-                        })),
+                        Expanded(
+                          child: Consumer(builder: (context, reportData, _) {
+                            Report? report = context
+                                .watch<DataAndSelectionManager>()
+                                .highlighted;
+                            if (report == null) {
+                              return SizedBox.shrink();
+                            } else {
+                              print(report);
+                              return ReportDisplayCard(report);
+                            }
+                          }),
+                        ),
                       ],
                     );
                   },
