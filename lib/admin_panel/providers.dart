@@ -8,29 +8,29 @@ import '../main_form/database_communication.dart';
 
 class DataAndSelectionManager extends ChangeNotifier {
   //Data
-  List<Submission> _submissions = [];
+  List<Report> _reports = [];
 
-  UnmodifiableListView<Submission> get submissions =>
-      UnmodifiableListView(_submissions);
+  UnmodifiableListView<Report> get reports =>
+      UnmodifiableListView(_reports);
 
-  Future fetchSubmissions({refresh = false}) async {
+  Future fetchReports({refresh = false}) async {
     //TODO handle limit and load more
-    if (refresh || _submissions.isEmpty) {
-      _submissions.clear();
+    if (refresh || _reports.isEmpty) {
+      _reports.clear();
       await FirebaseFirestore.instance
-          .collection("submissions")
-          .orderBy("submission timestamp", descending: true)
+          .collection("reports")
+          .orderBy("report timestamp", descending: true)
           .limit(100)
           .get()
           .then((QuerySnapshot querySnapshot) {
         querySnapshot.docs.forEach((doc) {
           Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-          _submissions.add(Submission(
+          _reports.add(Report(
               id: doc.id,
-              submissionTimestamp: DateTime.fromMillisecondsSinceEpoch(
-                  data["submission timestamp"].seconds * 1000),
+              reportTimestamp: DateTime.fromMillisecondsSinceEpoch(
+                  data["report timestamp"].seconds * 1000),
               personalData: data["personal data"],
-              eventData: data["event data"]));
+              incidentData: data["event data"]));
         });
         notifyListeners();
         return true;
@@ -41,15 +41,15 @@ class DataAndSelectionManager extends ChangeNotifier {
     }}
 
     // Selections
-    List< Submission> _selected = [];
+    List< Report> _selected = [];
 
-    UnmodifiableListView<Submission> get selected =>
+    UnmodifiableListView<Report> get selected =>
         UnmodifiableListView(_selected);
 
     bool isEverythingSelected = false;
 
     void _updateSelectionStatus() {
-      if (_selected.length == _submissions.length) {
+      if (_selected.length == _reports.length) {
         isEverythingSelected = true;
       } else {
         isEverythingSelected = false;
@@ -57,41 +57,41 @@ class DataAndSelectionManager extends ChangeNotifier {
     }
 
     void toggleSelectAll() {
-      if (_selected.length == _submissions.length) { //
+      if (_selected.length == _reports.length) { //
         _selected.clear();
       } else {
         _selected.clear();
-        for (int i = 0; i < _submissions.length; i++) {
-          _selected[i] = _submissions[i];
+        for (int i = 0; i < _reports.length; i++) {
+          _selected[i] = _reports[i];
         }
       }
       _updateSelectionStatus();
       notifyListeners();
     }
 
-    void toggleSelection(Submission submission) {
-      if (_selected.contains(submission)) {
-        _selected.removeWhere((value) => value == submission);
+    void toggleSelection(Report report) {
+      if (_selected.contains(report)) {
+        _selected.removeWhere((value) => value == report);
       } else {
-        _selected.add(submission);
+        _selected.add(report);
       }
       _updateSelectionStatus();
       notifyListeners();
     }
 
-    bool isSelected(Submission submission) {
-      return _selected.contains(submission);
+    bool isSelected(Report report) {
+      return _selected.contains(report);
     }
 
-    void deleteSubmission(Submission submission){
-      submission.deleteFromDatabase();
-      _submissions.remove(submission);
+    void deleteReport(Report report){
+      report.deleteFromDatabase();
+      _reports.remove(report);
       _updateSelectionStatus();
       notifyListeners();
     }
     void deleteSelected() {
-      for (var submission in _selected) {
-        deleteSubmission(submission);
+      for (var report in _selected) {
+        deleteReport(report);
       }
       _selected.clear();
       _updateSelectionStatus();
