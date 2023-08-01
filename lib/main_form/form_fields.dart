@@ -15,8 +15,8 @@ class MainFormField extends StatefulWidget {
         required this.validator,
         required this.controller,
         this.maxLines,
-        GlobalKey? this.formKey,
-        Icon? this.sufixIcon});
+        this.formKey,
+        this.sufixIcon});
 
   @override
   State<MainFormField> createState() => _MainFormFieldState();

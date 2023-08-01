@@ -37,7 +37,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                       padding: const EdgeInsets.all(8.0),
                       child: TextFormField(
                         controller: _emailController,
-                        decoration: InputDecoration(labelText: 'Email'),
+                        decoration: const InputDecoration(labelText: 'Email'),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Proszę wprowadzić email';
@@ -50,7 +50,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                       padding: const EdgeInsets.all(8.0),
                       child: TextFormField(
                         controller: _passwordController,
-                        decoration: InputDecoration(labelText: 'Hasło'),
+                        decoration: const InputDecoration(labelText: 'Hasło'),
                         obscureText: true,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -60,15 +60,15 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                         },
                       ),
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     if (_isLoading)
-                      CircularProgressIndicator()
+                      const CircularProgressIndicator()
                     else
                       Padding(
                         padding: const EdgeInsets.only(bottom: 8.0),
                         child: FilledButton(
                           onPressed: _signIn,
-                          child: Text('Zaloguj się'),
+                          child: const Text('Zaloguj się'),
                         ),
                       ),
                   ],

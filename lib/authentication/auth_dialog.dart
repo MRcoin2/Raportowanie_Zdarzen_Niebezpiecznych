@@ -13,7 +13,7 @@ enum codeInputStatus {
 Future<bool> verifyCode(String code, String email) async {
   //make a POST request to API_URL/verify-otp with the email and code in the data of the https request
   //if the response is 200, return true, else return false
-  var response = await http.post(Uri.parse('${API_URL}/verify-otp'),
+  var response = await http.post(Uri.parse('$API_URL/verify-otp'),
       body: json.encode({'api_key': API_KEY, 'email': email, 'otp': code}));
   if (response.statusCode == 200) {
     return true;
@@ -25,7 +25,7 @@ Future<bool> verifyCode(String code, String email) async {
 Future sendCode(String email) async {
   //make a POST request to API_URL/send-otp with the email in the data of the https request
   //if the response is 200, return true, else return false
-  var response = await http.post(Uri.parse('${API_URL}/send-otp'),
+  var response = await http.post(Uri.parse('$API_URL/send-otp'),
       body: json.encode({"email": email, "api_key": API_KEY, "otp_length": 4}));
   if (response.statusCode == 200) {
     return true;
@@ -37,7 +37,7 @@ Future sendCode(String email) async {
 class AuthDialog extends StatefulWidget {
   final String email;
 
-  AuthDialog({super.key, required this.email});
+  const AuthDialog({super.key, required this.email});
 
   @override
   State<AuthDialog> createState() => _AuthDialogState();
@@ -47,7 +47,7 @@ class _AuthDialogState extends State<AuthDialog> {
   String _code = "";
   bool _verified = false;
   codeInputStatus _status = codeInputStatus.inputting;
-  TextEditingController _codeController = TextEditingController();
+  final TextEditingController _codeController = TextEditingController();
 
   @override
   void initState() {

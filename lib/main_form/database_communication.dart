@@ -5,21 +5,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 Future<void> submitForm(
     Map<String, dynamic> formData, List<XFile> images) async {
-  FirebaseAuth _auth = FirebaseAuth.instance;
-  if (_auth.currentUser == null) {
-    await _auth.signInAnonymously();
+  FirebaseAuth auth = FirebaseAuth.instance;
+  if (auth.currentUser == null) {
+    await auth.signInAnonymously();
   }
   FirebaseFirestore db = FirebaseFirestore.instance;
   final storageRef = FirebaseStorage.instance.ref();
   db.collection("reports").add(formData).then((docReference) async {
-    print(docReference.id);
     for (var image in images) {
       storageRef
           .child("images/${docReference.id}/${image.name}")
           .putData((await image.readAsBytes()));
     }
-    if (_auth.currentUser?.isAnonymous ?? false) {
-      _auth.currentUser?.delete();
+    if (auth.currentUser?.isAnonymous ?? false) {
+      auth.currentUser?.delete();
     }
   });
 }

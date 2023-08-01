@@ -7,7 +7,7 @@ import '../main_form/database_communication.dart';
 
 class DataAndSelectionManager extends ChangeNotifier {
   //Data
-  List<Report> _reports = [];
+  final List<Report> _reports = [];
 
   UnmodifiableListView<Report> get reports => UnmodifiableListView(_reports);
 
@@ -21,7 +21,7 @@ class DataAndSelectionManager extends ChangeNotifier {
           .limit(100)
           .get()
           .then((QuerySnapshot querySnapshot) {
-        querySnapshot.docs.forEach((doc) {
+        for (var doc in querySnapshot.docs) {
           Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
           _reports.add(Report(
               id: doc.id,
@@ -29,7 +29,7 @@ class DataAndSelectionManager extends ChangeNotifier {
                   data["report timestamp"].seconds * 1000),
               personalData: data["personal data"],
               incidentData: data["incident data"]));
-        });
+        }
         notifyListeners();
         return true;
       });
@@ -40,7 +40,7 @@ class DataAndSelectionManager extends ChangeNotifier {
   }
 
   // Selections
-  List<Report> _selected = [];
+  final List<Report> _selected = [];
 
   UnmodifiableListView<Report> get selected => UnmodifiableListView(_selected);
 

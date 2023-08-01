@@ -129,8 +129,8 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate
       ],
-      supportedLocales: [
-        const Locale('pl')
+      supportedLocales: const [
+        Locale('pl')
       ],
     );
   }

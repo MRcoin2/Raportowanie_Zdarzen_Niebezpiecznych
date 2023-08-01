@@ -24,19 +24,19 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
         future: FirebaseAuth.instance.authStateChanges().first,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+            return const CircularProgressIndicator();
           } else if (snapshot.data == null || snapshot.data!.isAnonymous) {
             // No user is signed in, redirect to login page
             WidgetsBinding.instance.addPostFrameCallback((_) {
               Navigator.of(context).pushReplacementNamed('/admin-login');
             });
-            return SizedBox.shrink();
+            return const SizedBox.shrink();
           } else {
             // User is signed in, show admin panel
             return Scaffold(
               appBar: AppBar(
                 forceMaterialTransparency: true,
-                title: Text('Admin Panel'),
+                title: const Text('Admin Panel'),
                 actions: [
                   ElevatedButton(
                     onPressed: () async {
@@ -44,7 +44,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                       Navigator.of(context)
                           .pushReplacementNamed('/admin-login');
                     },
-                    child: Text('Logout'),
+                    child: const Text('Logout'),
                   ),
                 ],
               ),
@@ -70,7 +70,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                                       1
                                   ? MediaQuery.of(context).size.width * 0.250
                                   : double.infinity,
-                              child: TopMenuBar(),
+                              child: const TopMenuBar(),
                             ),
                             Consumer<DataAndSelectionManager>(
                               builder: (context, reportData, child) {
@@ -87,7 +87,6 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                                         : double.infinity,
                                     child: ListView.builder(
                                       itemBuilder: (context, index) {
-                                        print(index);
                                         if (index <
                                             context
                                                 .read<DataAndSelectionManager>()
@@ -114,9 +113,8 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                                 .watch<DataAndSelectionManager>()
                                 .highlighted;
                             if (report == null) {
-                              return SizedBox.shrink();
+                              return const SizedBox.shrink();
                             } else {
-                              print(report);
                               return ReportDisplayCard(report);
                             }
                           }),

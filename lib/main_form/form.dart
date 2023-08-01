@@ -29,9 +29,9 @@ class _MainFormState extends State<MainForm> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _otherCategoryController =
       TextEditingController();
-  List<XFile> _images = [];
+  final List<XFile> _images = [];
   final ImagePicker _picker = ImagePicker();
-  List<String> _categories = [
+  final List<String> _categories = [
     "napaść na kuratora (słowna)",
     "napaść na kuratora (fizyczna)",
     "pogryzienie przez zwierzę",
@@ -111,8 +111,8 @@ class _MainFormState extends State<MainForm> {
                     child: MainFormField(
                       formKey: _emailKey,
                       sufixIcon: _verificationStatus
-                          ? Icon(Icons.how_to_reg)
-                          : Icon(Icons.person_off),
+                          ? const Icon(Icons.how_to_reg)
+                          : const Icon(Icons.person_off),
                       controller: _emailController,
                       labelText: "E-mail służbowy",
                       validator: (value) {
@@ -153,7 +153,7 @@ class _MainFormState extends State<MainForm> {
                               );
                             }
                           },
-                          child: Text("zwerfikuj"))
+                          child: const Text("zwerfikuj"))
                       : Container(),
                 ],
               ),
@@ -161,7 +161,7 @@ class _MainFormState extends State<MainForm> {
                 controller: _phoneController,
                 labelText: "Numer Telefonu (opcjonalnie)",
                 validator: (value) {
-                  if (!value!.isEmpty && !RegExp(r'^\d{9}$').hasMatch(value)) {
+                  if (value!.isNotEmpty && !RegExp(r'^\d{9}$').hasMatch(value)) {
                     return 'Proszę wprowadzić poprawny numer telefonu lub nie wprowadzać nic';
                   }
                   return null;
@@ -322,9 +322,9 @@ class _MainFormState extends State<MainForm> {
                       if (file != null) {
                         setState(() {
                           _images.add(file);
-                          _images.forEach((element) {
+                          for (var element in _images) {
                             print(element.name);
-                          });
+                          }
                         });
                       }
                     });

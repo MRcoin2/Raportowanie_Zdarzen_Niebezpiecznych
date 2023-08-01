@@ -6,9 +6,9 @@ import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/providers.dart'
 import '../main_form/database_communication.dart';
 
 class ReportListElement extends StatefulWidget {
-  late final Report report;
+  final Report report;
 
-  ReportListElement({super.key, required this.report});
+  const ReportListElement({super.key, required this.report});
 
   @override
   State<ReportListElement> createState() => _ReportListElementState();
@@ -42,11 +42,11 @@ class _ReportListElementState extends State<ReportListElement> {
                     ),
                     Text(
                       widget.report.incidentData['date'].toString(),
-                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
                     ),
                     Text(
                       widget.report.incidentData['description'],
-                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
                       softWrap: true,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
@@ -67,19 +67,19 @@ class _ReportListElementState extends State<ReportListElement> {
                             onPressed: () {
                               //TODO implement archiving
                             },
-                            icon: Icon(Icons.archive_outlined)),
+                            icon: const Icon(Icons.archive_outlined)),
                         IconButton(
                             onPressed: () {
                               showDialog(context: context, builder: (context){
                                 return AlertDialog(
-                                  title: Text('Czy na pewno chcesz usunąć to zgłoszenie?'),
+                                  title: const Text('Czy na pewno chcesz usunąć to zgłoszenie?'),
                                   actions: [
                                     TextButton(onPressed: (){
                                       Navigator.of(context).pop(false);
-                                    }, child: Text('Nie')),
+                                    }, child: const Text('Nie')),
                                     TextButton(onPressed: (){
                                       Navigator.of(context).pop(true);
-                                    }, child: Text('Tak')),
+                                    }, child: const Text('Tak')),
                                   ],
                                 );
                               }).then((value) {
@@ -90,7 +90,7 @@ class _ReportListElementState extends State<ReportListElement> {
                                 }
                               });
                             },
-                            icon: Icon(Icons.delete_outline)),
+                            icon: const Icon(Icons.delete_outline)),
                         IconButton(
                             onPressed: () {
                               context
@@ -100,8 +100,8 @@ class _ReportListElementState extends State<ReportListElement> {
                             icon: context
                                     .watch<DataAndSelectionManager>()
                                     .isSelected(widget.report)
-                                ? Icon(Icons.check_box_outlined)
-                                : Icon(Icons.check_box_outline_blank)),
+                                ? const Icon(Icons.check_box_outlined)
+                                : const Icon(Icons.check_box_outline_blank)),
                       ],
                     )
                   ],
@@ -135,9 +135,9 @@ class _TopMenuBarState extends State<TopMenuBar> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  IconButton(onPressed: () {}, icon: Icon(Icons.sort)),
+                  IconButton(onPressed: () {}, icon: const Icon(Icons.sort)),
                   IconButton(
-                      onPressed: () {}, icon: Icon(Icons.filter_alt_outlined))
+                      onPressed: () {}, icon: const Icon(Icons.filter_alt_outlined))
                 ],
               ),
             ),
@@ -152,21 +152,21 @@ class _TopMenuBarState extends State<TopMenuBar> {
                     children: [
                       IconButton(
                         onPressed: () {},
-                        icon: Icon(Icons.archive_outlined),
+                        icon: const Icon(Icons.archive_outlined),
                         tooltip: "Archiwizuj wszystkie zaznaczone",
                       ),
                       IconButton(
                         onPressed: () {
                           showDialog(context: context, builder: (context){
                             return AlertDialog(
-                              title: Text('Czy na pewno chcesz usunąć wszystkie zaznaczone zgłoszenia?'),
+                              title: const Text('Czy na pewno chcesz usunąć wszystkie zaznaczone zgłoszenia?'),
                               actions: [
                                 TextButton(onPressed: (){
                                   Navigator.of(context).pop(false);
-                                }, child: Text('Nie')),
+                                }, child: const Text('Nie')),
                                 TextButton(onPressed: (){
                                   Navigator.of(context).pop(true);
-                                }, child: Text('Tak')),
+                                }, child: const Text('Tak')),
                               ],
                             );
                           }).then((value) {
@@ -177,7 +177,7 @@ class _TopMenuBarState extends State<TopMenuBar> {
                             }
                           });
                         },
-                        icon: Icon(Icons.delete_sweep_outlined),
+                        icon: const Icon(Icons.delete_sweep_outlined),
                         tooltip: "Usuń wszystkie zaznaczone",
                       ),
                       IconButton(
@@ -189,8 +189,8 @@ class _TopMenuBarState extends State<TopMenuBar> {
                         icon: context
                                 .watch<DataAndSelectionManager>()
                                 .isEverythingSelected
-                            ? Icon(Icons.check_box_outlined)
-                            : Icon(Icons.check_box_outline_blank),
+                            ? const Icon(Icons.check_box_outlined)
+                            : const Icon(Icons.check_box_outline_blank),
                         tooltip: "Zaznacz wszystkie",
                       ),
                     ],
@@ -214,35 +214,35 @@ class SideMenuBar extends StatelessWidget {
       width: MediaQuery.of(context).size.width * 0.25,
       child: Card(
         child: Padding(
-          padding: EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
               ListTile(
-                leading: Icon(Icons.home_outlined),
-                title: Text("Strona główna"),
+                leading: const Icon(Icons.home_outlined),
+                title: const Text("Strona główna"),
                 onTap: () {},
               ),
               ListTile(
-                leading: Icon(Icons.document_scanner_outlined),
-                title: Text("Generowanie raportu"),
+                leading: const Icon(Icons.document_scanner_outlined),
+                title: const Text("Generowanie raportu"),
                 onTap: () {
                   printReport(context.read<DataAndSelectionManager>().highlighted!);
                 },
               ),
-              Padding(padding: EdgeInsets.only(top: 8)),
+              const Padding(padding: EdgeInsets.only(top: 8)),
               ListTile(
-                leading: Icon(Icons.archive_outlined),
-                title: Text("Archiwum"),
+                leading: const Icon(Icons.archive_outlined),
+                title: const Text("Archiwum"),
                 onTap: () {},
               ),
               ListTile(
-                leading: Icon(Icons.delete_outline),
-                title: Text("Kosz"),
+                leading: const Icon(Icons.delete_outline),
+                title: const Text("Kosz"),
                 onTap: () {},
               ),
               ListTile(
-                leading: Icon(Icons.settings_outlined),
-                title: Text("Ustawienia"),
+                leading: const Icon(Icons.settings_outlined),
+                title: const Text("Ustawienia"),
                 onTap: () {},
               ),
             ],
@@ -262,7 +262,7 @@ class ReportDisplayCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -272,27 +272,27 @@ class ReportDisplayCard extends StatelessWidget {
             ),
             Text(
               report.incidentData['date']??'',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
             Text(
               report.incidentData['description']??'',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
             Text(
               report.incidentData['location']??'',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
             Text(
               report.personalData['name']??'',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
             Text(
               report.personalData['email']??'',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
             Text(
               report.personalData['phone']??'',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
         ),
