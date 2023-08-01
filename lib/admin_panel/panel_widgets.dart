@@ -70,10 +70,25 @@ class _ReportListElementState extends State<ReportListElement> {
                             icon: Icon(Icons.archive_outlined)),
                         IconButton(
                             onPressed: () {
-                              //TODO add a confirmation dialog
-                              context
-                                  .read<DataAndSelectionManager>()
-                                  .deleteReport(widget.report);
+                              showDialog(context: context, builder: (context){
+                                return AlertDialog(
+                                  title: Text('Czy na pewno chcesz usunąć to zgłoszenie?'),
+                                  actions: [
+                                    TextButton(onPressed: (){
+                                      Navigator.of(context).pop(false);
+                                    }, child: Text('Nie')),
+                                    TextButton(onPressed: (){
+                                      Navigator.of(context).pop(true);
+                                    }, child: Text('Tak')),
+                                  ],
+                                );
+                              }).then((value) {
+                                if(value){
+                                  context
+                                      .read<DataAndSelectionManager>()
+                                      .deleteReport(widget.report);
+                                }
+                              });
                             },
                             icon: Icon(Icons.delete_outline)),
                         IconButton(
@@ -142,9 +157,25 @@ class _TopMenuBarState extends State<TopMenuBar> {
                       ),
                       IconButton(
                         onPressed: () {
-                          context
-                              .read<DataAndSelectionManager>()
-                              .deleteSelected();
+                          showDialog(context: context, builder: (context){
+                            return AlertDialog(
+                              title: Text('Czy na pewno chcesz usunąć wszystkie zaznaczone zgłoszenia?'),
+                              actions: [
+                                TextButton(onPressed: (){
+                                  Navigator.of(context).pop(false);
+                                }, child: Text('Nie')),
+                                TextButton(onPressed: (){
+                                  Navigator.of(context).pop(true);
+                                }, child: Text('Tak')),
+                              ],
+                            );
+                          }).then((value) {
+                            if(value){
+                              context
+                                  .read<DataAndSelectionManager>()
+                                  .deleteSelected();
+                            }
+                          });
                         },
                         icon: Icon(Icons.delete_sweep_outlined),
                         tooltip: "Usuń wszystkie zaznaczone",
