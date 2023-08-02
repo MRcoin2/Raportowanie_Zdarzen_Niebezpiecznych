@@ -5,11 +5,82 @@ import 'package:flutter/material.dart';
 
 import '../main_form/database_communication.dart';
 
+class Filters {
+  bool useIncidentTimestamp = false;
+  DateTime? from;
+  DateTime? to;
+  List<String>? categories;
+
+  Filters(
+      {this.from, this.to, this.categories, this.useIncidentTimestamp = false});
+}
+
 class DataAndSelectionManager extends ChangeNotifier {
   //Data
   final List<Report> _reports = [];
+  Filters _filters = Filters();
 
-  UnmodifiableListView<Report> get reports => UnmodifiableListView(_reports);
+  UnmodifiableListView<Report> get reports => UnmodifiableListView(
+        _reports.where(
+          (report) {
+            if (_filters.useIncidentTimestamp) {
+              if (_filters.from != null && _filters.to != null) {
+                if (report.incidentData["incident timestamp"]
+                        .compareTo(_filters.from!) <
+                    0) {
+                  return false;
+                }
+                if (report.incidentData["incident timestamp"]
+                        .compareTo(_filters.to!) >
+                    0) {
+                  return false;
+                }
+              } else if (_filters.from != null) {
+                if (report.incidentData["incident timestamp"]
+                        .compareTo(_filters.from!) <
+                    0) {
+                  return false;
+                }
+              } else if (_filters.to != null) {
+                if (report.incidentData["incident timestamp"]
+                        .compareTo(_filters.to!) >
+                    0) {
+                  return false;
+                }
+              }
+            } else {
+              if (_filters.from != null && _filters.to != null) {
+                if (report.reportTimestamp.compareTo(_filters.from!) < 0) {
+                  return false;
+                }
+                if (report.reportTimestamp.compareTo(_filters.to!) > 0) {
+                  return false;
+                }
+              } else if (_filters.from != null) {
+                if (report.reportTimestamp.compareTo(_filters.from!) < 0) {
+                  return false;
+                }
+              } else if (_filters.to != null) {
+                if (report.reportTimestamp.compareTo(_filters.to!) > 0) {
+                  return false;
+                }
+              }
+            }
+            if (_filters.categories != null) {
+              if (!_filters.categories!.contains(
+                  report.incidentData["category"])) {
+                return false;
+              }
+            }
+            return true;
+          },
+        ),
+      );
+
+  void setFilters(Filters filters) {
+    _filters = filters;
+    notifyListeners();
+  }
 
   Future fetchReports({refresh = false}) async {
     //TODO handle limit and load more

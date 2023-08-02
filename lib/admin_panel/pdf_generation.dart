@@ -37,7 +37,7 @@ Future<Uint8List> generatePdf(Report report) async {
     return response.bodyBytes;
   }
   else {
-    return Uint8List(0);
+    throw Exception('Failed to generate PDF');
   }
 }
 

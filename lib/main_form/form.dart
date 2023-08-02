@@ -5,6 +5,18 @@ import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/database_communic
 import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form_fields.dart';
 import 'package:image_picker/image_picker.dart';
 
+final List<String> categories = [
+  "napaść na kuratora (słowna)",
+  "napaść na kuratora (fizyczna)",
+  "pogryzienie przez zwierzę",
+  "zniszczenie ubrania",
+  "zniszczenie mienia (np uszkodzenie samochodu)",
+  "wypadek podczas wykonywania czynności służbowych (np złamanie, zasłabnięcie)",
+  "zarażenie się chorobą",
+  "groźby pod adresem kuratora",
+  "inne...",
+];
+
 class MainForm extends StatefulWidget {
   const MainForm({super.key});
 
@@ -31,17 +43,7 @@ class _MainFormState extends State<MainForm> {
       TextEditingController();
   final List<XFile> _images = [];
   final ImagePicker _picker = ImagePicker();
-  final List<String> _categories = [
-    "napaść na kuratora (słowna)",
-    "napaść na kuratora (fizyczna)",
-    "pogryzienie przez zwierzę",
-    "zniszczenie ubrania",
-    "zniszczenie mienia (np uszkodzenie samochodu)",
-    "wypadek podczas wykonywania czynności służbowych (np złamanie, zasłabnięcie)",
-    "zarażenie się chorobą",
-    "groźby pod adresem kuratora",
-    "inne...",
-  ];
+
   late String _chosenCategory;
   bool _isCategoryOther = false;
 
@@ -219,6 +221,7 @@ class _MainFormState extends State<MainForm> {
                   Expanded(
                       child: DatePickerFormField(
                     dateController: _dateController,
+                        labelText: "Data zdarzenia",
                   )),
                   Expanded(
                       child: TimePickerFormField(
@@ -243,7 +246,7 @@ class _MainFormState extends State<MainForm> {
                       padding: const EdgeInsets.all(8.0),
                       child: DropdownButtonFormField(
                         items: [
-                          ..._categories.map((category) => DropdownMenuItem(
+                          ...categories.map((category) => DropdownMenuItem(
                               value: category,
                               child: Text(
                                 category,

@@ -46,8 +46,9 @@ class _MainFormFieldState extends State<MainFormField> {
 // form field that on click displays a date picker dialog and fills itself with the selected date
 class DatePickerFormField extends StatefulWidget {
   final TextEditingController dateController;
+  final String labelText;
 
-  const DatePickerFormField({super.key, required this.dateController});
+  const DatePickerFormField({super.key, required this.dateController, required this.labelText});
 
   @override
   State<DatePickerFormField> createState() => _DatePickerFormFieldState();
@@ -82,9 +83,9 @@ class _DatePickerFormFieldState extends State<DatePickerFormField> {
           Expanded(
             child: TextFormField(
               controller: widget.dateController,
-              decoration: const InputDecoration(
-                labelText: "Data zdarzenia",
-                hintStyle: TextStyle(overflow: TextOverflow.ellipsis),
+              decoration: InputDecoration(
+                labelText: widget.labelText,
+                hintStyle: const TextStyle(overflow: TextOverflow.ellipsis),
                 hintText: "DD.MM.RRRR",
               ),
               validator: (value) {

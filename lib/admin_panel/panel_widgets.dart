@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_portal/flutter_portal.dart';
 import 'package:provider/provider.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pdf_generation.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/providers.dart';
 
 import '../main_form/database_communication.dart';
+import '../main_form/form.dart';
+import '../main_form/form_fields.dart';
 
 class ReportListElement extends StatefulWidget {
   final Report report;
@@ -22,7 +25,14 @@ class _ReportListElementState extends State<ReportListElement> {
         context.read<DataAndSelectionManager>().toggleHighlight(widget.report);
       },
       child: Card(
-        elevation:  context.read<DataAndSelectionManager>().isHighlighted(widget.report)? 5 : 2,
+        surfaceTintColor:
+            context.read<DataAndSelectionManager>().isHighlighted(widget.report)
+                ? Colors.blue
+                : Theme.of(context).cardTheme.color,
+        elevation:
+            context.read<DataAndSelectionManager>().isHighlighted(widget.report)
+                ? 5
+                : 2,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Row(
@@ -70,20 +80,27 @@ class _ReportListElementState extends State<ReportListElement> {
                             icon: const Icon(Icons.archive_outlined)),
                         IconButton(
                             onPressed: () {
-                              showDialog(context: context, builder: (context){
-                                return AlertDialog(
-                                  title: const Text('Czy na pewno chcesz usunąć to zgłoszenie?'),
-                                  actions: [
-                                    TextButton(onPressed: (){
-                                      Navigator.of(context).pop(false);
-                                    }, child: const Text('Nie')),
-                                    TextButton(onPressed: (){
-                                      Navigator.of(context).pop(true);
-                                    }, child: const Text('Tak')),
-                                  ],
-                                );
-                              }).then((value) {
-                                if(value){
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: const Text(
+                                          'Czy na pewno chcesz usunąć to zgłoszenie?'),
+                                      actions: [
+                                        TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop(false);
+                                            },
+                                            child: const Text('Nie')),
+                                        TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop(true);
+                                            },
+                                            child: const Text('Tak')),
+                                      ],
+                                    );
+                                  }).then((value) {
+                                if (value) {
                                   context
                                       .read<DataAndSelectionManager>()
                                       .deleteReport(widget.report);
@@ -123,6 +140,15 @@ class TopMenuBar extends StatefulWidget {
 }
 
 class _TopMenuBarState extends State<TopMenuBar> {
+  bool showMenu = false;
+
+  toggleMenu() {
+    setState(() {
+      showMenu = !showMenu;
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -136,8 +162,19 @@ class _TopMenuBarState extends State<TopMenuBar> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(onPressed: () {}, icon: const Icon(Icons.sort)),
-                  IconButton(
-                      onPressed: () {}, icon: const Icon(Icons.filter_alt_outlined))
+                  PortalTarget(
+                    visible: showMenu,
+                    anchor: const Aligned(
+                      follower: Alignment.topLeft,
+                      target: Alignment.topRight,
+                    ),
+                    portalFollower: FilterPanel(),//TODO implement closing on click outside
+                    child: IconButton(
+                        onPressed: () {
+                          toggleMenu();
+                        },
+                        icon: Icon(Icons.filter_alt_outlined)),
+                  ),
                 ],
               ),
             ),
@@ -157,20 +194,27 @@ class _TopMenuBarState extends State<TopMenuBar> {
                       ),
                       IconButton(
                         onPressed: () {
-                          showDialog(context: context, builder: (context){
-                            return AlertDialog(
-                              title: const Text('Czy na pewno chcesz usunąć wszystkie zaznaczone zgłoszenia?'),
-                              actions: [
-                                TextButton(onPressed: (){
-                                  Navigator.of(context).pop(false);
-                                }, child: const Text('Nie')),
-                                TextButton(onPressed: (){
-                                  Navigator.of(context).pop(true);
-                                }, child: const Text('Tak')),
-                              ],
-                            );
-                          }).then((value) {
-                            if(value){
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: const Text(
+                                      'Czy na pewno chcesz usunąć wszystkie zaznaczone zgłoszenia?'),
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(false);
+                                        },
+                                        child: const Text('Nie')),
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(true);
+                                        },
+                                        child: const Text('Tak')),
+                                  ],
+                                );
+                              }).then((value) {
+                            if (value) {
                               context
                                   .read<DataAndSelectionManager>()
                                   .deleteSelected();
@@ -205,6 +249,71 @@ class _TopMenuBarState extends State<TopMenuBar> {
   }
 }
 
+class FilterPanel extends StatefulWidget {
+  FilterPanel({
+    super.key,
+  });
+
+  final TextEditingController fromDateController = TextEditingController();
+  final TextEditingController toDateController = TextEditingController();
+
+  @override
+  State<FilterPanel> createState() => _FilterPanelState();
+}
+
+class _FilterPanelState extends State<FilterPanel> {
+  @override
+  Widget build(BuildContext context) {
+    //menu for managing the filters
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.3,
+      height: MediaQuery.of(context).size.height * 0.3,
+      child: Card(
+        elevation: 4,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Form(
+            child: Column(
+              children: [
+                Text("Ustawienia filtrów:"),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DatePickerFormField(
+                          labelText: "Od",
+                          dateController: widget.fromDateController),
+                    ),
+                    Expanded(
+                      child: DatePickerFormField(
+                        labelText: "Do",
+                        dateController: widget.toDateController,
+                      ),
+                    )
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: DropdownButtonFormField(items: [ //TODO make each element be selectable for multiple categories to be selected at once
+                    ...categories.map(
+                      (category) => DropdownMenuItem(
+                        value: category,
+                        child: Text(
+                          category,
+                          style: const TextStyle(overflow: TextOverflow.ellipsis),
+                        ),
+                      ),
+                    ),
+                  ], onChanged: (value) {}),
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class SideMenuBar extends StatelessWidget {
   const SideMenuBar({super.key});
 
@@ -226,7 +335,8 @@ class SideMenuBar extends StatelessWidget {
                 leading: const Icon(Icons.document_scanner_outlined),
                 title: const Text("Generowanie raportu"),
                 onTap: () {
-                  printReport(context.read<DataAndSelectionManager>().highlighted!);
+                  printReport(
+                      context.read<DataAndSelectionManager>().highlighted!);
                 },
               ),
               const Padding(padding: EdgeInsets.only(top: 8)),
@@ -267,31 +377,31 @@ class ReportDisplayCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              report.incidentData['category']??'',
+              report.incidentData['category'] ?? '',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             Text(
-              report.incidentData['date']??'',
+              report.incidentData['date'] ?? '',
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
             Text(
-              report.incidentData['description']??'',
+              report.incidentData['description'] ?? '',
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
             Text(
-              report.incidentData['location']??'',
+              report.incidentData['location'] ?? '',
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
             Text(
-              report.personalData['name']??'',
+              report.personalData['name'] ?? '',
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
             Text(
-              report.personalData['email']??'',
+              report.personalData['email'] ?? '',
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
             Text(
-              report.personalData['phone']??'',
+              report.personalData['phone'] ?? '',
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
@@ -299,4 +409,38 @@ class ReportDisplayCard extends StatelessWidget {
       ),
     );
   }
+}
+
+//show a widget on top of the currently displayed page in the location of the widget that called this function
+void showOverlayMenu(BuildContext context,
+    {required Widget child, offsetX = 0.0, offsetY = 0.0}) {
+  final RenderBox button = context.findRenderObject() as RenderBox;
+  final RenderBox overlay =
+      Overlay.of(context).context.findRenderObject() as RenderBox;
+  final position =
+      button.localToGlobal(Offset(offsetX, offsetY), ancestor: overlay);
+
+  late OverlayEntry overlayEntry;
+  overlayEntry = OverlayEntry(
+    builder: (context) => Stack(
+      children: [
+        GestureDetector(
+          onTap: () {
+            overlayEntry.remove();
+          },
+          child: Container(
+            color: Colors.transparent,
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+          ),
+        ),
+        Positioned(
+          top: position.dy,
+          left: position.dx,
+          child: child,
+        )
+      ],
+    ),
+  );
+  Overlay.of(context).insert(overlayEntry);
 }
