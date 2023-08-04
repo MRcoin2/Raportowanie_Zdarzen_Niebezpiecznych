@@ -6,7 +6,6 @@ import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pdf_generation.
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/providers.dart';
 
 import '../../main_form/database_communication.dart';
-
 class ReportListElement extends StatefulWidget {
   final Report report;
 

@@ -15,7 +15,6 @@ class Filters {
       {this.dateRange,
       required this.categories,
       this.useIncidentTimestamp = false});
-
 }
 
 class DataAndSelectionManager extends ChangeNotifier {
@@ -25,53 +24,36 @@ class DataAndSelectionManager extends ChangeNotifier {
 
   Filters get filters => _filters;
 
+  bool _isDateInRange(DateTime date, DateTimeRange? dateRange) {
+    if (dateRange?.start != null && dateRange?.end != null) {
+      if (date.compareTo(dateRange!.start) > 0 &&
+          date.compareTo(dateRange!.end) < 0) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    return true;
+  }
+
   UnmodifiableListView<Report> get reports => UnmodifiableListView(
         _reports.where(
           (report) {
+            if (_filters.dateRange?.start != null &&
+                _filters.dateRange?.end != null) {
             if (_filters.useIncidentTimestamp) {
-              DateTime incidentTimestamp = DateTime.fromMillisecondsSinceEpoch(report.incidentData["incident timestamp"].seconds *1000);
-              if (_filters.dateRange?.start != null && _filters.dateRange?.end != null) {
-                print("incident timestamp: ${incidentTimestamp}\n from: ${_filters.dateRange?.start}\n to: ${_filters.dateRange?.end}");
-                if (incidentTimestamp
-                        .compareTo(_filters.dateRange!.start) <
-                    0) {
-                  return false;
-                }
-                if (incidentTimestamp
-                        .compareTo(_filters.dateRange!.end) >
-                    0) {
-                  return false;
-                }
-              } else if (_filters.dateRange?.start != null) {
-                if (incidentTimestamp
-                        .compareTo(_filters.dateRange!.start) <
-                    0) {
-                  return false;
-                }
-              } else if (_filters.dateRange?.end != null) {
-                if (incidentTimestamp
-                        .compareTo(_filters.dateRange!.end) >
-                    0) {
+              DateTime incidentTimestamp = DateTime.fromMillisecondsSinceEpoch(
+                  report.incidentData["incident timestamp"].seconds * 1000);
+                if (!_isDateInRange(incidentTimestamp, _filters.dateRange)) {
                   return false;
                 }
               }
-            } else {
-              if (_filters.dateRange?.start != null && _filters.dateRange?.end != null) {
-                if (report.reportTimestamp.compareTo(_filters.dateRange!.start) < 0) {
-                  return false;
-                }
-                if (report.reportTimestamp.compareTo(_filters.dateRange!.end) > 0) {
-                  return false;
-                }
-              } else if (_filters.dateRange?.start != null) {
-                if (report.reportTimestamp.compareTo(_filters.dateRange!.start) < 0) {
-                  return false;
-                }
-              } else if (_filters.dateRange?.end != null) {
-                if (report.reportTimestamp.compareTo(_filters.dateRange!.end) > 0) {
-                  return false;
-                }
+            else {
+              if (!_isDateInRange(
+                  report.reportTimestamp, _filters.dateRange)) {
+                return false;
               }
+            }
             }
             if (_filters.categories.isNotEmpty) {
               if (_filters.categories.contains("inne...") &&
@@ -83,8 +65,7 @@ class DataAndSelectionManager extends ChangeNotifier {
                 return true;
               }
               return false;
-            }
-            else{
+            } else {
               return false;
             }
           },

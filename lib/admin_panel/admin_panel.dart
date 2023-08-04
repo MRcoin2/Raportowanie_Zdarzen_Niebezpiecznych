@@ -94,6 +94,9 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                                                   .read<DataAndSelectionManager>()
                                                   .reports
                                                   .length) {
+                                            print(context
+                                                .read<DataAndSelectionManager>()
+                                                .reports);
                                             return ReportListElement(
                                               report: context
                                                   .read<DataAndSelectionManager>()
