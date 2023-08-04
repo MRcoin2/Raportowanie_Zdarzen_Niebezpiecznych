@@ -2,83 +2,133 @@ import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form.dart';
 
 import '../main_form/database_communication.dart';
 
 class Filters {
   bool useIncidentTimestamp = false;
-  DateTime? from;
-  DateTime? to;
-  List<String>? categories;
+  List<String> categories;
+  DateTimeRange? dateRange;
 
   Filters(
-      {this.from, this.to, this.categories, this.useIncidentTimestamp = false});
+      {this.dateRange,
+      required this.categories,
+      this.useIncidentTimestamp = false});
+
 }
 
 class DataAndSelectionManager extends ChangeNotifier {
   //Data
   final List<Report> _reports = [];
-  Filters _filters = Filters();
+  Filters _filters = Filters(categories: [...categories]);
+
+  Filters get filters => _filters;
 
   UnmodifiableListView<Report> get reports => UnmodifiableListView(
         _reports.where(
           (report) {
             if (_filters.useIncidentTimestamp) {
-              if (_filters.from != null && _filters.to != null) {
-                if (report.incidentData["incident timestamp"]
-                        .compareTo(_filters.from!) <
+              DateTime incidentTimestamp = DateTime.fromMillisecondsSinceEpoch(report.incidentData["incident timestamp"].seconds *1000);
+              if (_filters.dateRange?.start != null && _filters.dateRange?.end != null) {
+                print("incident timestamp: ${incidentTimestamp}\n from: ${_filters.dateRange?.start}\n to: ${_filters.dateRange?.end}");
+                if (incidentTimestamp
+                        .compareTo(_filters.dateRange!.start) <
                     0) {
                   return false;
                 }
-                if (report.incidentData["incident timestamp"]
-                        .compareTo(_filters.to!) >
+                if (incidentTimestamp
+                        .compareTo(_filters.dateRange!.end) >
                     0) {
                   return false;
                 }
-              } else if (_filters.from != null) {
-                if (report.incidentData["incident timestamp"]
-                        .compareTo(_filters.from!) <
+              } else if (_filters.dateRange?.start != null) {
+                if (incidentTimestamp
+                        .compareTo(_filters.dateRange!.start) <
                     0) {
                   return false;
                 }
-              } else if (_filters.to != null) {
-                if (report.incidentData["incident timestamp"]
-                        .compareTo(_filters.to!) >
+              } else if (_filters.dateRange?.end != null) {
+                if (incidentTimestamp
+                        .compareTo(_filters.dateRange!.end) >
                     0) {
                   return false;
                 }
               }
             } else {
-              if (_filters.from != null && _filters.to != null) {
-                if (report.reportTimestamp.compareTo(_filters.from!) < 0) {
+              if (_filters.dateRange?.start != null && _filters.dateRange?.end != null) {
+                if (report.reportTimestamp.compareTo(_filters.dateRange!.start) < 0) {
                   return false;
                 }
-                if (report.reportTimestamp.compareTo(_filters.to!) > 0) {
+                if (report.reportTimestamp.compareTo(_filters.dateRange!.end) > 0) {
                   return false;
                 }
-              } else if (_filters.from != null) {
-                if (report.reportTimestamp.compareTo(_filters.from!) < 0) {
+              } else if (_filters.dateRange?.start != null) {
+                if (report.reportTimestamp.compareTo(_filters.dateRange!.start) < 0) {
                   return false;
                 }
-              } else if (_filters.to != null) {
-                if (report.reportTimestamp.compareTo(_filters.to!) > 0) {
+              } else if (_filters.dateRange?.end != null) {
+                if (report.reportTimestamp.compareTo(_filters.dateRange!.end) > 0) {
                   return false;
                 }
               }
             }
-            if (_filters.categories != null) {
-              if (!_filters.categories!.contains(
-                  report.incidentData["category"])) {
-                return false;
+            if (_filters.categories.isNotEmpty) {
+              if (_filters.categories.contains("inne...") &&
+                  !categories.contains(report.incidentData["category"])) {
+                return true;
               }
+              if (_filters.categories
+                  .contains(report.incidentData["category"])) {
+                return true;
+              }
+              return false;
             }
-            return true;
+            else{
+              return false;
+            }
           },
         ),
       );
 
+  bool get isEveryCategoryFilterSelected {
+    return _filters.categories.length == categories.length;
+  }
+
   void setFilters(Filters filters) {
+    //TODO remember to remove filtered out entries from _selected
     _filters = filters;
+    notifyListeners();
+  }
+
+  void clearFilters() {
+    print("before clear:");
+    print(_filters.categories);
+    _filters = Filters(
+        useIncidentTimestamp: false,
+        dateRange: null,
+        categories: [...categories]);
+    print("after clear:");
+    print(_filters.categories);
+    notifyListeners();
+  }
+
+  void toggleFilterCategory(String category) {
+    if (_filters.categories.contains(category)) {
+      _filters.categories.remove(category);
+    } else {
+      _filters.categories.add(category);
+    }
+    notifyListeners();
+  }
+
+  void toggleFilterAllCategories() {
+    if (_filters.categories.length == categories.length) {
+      _filters.categories.clear();
+    } else {
+      _filters.categories.clear();
+      _filters.categories.addAll(categories);
+    }
     notifyListeners();
   }
 

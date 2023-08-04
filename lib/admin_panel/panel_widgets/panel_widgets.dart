@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:provider/provider.dart';
+import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/panel_widgets/filter_panel.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pdf_generation.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/providers.dart';
 
-import '../main_form/database_communication.dart';
-import '../main_form/form.dart';
-import '../main_form/form_fields.dart';
+import '../../main_form/database_communication.dart';
 
 class ReportListElement extends StatefulWidget {
   final Report report;
@@ -108,17 +107,16 @@ class _ReportListElementState extends State<ReportListElement> {
                               });
                             },
                             icon: const Icon(Icons.delete_outline)),
-                        IconButton(
-                            onPressed: () {
-                              context
-                                  .read<DataAndSelectionManager>()
-                                  .toggleSelection(widget.report);
-                            },
-                            icon: context
-                                    .watch<DataAndSelectionManager>()
-                                    .isSelected(widget.report)
-                                ? const Icon(Icons.check_box_outlined)
-                                : const Icon(Icons.check_box_outline_blank)),
+                        Checkbox(
+                          value: context
+                              .watch<DataAndSelectionManager>()
+                              .isSelected(widget.report),
+                          onChanged: (value) {
+                            context
+                                .read<DataAndSelectionManager>()
+                                .toggleSelection(widget.report);
+                          },
+                        )
                       ],
                     )
                   ],
@@ -140,14 +138,13 @@ class TopMenuBar extends StatefulWidget {
 }
 
 class _TopMenuBarState extends State<TopMenuBar> {
-  bool showMenu = false;
+  bool isFilterMenuOpen = false;
 
   toggleMenu() {
     setState(() {
-      showMenu = !showMenu;
+      isFilterMenuOpen = !isFilterMenuOpen;
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -163,17 +160,28 @@ class _TopMenuBarState extends State<TopMenuBar> {
                 children: [
                   IconButton(onPressed: () {}, icon: const Icon(Icons.sort)),
                   PortalTarget(
-                    visible: showMenu,
-                    anchor: const Aligned(
-                      follower: Alignment.topLeft,
-                      target: Alignment.topRight,
+                    visible: isFilterMenuOpen,
+                    portalFollower: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        setState(() {
+                          isFilterMenuOpen = false;
+                        });
+                      },
                     ),
-                    portalFollower: FilterPanel(),//TODO implement closing on click outside
-                    child: IconButton(
-                        onPressed: () {
-                          toggleMenu();
-                        },
-                        icon: Icon(Icons.filter_alt_outlined)),
+                    child: PortalTarget(
+                      visible: isFilterMenuOpen,
+                      anchor: const Aligned(
+                        follower: Alignment.topLeft,
+                        target: Alignment.topRight,
+                      ),
+                      portalFollower: FilterPanel(),
+                      child: IconButton(
+                          onPressed: () {
+                            toggleMenu();
+                          },
+                          icon: Icon(Icons.filter_alt_outlined)),
+                    ),
                   ),
                 ],
               ),
@@ -224,18 +232,22 @@ class _TopMenuBarState extends State<TopMenuBar> {
                         icon: const Icon(Icons.delete_sweep_outlined),
                         tooltip: "Usuń wszystkie zaznaczone",
                       ),
-                      IconButton(
-                        onPressed: () {
-                          context
-                              .read<DataAndSelectionManager>()
-                              .toggleSelectAll();
-                        },
-                        icon: context
+                      Tooltip(
+                        message: context
                                 .watch<DataAndSelectionManager>()
                                 .isEverythingSelected
-                            ? const Icon(Icons.check_box_outlined)
-                            : const Icon(Icons.check_box_outline_blank),
-                        tooltip: "Zaznacz wszystkie",
+                            ? "Odznacz wszystkie"
+                            : "Zaznacz wszystkie",
+                        child: Checkbox(
+                          value: context
+                              .watch<DataAndSelectionManager>()
+                              .isEverythingSelected,
+                          onChanged: (value) {
+                            context
+                                .read<DataAndSelectionManager>()
+                                .toggleSelectAll();
+                          },
+                        ),
                       ),
                     ],
                   )
@@ -249,70 +261,7 @@ class _TopMenuBarState extends State<TopMenuBar> {
   }
 }
 
-class FilterPanel extends StatefulWidget {
-  FilterPanel({
-    super.key,
-  });
 
-  final TextEditingController fromDateController = TextEditingController();
-  final TextEditingController toDateController = TextEditingController();
-
-  @override
-  State<FilterPanel> createState() => _FilterPanelState();
-}
-
-class _FilterPanelState extends State<FilterPanel> {
-  @override
-  Widget build(BuildContext context) {
-    //menu for managing the filters
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.3,
-      height: MediaQuery.of(context).size.height * 0.3,
-      child: Card(
-        elevation: 4,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Form(
-            child: Column(
-              children: [
-                Text("Ustawienia filtrów:"),
-                Row(
-                  children: [
-                    Expanded(
-                      child: DatePickerFormField(
-                          labelText: "Od",
-                          dateController: widget.fromDateController),
-                    ),
-                    Expanded(
-                      child: DatePickerFormField(
-                        labelText: "Do",
-                        dateController: widget.toDateController,
-                      ),
-                    )
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: DropdownButtonFormField(items: [ //TODO make each element be selectable for multiple categories to be selected at once
-                    ...categories.map(
-                      (category) => DropdownMenuItem(
-                        value: category,
-                        child: Text(
-                          category,
-                          style: const TextStyle(overflow: TextOverflow.ellipsis),
-                        ),
-                      ),
-                    ),
-                  ], onChanged: (value) {}),
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class SideMenuBar extends StatelessWidget {
   const SideMenuBar({super.key});
@@ -339,7 +288,7 @@ class SideMenuBar extends StatelessWidget {
                       context.read<DataAndSelectionManager>().highlighted!);
                 },
               ),
-              const Padding(padding: EdgeInsets.only(top: 8)),
+              const Divider(),
               ListTile(
                 leading: const Icon(Icons.archive_outlined),
                 title: const Text("Archiwum"),
@@ -350,6 +299,7 @@ class SideMenuBar extends StatelessWidget {
                 title: const Text("Kosz"),
                 onTap: () {},
               ),
+              const Divider(),
               ListTile(
                 leading: const Icon(Icons.settings_outlined),
                 title: const Text("Ustawienia"),
