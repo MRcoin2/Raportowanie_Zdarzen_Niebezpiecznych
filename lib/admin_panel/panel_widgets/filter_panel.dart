@@ -37,6 +37,8 @@ class _FilterPanelState extends State<FilterPanel> {
             DateFormat('dd.MM.yyyy').format(selectedDateRange.start);
         widget.toDateController.text =
             DateFormat('dd.MM.yyyy').format(selectedDateRange.end);
+        print(selectedDateRange);
+        print(widget.fromDateController.text);
       });
     }
   }
@@ -45,14 +47,8 @@ class _FilterPanelState extends State<FilterPanel> {
   Widget build(BuildContext context) {
     //menu for managing the filters
     return SizedBox(
-      height: MediaQuery
-          .of(context)
-          .size
-          .height * 0.5,
-      width: MediaQuery
-          .of(context)
-          .size
-          .width * 0.3,
+      height: MediaQuery.of(context).size.height * 0.5,
+      width: MediaQuery.of(context).size.width * 0.3,
       child: Card(
         elevation: 4,
         child: Padding(
@@ -60,20 +56,20 @@ class _FilterPanelState extends State<FilterPanel> {
           child: SingleChildScrollView(
             child: Form(
               onChanged: () {
-                try {
-                  context.read<DataAndSelectionManager>().setFilters(Filters(
-                      categories: context
-                          .read<DataAndSelectionManager>()
-                          .filters
-                          .categories,
-                      dateRange: selectedDateRange,
-                      useIncidentTimestamp: toggleButtonsState[0]
-                  ),
-                  );
-                }
-                catch (e) {
-                  print(e);
-                }
+                selectedDateRange = DateTimeRange(
+                    start: DateFormat('dd.MM.yyyy')
+                        .parse(widget.fromDateController.text),
+                    end: DateFormat('dd.MM.yyyy')
+                        .parse(widget.toDateController.text));
+                context.read<DataAndSelectionManager>().setFilters(
+                      Filters(
+                          categories: context
+                              .read<DataAndSelectionManager>()
+                              .filters
+                              .categories,
+                          dateRange: selectedDateRange,
+                          useIncidentTimestamp: toggleButtonsState[0]),
+                    );
               },
               autovalidateMode: AutovalidateMode.onUserInteraction,
               child: Column(
@@ -129,7 +125,10 @@ class _FilterPanelState extends State<FilterPanel> {
                               )
                             ],
                           ),
-                        ), Expanded(child: Container(),),
+                        ),
+                        Expanded(
+                          child: Container(),
+                        ),
                         TextButton(
                           onPressed: () {
                             widget.fromDateController.clear();
@@ -150,8 +149,10 @@ class _FilterPanelState extends State<FilterPanel> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ListTile(
-                          title: Text("zaznacz wszystkie",
-                            textAlign: TextAlign.right,),
+                          title: Text(
+                            "zaznacz wszystkie",
+                            textAlign: TextAlign.right,
+                          ),
                           trailing: Checkbox(
                             value: context
                                 .read<DataAndSelectionManager>()
@@ -164,26 +165,25 @@ class _FilterPanelState extends State<FilterPanel> {
                           ),
                         ),
                         ...categories.map(
-                              (category) =>
-                              ListTile(
-                                title: Text(
-                                  category,
-                                  style: const TextStyle(
-                                      overflow: TextOverflow.ellipsis),
-                                ),
-                                trailing: Checkbox(
-                                  value: context
-                                      .read<DataAndSelectionManager>()
-                                      .filters
-                                      .categories
-                                      .contains(category),
-                                  onChanged: (value) {
-                                    context
-                                        .read<DataAndSelectionManager>()
-                                        .toggleFilterCategory(category);
-                                  },
-                                ),
-                              ),
+                          (category) => ListTile(
+                            title: Text(
+                              category,
+                              style: const TextStyle(
+                                  overflow: TextOverflow.ellipsis),
+                            ),
+                            trailing: Checkbox(
+                              value: context
+                                  .read<DataAndSelectionManager>()
+                                  .filters
+                                  .categories
+                                  .contains(category),
+                              onChanged: (value) {
+                                context
+                                    .read<DataAndSelectionManager>()
+                                    .toggleFilterCategory(category);
+                              },
+                            ),
+                          ),
                         ),
                       ],
                     ),

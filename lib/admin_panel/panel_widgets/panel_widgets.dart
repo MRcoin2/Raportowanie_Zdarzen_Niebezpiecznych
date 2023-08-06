@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:provider/provider.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/panel_widgets/filter_panel.dart';
+import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/panel_widgets/sorting_menu.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pdf_generation.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/providers.dart';
 
@@ -138,12 +139,20 @@ class TopMenuBar extends StatefulWidget {
 
 class _TopMenuBarState extends State<TopMenuBar> {
   bool isFilterMenuOpen = false;
+  bool isSortingMenuOpen = false;
 
-  toggleMenu() {
+  toggleFilterMenu() {
     setState(() {
       isFilterMenuOpen = !isFilterMenuOpen;
     });
   }
+
+  toggleSortingMenu() {
+    setState(() {
+      isSortingMenuOpen = !isSortingMenuOpen;
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -156,8 +165,29 @@ class _TopMenuBarState extends State<TopMenuBar> {
             Expanded(
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(onPressed: () {}, icon: const Icon(Icons.sort)),
+                children: [PortalTarget(
+                  visible: isSortingMenuOpen,
+                  portalFollower: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      setState(() {
+                        isSortingMenuOpen = false;
+                      });
+                    },
+                  ),
+                  child: PortalTarget(
+                    visible: isSortingMenuOpen,
+                    anchor: const Aligned(
+                      follower: Alignment.topLeft,
+                      target: Alignment.topRight,
+                    ),
+                    portalFollower: SortingMenu(),
+                    child:
+                    IconButton(onPressed: () {
+                      toggleSortingMenu();
+                    }, icon: const Icon(Icons.sort)),
+                  ),
+                ),
                   PortalTarget(
                     visible: isFilterMenuOpen,
                     portalFollower: GestureDetector(
@@ -177,7 +207,7 @@ class _TopMenuBarState extends State<TopMenuBar> {
                       portalFollower: FilterPanel(),
                       child: IconButton(
                           onPressed: () {
-                            toggleMenu();
+                            toggleFilterMenu();
                           },
                           icon: Icon(Icons.filter_alt_outlined)),
                     ),

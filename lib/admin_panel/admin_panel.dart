@@ -62,55 +62,57 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           const SideMenuBar(),
-                          Column(
-                            children: [
-                              //logout button
-
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width /
-                                            MediaQuery.of(context).size.height >
-                                        1
-                                    ? MediaQuery.of(context).size.width * 0.250
-                                    : double.infinity,
-                                child: const TopMenuBar(),
-                              ),
-                              Consumer<DataAndSelectionManager>(
-                                builder: (context, reportData, child) {
-                                  return Expanded(
-                                    child: SizedBox(
-                                      height: MediaQuery.of(context).size.height,
-                                      width: MediaQuery.of(context).size.width /
-                                                  MediaQuery.of(context)
-                                                      .size
-                                                      .height >
-                                              1
-                                          ? MediaQuery.of(context).size.width *
-                                              0.250
-                                          : double.infinity,
-                                      child: ListView.builder(
-                                        itemBuilder: (context, index) {
-                                          if (index <
-                                              context
-                                                  .read<DataAndSelectionManager>()
-                                                  .reports
-                                                  .length) {
-                                            print(context
-                                                .read<DataAndSelectionManager>()
-                                                .reports);
-                                            return ReportListElement(
-                                              report: context
-                                                  .read<DataAndSelectionManager>()
-                                                  .reports[index],
-                                            );
-                                          }
-                                          return null;
-                                        },
+                          SizedBox(
+                          width: MediaQuery.of(context).size.width /
+                                      MediaQuery.of(context).size.height >
+                                  1
+                              ? MediaQuery.of(context).size.width * 0.250
+                              : double.infinity,
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  width: MediaQuery.of(context).size.width /
+                                              MediaQuery.of(context).size.height >
+                                          1
+                                      ? MediaQuery.of(context).size.width * 0.250
+                                      : double.infinity,
+                                  child: const TopMenuBar(),
+                                ),
+                                Consumer<DataAndSelectionManager>(
+                                  builder: (context, reportData, child) {
+                                    return Expanded(
+                                      child: SizedBox(
+                                        height: MediaQuery.of(context).size.height,
+                                        width: MediaQuery.of(context).size.width /
+                                                    MediaQuery.of(context)
+                                                        .size
+                                                        .height >
+                                                1
+                                            ? MediaQuery.of(context).size.width *
+                                                0.250
+                                            : double.infinity,
+                                        child: ListView.builder(
+                                          itemBuilder: (context, index) {
+                                            if (index <
+                                                context
+                                                    .read<DataAndSelectionManager>()
+                                                    .reports
+                                                    .length) {
+                                              return ReportListElement(
+                                                report: context
+                                                    .read<DataAndSelectionManager>()
+                                                    .reports[index],
+                                              );
+                                            }
+                                            return null;
+                                          },
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                           Expanded(
                             child: Consumer(builder: (context, reportData, _) {

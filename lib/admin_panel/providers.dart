@@ -10,7 +10,6 @@ class Filters {
   bool useIncidentTimestamp = false;
   List<String> categories;
   DateTimeRange? dateRange;
-
   Filters(
       {this.dateRange,
       required this.categories,
@@ -19,7 +18,8 @@ class Filters {
 
 class DataAndSelectionManager extends ChangeNotifier {
   //Data
-  final List<Report> _reports = [];
+
+  List<Report> _reports = [];
   Filters _filters = Filters(categories: [...categories]);
 
   Filters get filters => _filters;
@@ -27,7 +27,7 @@ class DataAndSelectionManager extends ChangeNotifier {
   bool _isDateInRange(DateTime date, DateTimeRange? dateRange) {
     if (dateRange?.start != null && dateRange?.end != null) {
       if (date.compareTo(dateRange!.start) > 0 &&
-          date.compareTo(dateRange!.end) < 0) {
+          date.compareTo(dateRange.end) < 0) {
         return true;
       } else {
         return false;
@@ -71,6 +71,30 @@ class DataAndSelectionManager extends ChangeNotifier {
           },
         ),
       );
+
+  void sortReportsByReportTimestamp(bool reverse) {
+    _reports.sort((a, b) => a.reportTimestamp.compareTo(b.reportTimestamp));
+    if (reverse) {
+      _reports = _reports.reversed.toList();
+    }
+    notifyListeners();
+  }
+
+  void sortReportsByIncidentTimestamp(bool reverse) {
+    _reports.sort((a, b) => a.incidentData["incident timestamp"].compareTo(b.incidentData["incident timestamp"]));
+    if (reverse) {
+      _reports = _reports.reversed.toList();
+    }
+    notifyListeners();
+  }
+
+  void sortReportsByCategory(bool reverse) {
+    _reports.sort((a, b) => a.incidentData["category"].toUpperCase().compareTo(b.incidentData["category"].toUpperCase()));
+    if (reverse) {
+      _reports = _reports.reversed.toList();
+    }
+    notifyListeners();
+  }
 
   bool get isEveryCategoryFilterSelected {
     return _filters.categories.length == categories.length;
