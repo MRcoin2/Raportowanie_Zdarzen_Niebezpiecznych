@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -9,14 +10,14 @@ class FilterPanel extends StatefulWidget {
     super.key,
   });
 
-  final TextEditingController fromDateController = TextEditingController();
-  final TextEditingController toDateController = TextEditingController();
-
   @override
   State<FilterPanel> createState() => _FilterPanelState();
 }
 
 class _FilterPanelState extends State<FilterPanel> {
+  final TextEditingController fromDateController = TextEditingController();
+  final TextEditingController toDateController = TextEditingController();
+
   List<bool> toggleButtonsState = [true, false];
 
   DateTimeRange selectedDateRange = DateTimeRange(
@@ -33,14 +34,34 @@ class _FilterPanelState extends State<FilterPanel> {
     if (picked != null && picked != selectedDateRange) {
       setState(() {
         selectedDateRange = picked;
-        widget.fromDateController.text =
+        fromDateController.text =
             DateFormat('dd.MM.yyyy').format(selectedDateRange.start);
-        widget.toDateController.text =
+        toDateController.text =
             DateFormat('dd.MM.yyyy').format(selectedDateRange.end);
-        print(selectedDateRange);
-        print(widget.fromDateController.text);
       });
     }
+  }
+
+  void updateDateRange() {
+    try{
+    selectedDateRange = DateTimeRange(
+        start:
+        DateFormat('dd.MM.yyyy').parse(fromDateController.text),
+        end: DateFormat('dd.MM.yyyy').parse(toDateController.text));}
+    catch(e){
+      if (kDebugMode) {
+        print("incorrect date format / field empty (skipping setting date range)");
+      }
+    }
+    context.read<DataAndSelectionManager>().setFilters(
+      Filters(
+          categories: context
+              .read<DataAndSelectionManager>()
+              .filters
+              .categories,
+          dateRange: selectedDateRange,
+          useIncidentTimestamp: toggleButtonsState[0]),
+    );
   }
 
   @override
@@ -56,22 +77,8 @@ class _FilterPanelState extends State<FilterPanel> {
           child: SingleChildScrollView(
             child: Form(
               onChanged: () {
-                selectedDateRange = DateTimeRange(
-                    start: DateFormat('dd.MM.yyyy')
-                        .parse(widget.fromDateController.text),
-                    end: DateFormat('dd.MM.yyyy')
-                        .parse(widget.toDateController.text));
-                context.read<DataAndSelectionManager>().setFilters(
-                      Filters(
-                          categories: context
-                              .read<DataAndSelectionManager>()
-                              .filters
-                              .categories,
-                          dateRange: selectedDateRange,
-                          useIncidentTimestamp: toggleButtonsState[0]),
-                    );
+                updateDateRange();
               },
-              autovalidateMode: AutovalidateMode.onUserInteraction,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -80,12 +87,11 @@ class _FilterPanelState extends State<FilterPanel> {
                       Expanded(
                         child: DateTextFormField(
                             labelText: "Od",
-                            dateController: widget.fromDateController),
+                            dateController: fromDateController),
                       ),
                       Expanded(
                         child: DateTextFormField(
-                            labelText: "Do",
-                            dateController: widget.toDateController),
+                            labelText: "Do", dateController: toDateController),
                       ),
                       IconButton(
                         onPressed: () => _selectDateRange(context),
@@ -98,21 +104,20 @@ class _FilterPanelState extends State<FilterPanel> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Text("Filtruj po:"),
+                        const Text("Filtruj po:"),
                         Padding(
                           padding: const EdgeInsets.only(left: 8.0),
                           child: ToggleButtons(
                             isSelected: toggleButtonsState,
                             onPressed: (index) {
-                              if (index == 0) {
-                                setState(() {
+                              setState(() {
+                                if (index == 0) {
                                   toggleButtonsState = [true, false];
-                                });
-                              } else {
-                                setState(() {
+                                } else {
                                   toggleButtonsState = [false, true];
-                                });
-                              }
+                                }
+                                updateDateRange();
+                              });
                             },
                             children: const [
                               Padding(
@@ -131,8 +136,8 @@ class _FilterPanelState extends State<FilterPanel> {
                         ),
                         TextButton(
                           onPressed: () {
-                            widget.fromDateController.clear();
-                            widget.toDateController.clear();
+                            fromDateController.clear();
+                            toDateController.clear();
                             context
                                 .read<DataAndSelectionManager>()
                                 .clearFilters();
@@ -149,7 +154,7 @@ class _FilterPanelState extends State<FilterPanel> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ListTile(
-                          title: Text(
+                          title: const Text(
                             "zaznacz wszystkie",
                             textAlign: TextAlign.right,
                           ),
@@ -221,6 +226,7 @@ class _DateTextFormFieldState extends State<DateTextFormField> {
           hintStyle: const TextStyle(overflow: TextOverflow.ellipsis),
           hintText: "DD.MM.RRRR",
         ),
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         validator: (value) {
           if (value == null ||
               value.isEmpty ||

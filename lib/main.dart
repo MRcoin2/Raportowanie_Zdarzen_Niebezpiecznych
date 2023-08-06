@@ -123,7 +123,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const FormPage(title: 'Raportowanie Zdarzeń Niebezpiecznych'),
         '/admin-login': (context) => const AdminLoginPage(),
-        '/admin-panel': (context) => const AdminPanelPage(),
+        '/admin-panel': (context) => const SelectionArea(child: AdminPanelPage()),
       },
       initialRoute: '/',
       localizationsDelegates: const [
