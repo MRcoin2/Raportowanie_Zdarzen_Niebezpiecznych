@@ -1,18 +1,20 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/admin_panel.dart';
+import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/archive_page.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/trash_page.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'admin_panel/providers.dart';
 import 'authentication/admin_login_page.dart';
 import 'firebase_options.dart';
 
-
 Future<void> main() async {
   await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-);
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -122,18 +124,19 @@ class MyApp extends StatelessWidget {
       ),
       themeMode: ThemeMode.system,
       routes: {
-        '/': (context) => const FormPage(title: 'Raportowanie Zdarzeń Niebezpiecznych'),
+        '/': (context) =>
+            const FormPage(title: 'Raportowanie Zdarzeń Niebezpiecznych'),
         '/admin-login': (context) => const AdminLoginPage(),
-        '/admin-panel': (context) => const SelectionArea(child: AdminPanelPage()),
-        '/admin-panel/trash': (context) => const SelectionArea(child: TrashPage()),
+        '/admin-panel': (context) => MultiProvider(providers: [
+              ChangeNotifierProvider(
+                  create: (context) => DataAndSelectionManager()),
+            ], child: const AdminPanelPage()),
+        '/admin-panel/trash': (context) => const TrashPage(),
+        '/admin-panel/archive': (context) => const ArchivePage(),
       },
       initialRoute: '/',
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate
-      ],
-      supportedLocales: const [
-        Locale('pl')
-      ],
+      localizationsDelegates: const [GlobalMaterialLocalizations.delegate],
+      supportedLocales: const [Locale('pl')],
     );
   }
 }
@@ -147,7 +150,6 @@ class FormPage extends StatefulWidget {
   State<FormPage> createState() => _FormPageState();
 }
 
-
 class _FormPageState extends State<FormPage> {
   @override
   Widget build(BuildContext context) {
@@ -158,18 +160,27 @@ class _FormPageState extends State<FormPage> {
             width: double.infinity,
             child: Center(
               child: Column(
-                children: [Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text("Raportowanie Zdarzeń Niebezpiecznych", style: Theme.of(context).textTheme.headlineLarge,),
-                ),
+                children: [
                   Padding(
-                    padding: const EdgeInsets.only(top:18.0, bottom: 18.0),
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Raportowanie Zdarzeń Niebezpiecznych",
+                      style: Theme.of(context).textTheme.headlineLarge,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 18.0, bottom: 18.0),
                     child: Card(
                       elevation: 2,
                       child: Padding(
-                        padding: const EdgeInsets.only(top:8.0, bottom: 8.0, left: 18.0, right: 18.0),
+                        padding: const EdgeInsets.only(
+                            top: 8.0, bottom: 8.0, left: 18.0, right: 18.0),
                         child: SizedBox(
-                          width: MediaQuery.of(context).size.height/MediaQuery.of(context).size.width<1?MediaQuery.of(context).size.width*0.50:double.infinity,
+                          width: MediaQuery.of(context).size.height /
+                                      MediaQuery.of(context).size.width <
+                                  1
+                              ? MediaQuery.of(context).size.width * 0.50
+                              : double.infinity,
                           child: const Center(
                             child: Padding(
                               padding: EdgeInsets.all(8.0),
@@ -189,4 +200,3 @@ class _FormPageState extends State<FormPage> {
     );
   }
 }
-

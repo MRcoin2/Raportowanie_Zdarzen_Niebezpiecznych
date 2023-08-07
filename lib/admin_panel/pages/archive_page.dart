@@ -1,3 +1,4 @@
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
@@ -7,14 +8,14 @@ import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/providers.dart'
 
 import '../../main_form/database_communication.dart';
 
-class AdminPanelPage extends StatefulWidget {
-  const AdminPanelPage({super.key});
+class ArchivePage extends StatefulWidget {
+  const ArchivePage({super.key});
 
   @override
-  State<AdminPanelPage> createState() => _AdminPanelPageState();
+  State<ArchivePage> createState() => _ArchivePageState();
 }
 
-class _AdminPanelPageState extends State<AdminPanelPage> {
+class _ArchivePageState extends State<ArchivePage> {
   @override
   Widget build(BuildContext context) {
     return Portal(
@@ -38,7 +39,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
               return Scaffold(
                 appBar: AppBar(
                   forceMaterialTransparency: true,
-                  title: const Text('Panel Administracyjny'),
+                  title: const Text('Archiwum'),
                   actions: [
                     ElevatedButton(
                       onPressed: () async {
@@ -53,35 +54,28 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                 body: Center(
                   child: FutureBuilder(
                     future:
-                        context.read<DataAndSelectionManager>().fetchReports(),
+                    context.read<DataAndSelectionManager>().fetchArchive(),
                     builder: (context, snapshot) {
-                      print("building admin panel");
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();
                       }
-                      print(context
-                          .read<DataAndSelectionManager>()
-                          .reports
-                          .length);
                       return Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           const SideMenuBar(),
                           SizedBox(
-                          width: MediaQuery.of(context).size.width /
-                                      MediaQuery.of(context).size.height >
-                                  1
-                              ? MediaQuery.of(context).size.width * 0.250
-                              : double.infinity,
+                            width: MediaQuery.of(context).size.width /
+                                MediaQuery.of(context).size.height > 1
+                                ? MediaQuery.of(context).size.width * 0.250
+                                : double.infinity,
                             child: Column(
                               children: [
                                 SizedBox(
                                   width: MediaQuery.of(context).size.width /
-                                              MediaQuery.of(context).size.height >
-                                          1
+                                      MediaQuery.of(context).size.height > 1
                                       ? MediaQuery.of(context).size.width * 0.250
                                       : double.infinity,
-                                  child: const TopMenuBar(),
+                                  child: const TopMenuBar(pageType: PageType.archivePage),
                                 ),
                                 Consumer<DataAndSelectionManager>(
                                   builder: (context, reportData, child) {
@@ -89,24 +83,24 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                                       child: SizedBox(
                                         height: MediaQuery.of(context).size.height,
                                         width: MediaQuery.of(context).size.width /
-                                                    MediaQuery.of(context)
-                                                        .size
-                                                        .height >
-                                                1
+                                            MediaQuery.of(context)
+                                                .size
+                                                .height >
+                                            1
                                             ? MediaQuery.of(context).size.width *
-                                                0.250
+                                            0.250
                                             : double.infinity,
                                         child: ListView.builder(
                                           itemBuilder: (context, index) {
                                             if (index <
                                                 context
                                                     .read<DataAndSelectionManager>()
-                                                    .reports
+                                                    .archivedReports
                                                     .length) {
-                                              return ReportListElement(
+                                              return ArchiveListElement(
                                                 report: context
                                                     .read<DataAndSelectionManager>()
-                                                    .reports[index],
+                                                    .archivedReports[index],
                                               );
                                             }
                                             return null;

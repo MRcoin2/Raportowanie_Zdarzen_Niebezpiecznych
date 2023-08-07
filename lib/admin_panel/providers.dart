@@ -5,12 +5,13 @@ import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form.dart';
 
 import '../main_form/database_communication.dart';
 
-enum PageType {reportsPage, trashPage, archivePage}
+enum PageType { reportsPage, trashPage, archivePage }
 
 class Filters {
   bool useIncidentTimestamp = false;
   List<String> categories;
   DateTimeRange? dateRange;
+
   Filters(
       {this.dateRange,
       required this.categories,
@@ -24,8 +25,6 @@ class DataAndSelectionManager extends ChangeNotifier {
   List<Report> _trash = [];
   List<Report> _archivedReports = [];
   Filters _filters = Filters(categories: [...categories]);
-
-
 
   Filters get filters => _filters;
 
@@ -41,22 +40,24 @@ class DataAndSelectionManager extends ChangeNotifier {
     return true;
   }
 
-  UnmodifiableListView<Report> get reports => UnmodifiableListView(
+  UnmodifiableListView<Report> get reports =>
+      UnmodifiableListView(
         _reports.where(
-          (report) {
+              (report) {
             if (_filters.dateRange != null) {
-            if (_filters.useIncidentTimestamp) {
-              DateTime incidentTimestamp = DateTime.fromMillisecondsSinceEpoch(
-                  report.incidentData["incident timestamp"].seconds * 1000);
+              if (_filters.useIncidentTimestamp) {
+                DateTime incidentTimestamp =
+                DateTime.fromMillisecondsSinceEpoch(
+                    report.incidentData["incident timestamp"].seconds *
+                        1000);
                 if (!_isDateInRange(incidentTimestamp, _filters.dateRange)) {
                   _selected.removeWhere((report) => report == report);
                   return false;
                 }
-              }
-            else {
-              if (!_isDateInRange(
+              } else {
+                if (!_isDateInRange(
                     report.reportTimestamp, _filters.dateRange)) {
-                _selected.removeWhere((report) => report == report);
+                  _selected.removeWhere((report) => report == report);
                   return false;
                 }
               }
@@ -80,83 +81,87 @@ class DataAndSelectionManager extends ChangeNotifier {
         ),
       );
 
-  UnmodifiableListView<Report> get trash => UnmodifiableListView(
-    _trash.where(
-          (report) {
-        if (_filters.dateRange != null) {
-          if (_filters.useIncidentTimestamp) {
-            DateTime incidentTimestamp = DateTime.fromMillisecondsSinceEpoch(
-                report.incidentData["incident timestamp"].seconds * 1000);
-            if (!_isDateInRange(incidentTimestamp, _filters.dateRange)) {
+  UnmodifiableListView<Report> get trash =>
+      UnmodifiableListView(
+        _trash.where(
+              (report) {
+            if (_filters.dateRange != null) {
+              if (_filters.useIncidentTimestamp) {
+                DateTime incidentTimestamp =
+                DateTime.fromMillisecondsSinceEpoch(
+                    report.incidentData["incident timestamp"].seconds *
+                        1000);
+                if (!_isDateInRange(incidentTimestamp, _filters.dateRange)) {
+                  _selected.removeWhere((report) => report == report);
+                  return false;
+                }
+              } else {
+                if (!_isDateInRange(
+                    report.reportTimestamp, _filters.dateRange)) {
+                  _selected.removeWhere((report) => report == report);
+                  return false;
+                }
+              }
+            }
+            if (_filters.categories.isEmpty) {
+              _selected.removeWhere((report) => report == report);
+              return false;
+            } else {
+              if (_filters.categories.contains("inne...") &&
+                  !categories.contains(report.incidentData["category"])) {
+                return true;
+              }
+              if (_filters.categories
+                  .contains(report.incidentData["category"])) {
+                return true;
+              }
               _selected.removeWhere((report) => report == report);
               return false;
             }
-          }
-          else {
-            if (!_isDateInRange(
-                report.reportTimestamp, _filters.dateRange)) {
-              _selected.removeWhere((report) => report == report);
-              return false;
-            }
-          }
-        }
-        if (_filters.categories.isEmpty) {
-          _selected.removeWhere((report) => report == report);
-          return false;
-        } else {
-          if (_filters.categories.contains("inne...") &&
-              !categories.contains(report.incidentData["category"])) {
-            return true;
-          }
-          if (_filters.categories
-              .contains(report.incidentData["category"])) {
-            return true;
-          }
-          _selected.removeWhere((report) => report == report);
-          return false;
-        }
-      },
-    ),
-  );
+          },
+        ),
+      );
 
-  UnmodifiableListView<Report> get archivedReports => UnmodifiableListView(
-    _archivedReports.where(
-          (report) {
-        if (_filters.dateRange != null) {
-          if (_filters.useIncidentTimestamp) {
-            DateTime incidentTimestamp = DateTime.fromMillisecondsSinceEpoch(
-                report.incidentData["incident timestamp"].seconds * 1000);
-            if (!_isDateInRange(incidentTimestamp, _filters.dateRange)) {
+  UnmodifiableListView<Report> get archivedReports =>
+      UnmodifiableListView(
+        _archivedReports.where(
+              (report) {
+            if (_filters.dateRange != null) {
+              if (_filters.useIncidentTimestamp) {
+                DateTime incidentTimestamp =
+                DateTime.fromMillisecondsSinceEpoch(
+                    report.incidentData["incident timestamp"].seconds *
+                        1000);
+                if (!_isDateInRange(incidentTimestamp, _filters.dateRange)) {
+                  _selected.removeWhere((report) => report == report);
+                  return false;
+                }
+              } else {
+                if (!_isDateInRange(
+                    report.reportTimestamp, _filters.dateRange)) {
+                  _selected.removeWhere((report) => report == report);
+                  return false;
+                }
+              }
+            }
+            if (_filters.categories.isEmpty) {
+              _selected.removeWhere((report) => report == report);
+              return false;
+            } else {
+              if (_filters.categories.contains("inne...") &&
+                  !categories.contains(report.incidentData["category"])) {
+                return true;
+              }
+              if (_filters.categories
+                  .contains(report.incidentData["category"])) {
+                return true;
+              }
               _selected.removeWhere((report) => report == report);
               return false;
             }
-          }
-          else {
-            if (!_isDateInRange(
-                report.reportTimestamp, _filters.dateRange)) {
-              _selected.removeWhere((report) => report == report);
-              return false;
-            }
-          }
-        }
-        if (_filters.categories.isEmpty) {
-          _selected.removeWhere((report) => report == report);
-          return false;
-        } else {
-          if (_filters.categories.contains("inne...") &&
-              !categories.contains(report.incidentData["category"])) {
-            return true;
-          }
-          if (_filters.categories
-              .contains(report.incidentData["category"])) {
-            return true;
-          }
-          _selected.removeWhere((report) => report == report);
-          return false;
-        }
-      },
-    ),
-  );
+          },
+        ),
+      );
 
   void sortReportsByReportTimestamp(bool reverse) {
     _reports.sort((a, b) => a.reportTimestamp.compareTo(b.reportTimestamp));
@@ -169,8 +174,12 @@ class DataAndSelectionManager extends ChangeNotifier {
   }
 
   void sortReportsByIncidentTimestamp(bool reverse) {
-    _reports.sort((a, b) => a.incidentData["incident timestamp"].compareTo(b.incidentData["incident timestamp"]));
-    _trash.sort((a, b) => a.incidentData["incident timestamp"].compareTo(b.incidentData["incident timestamp"]));
+    _reports.sort((a, b) =>
+        a.incidentData["incident timestamp"]
+            .compareTo(b.incidentData["incident timestamp"]));
+    _trash.sort((a, b) =>
+        a.incidentData["incident timestamp"]
+            .compareTo(b.incidentData["incident timestamp"]));
     if (reverse) {
       _reports = _reports.reversed.toList();
       _trash = _trash.reversed.toList();
@@ -179,8 +188,14 @@ class DataAndSelectionManager extends ChangeNotifier {
   }
 
   void sortReportsByCategory(bool reverse) {
-    _reports.sort((a, b) => a.incidentData["category"].toUpperCase().compareTo(b.incidentData["category"].toUpperCase()));
-    _trash.sort((a, b) => a.incidentData["category"].toUpperCase().compareTo(b.incidentData["category"].toUpperCase()));
+    _reports.sort((a, b) =>
+        a.incidentData["category"]
+            .toUpperCase()
+            .compareTo(b.incidentData["category"].toUpperCase()));
+    _trash.sort((a, b) =>
+        a.incidentData["category"]
+            .toUpperCase()
+            .compareTo(b.incidentData["category"].toUpperCase()));
     if (reverse) {
       _reports = _reports.reversed.toList();
       _trash = _trash.reversed.toList();
@@ -224,9 +239,11 @@ class DataAndSelectionManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future fetchReports({refresh = false}) async {
+  Future<bool> fetchReports({refresh = false}) async {
+    print("fetching reports");
     //TODO handle limit and load more
     if (refresh || _reports.isEmpty) {
+      print("clearing reports");
       _reports.clear();
       await FirebaseFirestore.instance
           .collection("reports")
@@ -234,8 +251,10 @@ class DataAndSelectionManager extends ChangeNotifier {
           .limit(100)
           .get()
           .then((QuerySnapshot querySnapshot) {
+        print(querySnapshot.docs.length);
         for (var doc in querySnapshot.docs) {
           Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          print("adding report");
           _reports.add(Report(
               id: doc.id,
               reportTimestamp: DateTime.fromMillisecondsSinceEpoch(
@@ -246,10 +265,9 @@ class DataAndSelectionManager extends ChangeNotifier {
         notifyListeners();
         return true;
       });
-    } else {
-      notifyListeners();
-      return false;
     }
+    notifyListeners();
+    return false;
   }
 
   // Selections
@@ -283,7 +301,6 @@ class DataAndSelectionManager extends ChangeNotifier {
         }
         break;
     }
-
   }
 
   void toggleSelectAll(pageType) {
@@ -332,8 +349,15 @@ class DataAndSelectionManager extends ChangeNotifier {
   }
 
   void moveReportToTrash(Report report, pageType) {
-    report.moveToTrash();
-    _reports.remove(report);
+    report.moveToTrash(pageType);
+    switch (pageType){
+      case PageType.reportsPage:
+        _reports.remove(report);
+        break;
+      case PageType.archivePage:
+        _archivedReports.remove(report);
+        break;
+    }
     _updateSelectionStatus(pageType);
     notifyListeners();
   }
@@ -346,6 +370,8 @@ class DataAndSelectionManager extends ChangeNotifier {
     _updateSelectionStatus(pageType);
     notifyListeners();
   }
+
+
 
   void clearSelections() {
     _selected.clear();
@@ -377,7 +403,7 @@ class DataAndSelectionManager extends ChangeNotifier {
       _trash.clear();
       await FirebaseFirestore.instance
           .collection("trash")
-          .orderBy("report timestamp", descending: true)
+          .orderBy("date deleted", descending: true)
           .limit(100)
           .get()
           .then((QuerySnapshot querySnapshot) {
@@ -431,4 +457,64 @@ class DataAndSelectionManager extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future fetchArchive({refresh = false}) async {
+    if (refresh || _archivedReports.isEmpty) {
+      print("fetching archive");
+      _archivedReports.clear();
+      await FirebaseFirestore.instance
+          .collection("archive")
+          .orderBy("report timestamp", descending: true)
+          .limit(100)
+          .get()
+          .then((QuerySnapshot querySnapshot) {
+        for (var doc in querySnapshot.docs) {
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          _archivedReports.add(Report(
+              id: doc.id,
+              reportTimestamp: DateTime.fromMillisecondsSinceEpoch(
+                  data["report timestamp"].seconds * 1000),
+              personalData: data["personal data"],
+              incidentData: data["incident data"]));
+        }
+        print(_archivedReports.length);
+        notifyListeners();
+        return true;
+      });
+    } else {
+      notifyListeners();
+      return false;
+    }
+  }
+
+  void archiveReport(Report report) {
+    report.archive();
+    _reports.remove(report);
+    _updateSelectionStatus(PageType.reportsPage);
+    notifyListeners();
+  }
+
+  void archiveSelected() {
+    for (var report in _selected) {
+      archiveReport(report);
+    }
+    _selected.clear();
+    _updateSelectionStatus(PageType.reportsPage);
+    notifyListeners();
+  }
+
+  void unarchiveReport(Report report) {
+    report.unarchive();
+    _archivedReports.remove(report);
+    _updateSelectionStatus(PageType.archivePage);
+    notifyListeners();
+  }
+
+  void unarchiveSelected() {
+    for (var report in _selected) {
+      unarchiveReport(report);
+    }
+    _selected.clear();
+    _updateSelectionStatus(PageType.archivePage);
+    notifyListeners();
+  }
 }

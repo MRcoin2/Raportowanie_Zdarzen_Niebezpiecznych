@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/panel_widgets/filter_panel.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/panel_widgets/sorting_menu.dart';
@@ -76,6 +77,9 @@ class _ReportListElementState extends State<ReportListElement> {
                         IconButton(
                             onPressed: () {
                               //TODO implement archiving
+                              context
+                                  .read<DataAndSelectionManager>()
+                                  .archiveReport(widget.report);
                             },
                             icon: const Icon(Icons.archive_outlined)),
                         IconButton(
@@ -103,7 +107,8 @@ class _ReportListElementState extends State<ReportListElement> {
                                 if (value) {
                                   context
                                       .read<DataAndSelectionManager>()
-                                      .moveReportToTrash(widget.report, PageType.reportsPage);
+                                      .moveReportToTrash(
+                                          widget.report, PageType.reportsPage);
                                 }
                               });
                             },
@@ -115,7 +120,8 @@ class _ReportListElementState extends State<ReportListElement> {
                           onChanged: (value) {
                             context
                                 .read<DataAndSelectionManager>()
-                                .toggleSelection(widget.report, PageType.reportsPage);
+                                .toggleSelection(
+                                    widget.report, PageType.reportsPage);
                           },
                         )
                       ],
@@ -199,10 +205,9 @@ class _TrashListElementState extends State<TrashListElement> {
                         IconButton(
                             tooltip: 'Przywróć',
                             onPressed: () {
-                              widget.report.restoreFromTrash();
+                              context.read<DataAndSelectionManager>().restoreFromTrash(widget.report);
                             },
-                            icon:
-                                const Icon(Icons.restore_outlined)),
+                            icon: const Icon(Icons.restore_outlined)),
                         Checkbox(
                           value: context
                               .watch<DataAndSelectionManager>()
@@ -210,7 +215,136 @@ class _TrashListElementState extends State<TrashListElement> {
                           onChanged: (value) {
                             context
                                 .read<DataAndSelectionManager>()
-                                .toggleSelection(widget.report, PageType.trashPage);
+                                .toggleSelection(
+                                    widget.report, PageType.trashPage);
+                          },
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ArchiveListElement extends StatefulWidget {
+  final Report report;
+
+  const ArchiveListElement({super.key, required this.report});
+
+  @override
+  State<ArchiveListElement> createState() => _ArchiveListElementState();
+}
+
+class _ArchiveListElementState extends State<ArchiveListElement> {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        context.read<DataAndSelectionManager>().toggleHighlight(widget.report);
+      },
+      child: Card(
+        surfaceTintColor:
+            context.read<DataAndSelectionManager>().isHighlighted(widget.report)
+                ? Colors.blue
+                : Theme.of(context).cardTheme.color,
+        elevation:
+            context.read<DataAndSelectionManager>().isHighlighted(widget.report)
+                ? 5
+                : 2,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      widget.report.incidentData['category'],
+                      style: Theme.of(context).textTheme.titleLarge,
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ),
+                    Text(
+                      widget.report.incidentData['date'].toString(),
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                    Text(
+                      widget.report.incidentData['description'],
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    )
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                            tooltip: 'Przywróć',
+                            onPressed: () {
+                              context
+                                  .read<DataAndSelectionManager>()
+                                  .unarchiveReport(widget.report);
+                            },
+                            icon: const Icon(Icons.unarchive_outlined)),
+                        IconButton(
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: const Text(
+                                          'Czy na pewno chcesz usunąć to zgłoszenie?'),
+                                      actions: [
+                                        TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop(false);
+                                            },
+                                            child: const Text('Nie')),
+                                        TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop(true);
+                                            },
+                                            child: const Text('Tak')),
+                                      ],
+                                    );
+                                  }).then((value) {
+                                if (value) {
+                                  context
+                                      .read<DataAndSelectionManager>()
+                                      .moveReportToTrash(
+                                          widget.report, PageType.archivePage);
+                                }
+                              });
+                            },
+                            icon: const Icon(Icons.delete_outline)),
+                        Checkbox(
+                          value: context
+                              .watch<DataAndSelectionManager>()
+                              .isSelected(widget.report),
+                          onChanged: (value) {
+                            context
+                                .read<DataAndSelectionManager>()
+                                .toggleSelection(
+                                    widget.report, PageType.archivePage);
                           },
                         )
                       ],
@@ -229,8 +363,7 @@ class _TrashListElementState extends State<TrashListElement> {
 class TopMenuBar extends StatefulWidget {
   final PageType pageType;
 
-  const TopMenuBar(
-      {super.key, this.pageType = PageType.reportsPage});
+  const TopMenuBar({super.key, this.pageType = PageType.reportsPage});
 
   @override
   State<TopMenuBar> createState() => _TopMenuBarState();
@@ -364,8 +497,7 @@ class _TopMenuBarState extends State<TopMenuBar> {
                                     .read<DataAndSelectionManager>()
                                     .restoreSelectedFromTrash();
                               },
-                              icon:
-                                  const Icon(Icons.restore_outlined),
+                              icon: const Icon(Icons.restore_outlined),
                               tooltip: "Przywróć wszystkie zaznaczone",
                             ),
                             Tooltip(
@@ -391,11 +523,26 @@ class _TopMenuBarState extends State<TopMenuBar> {
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            IconButton(
-                              onPressed: () {},
-                              icon: const Icon(Icons.archive_outlined),
-                              tooltip: "Archiwizuj wszystkie zaznaczone",
-                            ),
+                            widget.pageType == PageType.reportsPage
+                                ? IconButton(
+                                    onPressed: () {
+                                      context
+                                          .read<DataAndSelectionManager>()
+                                          .archiveSelected();
+                                    },
+                                    icon: const Icon(Icons.archive_outlined),
+                                    tooltip: "Archiwizuj wszystkie zaznaczone",
+                                  )
+                                : IconButton(
+                                    onPressed: () {
+                                      context
+                                          .read<DataAndSelectionManager>()
+                                          .unarchiveSelected();
+                                    },
+                                    icon: const Icon(Icons.unarchive_outlined),
+                                    tooltip:
+                                        "Przywróć z archiwum wszystkie zaznaczone",
+                                  ),
                             IconButton(
                               onPressed: () {
                                 showDialog(
@@ -442,7 +589,7 @@ class _TopMenuBarState extends State<TopMenuBar> {
                                 onChanged: (value) {
                                   context
                                       .read<DataAndSelectionManager>()
-                                      .toggleSelectAll(PageType.reportsPage);
+                                      .toggleSelectAll(widget.pageType);
                                 },
                               ),
                             ),
@@ -524,41 +671,121 @@ class ReportDisplayCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              report.incidentData['category'] ?? '',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            Text(
-              report.incidentData['date'] ?? '',
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-            Text(
-              report.incidentData['description'] ?? '',
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-            Text(
-              report.incidentData['location'] ?? '',
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-            Text(
-              report.personalData['name'] ?? '',
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-            Text(
-              report.personalData['email'] ?? '',
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-            Text(
-              report.personalData['phone'] ?? '',
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-          ],
+    return SelectionArea(
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(18.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                report.incidentData['category'] ?? '',
+                style: Theme.of(context).textTheme.displayMedium,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const Divider(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const Text(
+                    "Data zgłoszenia: ",
+                    style: TextStyle(color: Colors.grey),
+                    textAlign: TextAlign.right,
+                  ),
+                  Text(
+                    ' ${DateFormat("dd.MM.yyyy").format(DateTime.fromMillisecondsSinceEpoch(report.reportTimestamp.millisecondsSinceEpoch))}',
+                    textAlign: TextAlign.right,
+                  )
+                ],
+              ),
+              // personal data
+              Row(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Dane osobowe:",
+                          style: Theme.of(context).textTheme.titleLarge),
+                      const Text(
+                        "Imię Nazwisko:",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                      const Text(
+                        "Status:",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                      const Text(
+                        "Sąd:",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                      const Text(
+                        "Adres e-mail:",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                      const Text(
+                        "Numer telefonu:",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("", style: Theme.of(context).textTheme.titleLarge),
+                      Text(
+                          "${report.personalData['name']} ${report.personalData['surname']}"),
+                      Text("${report.personalData['status']}"),
+                      Text("${report.personalData['affiliation']}"),
+                      Text("${report.personalData['email']}"),
+                      Text("${report.personalData['phoneNumber'] ?? ''}"),
+                    ],
+                  )
+                ],
+              ),
+              Text(""),
+              Row(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Dane zdarzenia:",
+                          style: Theme.of(context).textTheme.titleLarge),
+                      const Text(
+                        "Lokalizacja:",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                      const Text(
+                        "Data zdarzenia:",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                      const Text(
+                        "Opis:",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("", style: Theme.of(context).textTheme.titleLarge),
+                      Text("${report.incidentData["location"]}"),
+                      Text(
+                          "${report.incidentData['date']} ${report.incidentData['time']}"),
+                      Text(""),
+                    ],
+                  )
+                ],
+              ),
+              Text(""),
+              Text(
+                "${report.incidentData['description']}",
+                textAlign: TextAlign.justify,
+              ),
+
+              const Divider(),
+            ],
+          ),
         ),
       ),
     );

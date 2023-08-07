@@ -3,6 +3,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../admin_panel/providers.dart';
+
 Future<void> submitForm(
     Map<String, dynamic> formData, List<XFile> images) async {
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -29,13 +31,23 @@ class Report {
   final Map<String, dynamic> personalData;
   final Map<String, dynamic> incidentData;
 
-  void moveToTrash() {
-    //Add the document to the "trash" collection and delete from "reports"
-    FirebaseFirestore.instance.collection("trash").doc(id).set(toMap());
-    FirebaseFirestore.instance.collection("trash").doc(id).update({
-      "date deleted": DateTime.now(),
-    });
-    FirebaseFirestore.instance.collection("reports").doc(id).delete();
+  void moveToTrash(pageType) {
+    switch (pageType) {
+      case PageType.reportsPage:
+        FirebaseFirestore.instance.collection("trash").doc(id).set(toMap());
+        FirebaseFirestore.instance.collection("trash").doc(id).update({
+          "date deleted": DateTime.now(),
+        });
+        FirebaseFirestore.instance.collection("reports").doc(id).delete();
+        break;
+      case PageType.archivePage:
+        FirebaseFirestore.instance.collection("trash").doc(id).set(toMap());
+        FirebaseFirestore.instance.collection("trash").doc(id).update({
+          "date deleted": DateTime.now(),
+        });
+        FirebaseFirestore.instance.collection("archive").doc(id).delete();
+        break;
+    }
   }
 
   void restoreFromTrash() {
@@ -53,6 +65,17 @@ class Report {
         item.delete();
       }
     });
+  }
+
+  void archive() {
+    //Add the document to the "trash" collection and delete from "reports"
+    FirebaseFirestore.instance.collection("archive").doc(id).set(toMap());
+    FirebaseFirestore.instance.collection("reports").doc(id).delete();
+  }
+
+  void unarchive() {
+    FirebaseFirestore.instance.collection("reports").doc(id).set(toMap());
+    FirebaseFirestore.instance.collection("archive").doc(id).delete();
   }
 
   Report(
