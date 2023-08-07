@@ -1,3 +1,4 @@
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
@@ -5,16 +6,16 @@ import 'package:provider/provider.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/panel_widgets/panel_widgets.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/providers.dart';
 
-import '../main_form/database_communication.dart';
+import '../../main_form/database_communication.dart';
 
-class AdminPanelPage extends StatefulWidget {
-  const AdminPanelPage({super.key});
+class TrashPage extends StatefulWidget {
+  const TrashPage({super.key});
 
   @override
-  State<AdminPanelPage> createState() => _AdminPanelPageState();
+  State<TrashPage> createState() => _AdminPanelPageState();
 }
 
-class _AdminPanelPageState extends State<AdminPanelPage> {
+class _AdminPanelPageState extends State<TrashPage> {
   @override
   Widget build(BuildContext context) {
     return Portal(
@@ -38,7 +39,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
               return Scaffold(
                 appBar: AppBar(
                   forceMaterialTransparency: true,
-                  title: const Text('Admin Panel'),
+                  title: const Text('Kosz'),
                   actions: [
                     ElevatedButton(
                       onPressed: () async {
@@ -46,14 +47,14 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                         Navigator.of(context)
                             .pushReplacementNamed('/admin-login');
                       },
-                      child: const Text('Logout'),
+                      child: const Text('Wyloguj'),
                     ),
                   ],
                 ),
                 body: Center(
                   child: FutureBuilder(
                     future:
-                        context.read<DataAndSelectionManager>().fetchReports(),
+                    context.read<DataAndSelectionManager>().fetchTrash(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();
@@ -63,20 +64,18 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                         children: [
                           const SideMenuBar(),
                           SizedBox(
-                          width: MediaQuery.of(context).size.width /
-                                      MediaQuery.of(context).size.height >
-                                  1
-                              ? MediaQuery.of(context).size.width * 0.250
-                              : double.infinity,
+                            width: MediaQuery.of(context).size.width /
+                                MediaQuery.of(context).size.height > 1
+                                ? MediaQuery.of(context).size.width * 0.250
+                                : double.infinity,
                             child: Column(
                               children: [
                                 SizedBox(
                                   width: MediaQuery.of(context).size.width /
-                                              MediaQuery.of(context).size.height >
-                                          1
+                                      MediaQuery.of(context).size.height > 1
                                       ? MediaQuery.of(context).size.width * 0.250
                                       : double.infinity,
-                                  child: const TopMenuBar(),
+                                  child: const TopMenuBar(pageType: PageType.trashPage),
                                 ),
                                 Consumer<DataAndSelectionManager>(
                                   builder: (context, reportData, child) {
@@ -84,24 +83,24 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                                       child: SizedBox(
                                         height: MediaQuery.of(context).size.height,
                                         width: MediaQuery.of(context).size.width /
-                                                    MediaQuery.of(context)
-                                                        .size
-                                                        .height >
-                                                1
+                                            MediaQuery.of(context)
+                                                .size
+                                                .height >
+                                            1
                                             ? MediaQuery.of(context).size.width *
-                                                0.250
+                                            0.250
                                             : double.infinity,
                                         child: ListView.builder(
                                           itemBuilder: (context, index) {
                                             if (index <
                                                 context
                                                     .read<DataAndSelectionManager>()
-                                                    .reports
+                                                    .trash
                                                     .length) {
-                                              return ReportListElement(
+                                              return TrashListElement(
                                                 report: context
                                                     .read<DataAndSelectionManager>()
-                                                    .reports[index],
+                                                    .trash[index],
                                               );
                                             }
                                             return null;

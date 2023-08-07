@@ -1,6 +1,7 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/admin_panel.dart';
+import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/admin_panel.dart';
+import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/trash_page.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -124,6 +125,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const FormPage(title: 'Raportowanie Zdarzeń Niebezpiecznych'),
         '/admin-login': (context) => const AdminLoginPage(),
         '/admin-panel': (context) => const SelectionArea(child: AdminPanelPage()),
+        '/admin-panel/trash': (context) => const SelectionArea(child: TrashPage()),
       },
       initialRoute: '/',
       localizationsDelegates: const [

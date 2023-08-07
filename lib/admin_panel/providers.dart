@@ -1,10 +1,11 @@
 import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form.dart';
 
 import '../main_form/database_communication.dart';
+
+enum PageType {reportsPage, trashPage, archivePage}
 
 class Filters {
   bool useIncidentTimestamp = false;
@@ -20,7 +21,11 @@ class DataAndSelectionManager extends ChangeNotifier {
   //Data
 
   List<Report> _reports = [];
+  List<Report> _trash = [];
+  List<Report> _archivedReports = [];
   Filters _filters = Filters(categories: [...categories]);
+
+
 
   Filters get filters => _filters;
 
@@ -39,23 +44,27 @@ class DataAndSelectionManager extends ChangeNotifier {
   UnmodifiableListView<Report> get reports => UnmodifiableListView(
         _reports.where(
           (report) {
-            if (_filters.dateRange?.start != null &&
-                _filters.dateRange?.end != null) {
+            if (_filters.dateRange != null) {
             if (_filters.useIncidentTimestamp) {
               DateTime incidentTimestamp = DateTime.fromMillisecondsSinceEpoch(
                   report.incidentData["incident timestamp"].seconds * 1000);
                 if (!_isDateInRange(incidentTimestamp, _filters.dateRange)) {
+                  _selected.removeWhere((report) => report == report);
                   return false;
                 }
               }
             else {
               if (!_isDateInRange(
-                  report.reportTimestamp, _filters.dateRange)) {
-                return false;
+                    report.reportTimestamp, _filters.dateRange)) {
+                _selected.removeWhere((report) => report == report);
+                  return false;
+                }
               }
             }
-            }
-            if (_filters.categories.isNotEmpty) {
+            if (_filters.categories.isEmpty) {
+              _selected.removeWhere((report) => report == report);
+              return false;
+            } else {
               if (_filters.categories.contains("inne...") &&
                   !categories.contains(report.incidentData["category"])) {
                 return true;
@@ -64,34 +73,117 @@ class DataAndSelectionManager extends ChangeNotifier {
                   .contains(report.incidentData["category"])) {
                 return true;
               }
-              return false;
-            } else {
+              _selected.removeWhere((report) => report == report);
               return false;
             }
           },
         ),
       );
 
+  UnmodifiableListView<Report> get trash => UnmodifiableListView(
+    _trash.where(
+          (report) {
+        if (_filters.dateRange != null) {
+          if (_filters.useIncidentTimestamp) {
+            DateTime incidentTimestamp = DateTime.fromMillisecondsSinceEpoch(
+                report.incidentData["incident timestamp"].seconds * 1000);
+            if (!_isDateInRange(incidentTimestamp, _filters.dateRange)) {
+              _selected.removeWhere((report) => report == report);
+              return false;
+            }
+          }
+          else {
+            if (!_isDateInRange(
+                report.reportTimestamp, _filters.dateRange)) {
+              _selected.removeWhere((report) => report == report);
+              return false;
+            }
+          }
+        }
+        if (_filters.categories.isEmpty) {
+          _selected.removeWhere((report) => report == report);
+          return false;
+        } else {
+          if (_filters.categories.contains("inne...") &&
+              !categories.contains(report.incidentData["category"])) {
+            return true;
+          }
+          if (_filters.categories
+              .contains(report.incidentData["category"])) {
+            return true;
+          }
+          _selected.removeWhere((report) => report == report);
+          return false;
+        }
+      },
+    ),
+  );
+
+  UnmodifiableListView<Report> get archivedReports => UnmodifiableListView(
+    _archivedReports.where(
+          (report) {
+        if (_filters.dateRange != null) {
+          if (_filters.useIncidentTimestamp) {
+            DateTime incidentTimestamp = DateTime.fromMillisecondsSinceEpoch(
+                report.incidentData["incident timestamp"].seconds * 1000);
+            if (!_isDateInRange(incidentTimestamp, _filters.dateRange)) {
+              _selected.removeWhere((report) => report == report);
+              return false;
+            }
+          }
+          else {
+            if (!_isDateInRange(
+                report.reportTimestamp, _filters.dateRange)) {
+              _selected.removeWhere((report) => report == report);
+              return false;
+            }
+          }
+        }
+        if (_filters.categories.isEmpty) {
+          _selected.removeWhere((report) => report == report);
+          return false;
+        } else {
+          if (_filters.categories.contains("inne...") &&
+              !categories.contains(report.incidentData["category"])) {
+            return true;
+          }
+          if (_filters.categories
+              .contains(report.incidentData["category"])) {
+            return true;
+          }
+          _selected.removeWhere((report) => report == report);
+          return false;
+        }
+      },
+    ),
+  );
+
   void sortReportsByReportTimestamp(bool reverse) {
     _reports.sort((a, b) => a.reportTimestamp.compareTo(b.reportTimestamp));
+    _trash.sort((a, b) => a.reportTimestamp.compareTo(b.reportTimestamp));
     if (reverse) {
       _reports = _reports.reversed.toList();
+      _trash = _trash.reversed.toList();
     }
     notifyListeners();
   }
 
   void sortReportsByIncidentTimestamp(bool reverse) {
     _reports.sort((a, b) => a.incidentData["incident timestamp"].compareTo(b.incidentData["incident timestamp"]));
+    _trash.sort((a, b) => a.incidentData["incident timestamp"].compareTo(b.incidentData["incident timestamp"]));
     if (reverse) {
       _reports = _reports.reversed.toList();
+      _trash = _trash.reversed.toList();
     }
     notifyListeners();
   }
 
   void sortReportsByCategory(bool reverse) {
     _reports.sort((a, b) => a.incidentData["category"].toUpperCase().compareTo(b.incidentData["category"].toUpperCase()));
+    _trash.sort((a, b) => a.incidentData["category"].toUpperCase().compareTo(b.incidentData["category"].toUpperCase()));
     if (reverse) {
       _reports = _reports.reversed.toList();
+      _trash = _trash.reversed.toList();
     }
     notifyListeners();
   }
@@ -101,20 +193,15 @@ class DataAndSelectionManager extends ChangeNotifier {
   }
 
   void setFilters(Filters filters) {
-    //TODO remember to remove filtered out entries from _selected
     _filters = filters;
     notifyListeners();
   }
 
   void clearFilters() {
-    print("before clear:");
-    print(_filters.categories);
     _filters = Filters(
         useIncidentTimestamp: false,
         dateRange: null,
         categories: [...categories]);
-    print("after clear:");
-    print(_filters.categories);
     notifyListeners();
   }
 
@@ -172,32 +259,71 @@ class DataAndSelectionManager extends ChangeNotifier {
 
   bool isEverythingSelected = false;
 
-  void _updateSelectionStatus() {
-    if (_selected.length == _reports.length) {
-      isEverythingSelected = true;
-    } else {
-      isEverythingSelected = false;
+  void _updateSelectionStatus(pageType) {
+    switch (pageType) {
+      case PageType.reportsPage:
+        if (_selected.length == _reports.length) {
+          isEverythingSelected = true;
+        } else {
+          isEverythingSelected = false;
+        }
+        break;
+      case PageType.trashPage:
+        if (_selected.length == _trash.length) {
+          isEverythingSelected = true;
+        } else {
+          isEverythingSelected = false;
+        }
+        break;
+      case PageType.archivePage:
+        if (_selected.length == _archivedReports.length) {
+          isEverythingSelected = true;
+        } else {
+          isEverythingSelected = false;
+        }
+        break;
     }
+
   }
 
-  void toggleSelectAll() {
-    if (_selected.length == _reports.length) {
-      _selected.clear();
-    } else {
-      _selected.clear();
-      _selected.addAll(_reports);
+  void toggleSelectAll(pageType) {
+    switch (pageType) {
+      case PageType.reportsPage:
+        if (_selected.length == _reports.length) {
+          _selected.clear();
+        } else {
+          _selected.clear();
+          _selected.addAll(_reports);
+        }
+        break;
+      case PageType.trashPage:
+        if (_selected.length == _trash.length) {
+          _selected.clear();
+        } else {
+          _selected.clear();
+          _selected.addAll(_trash);
+        }
+        break;
+      case PageType.archivePage:
+        if (_selected.length == _archivedReports.length) {
+          _selected.clear();
+        } else {
+          _selected.clear();
+          _selected.addAll(_archivedReports);
+        }
+        break;
     }
-    _updateSelectionStatus();
+    _updateSelectionStatus(pageType);
     notifyListeners();
   }
 
-  void toggleSelection(Report report) {
+  void toggleSelection(Report report, pageType) {
     if (_selected.contains(report)) {
       _selected.removeWhere((value) => value == report);
     } else {
       _selected.add(report);
     }
-    _updateSelectionStatus();
+    _updateSelectionStatus(pageType);
     notifyListeners();
   }
 
@@ -205,25 +331,25 @@ class DataAndSelectionManager extends ChangeNotifier {
     return _selected.contains(report);
   }
 
-  void deleteReport(Report report) {
-    report.deleteFromDatabase();
+  void moveReportToTrash(Report report, pageType) {
+    report.moveToTrash();
     _reports.remove(report);
-    _updateSelectionStatus();
+    _updateSelectionStatus(pageType);
     notifyListeners();
   }
 
-  void deleteSelected() {
+  void moveSelectedToTrash(pageType) {
     for (var report in _selected) {
-      deleteReport(report);
+      moveReportToTrash(report, pageType);
     }
     _selected.clear();
-    _updateSelectionStatus();
+    _updateSelectionStatus(pageType);
     notifyListeners();
   }
 
   void clearSelections() {
     _selected.clear();
-    _updateSelectionStatus();
+    isEverythingSelected = false;
     notifyListeners();
   }
 
@@ -245,4 +371,64 @@ class DataAndSelectionManager extends ChangeNotifier {
   bool isHighlighted(Report report) {
     return _highlighted == report;
   }
+
+  Future fetchTrash({refresh = false}) async {
+    if (refresh || _trash.isEmpty) {
+      _trash.clear();
+      await FirebaseFirestore.instance
+          .collection("trash")
+          .orderBy("report timestamp", descending: true)
+          .limit(100)
+          .get()
+          .then((QuerySnapshot querySnapshot) {
+        for (var doc in querySnapshot.docs) {
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          _trash.add(Report(
+              id: doc.id,
+              reportTimestamp: DateTime.fromMillisecondsSinceEpoch(
+                  data["report timestamp"].seconds * 1000),
+              personalData: data["personal data"],
+              incidentData: data["incident data"]));
+        }
+        notifyListeners();
+        return true;
+      });
+    } else {
+      notifyListeners();
+      return false;
+    }
+  }
+
+  void restoreFromTrash(Report report) {
+    report.restoreFromTrash();
+    _trash.remove(report);
+    _updateSelectionStatus(PageType.trashPage);
+    notifyListeners();
+  }
+
+  void restoreSelectedFromTrash() {
+    for (var report in _selected) {
+      restoreFromTrash(report);
+    }
+    _selected.clear();
+    _updateSelectionStatus(PageType.trashPage);
+    notifyListeners();
+  }
+
+  void deletePermanently(Report report) {
+    report.deletePermanently();
+    _trash.remove(report);
+    _updateSelectionStatus(PageType.trashPage);
+    notifyListeners();
+  }
+
+  void deleteSelectedPermanently() {
+    for (var report in _selected) {
+      deletePermanently(report);
+    }
+    _selected.clear();
+    _updateSelectionStatus(PageType.trashPage);
+    notifyListeners();
+  }
+
 }

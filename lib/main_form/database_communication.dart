@@ -29,8 +29,25 @@ class Report {
   final Map<String, dynamic> personalData;
   final Map<String, dynamic> incidentData;
 
-  void deleteFromDatabase() {
+  void moveToTrash() {
+    //Add the document to the "trash" collection and delete from "reports"
+    FirebaseFirestore.instance.collection("trash").doc(id).set(toMap());
+    FirebaseFirestore.instance.collection("trash").doc(id).update({
+      "date deleted": DateTime.now(),
+    });
     FirebaseFirestore.instance.collection("reports").doc(id).delete();
+  }
+
+  void restoreFromTrash() {
+    FirebaseFirestore.instance.collection("reports").doc(id).set(toMap());
+    FirebaseFirestore.instance.collection("trash").doc(id).delete();
+    FirebaseFirestore.instance.collection("reports").doc(id).update({
+      "date deleted": FieldValue.delete(),
+    });
+  }
+
+  void deletePermanently() {
+    FirebaseFirestore.instance.collection("trash").doc(id).delete();
     FirebaseStorage.instance.ref().child("images/$id").listAll().then((value) {
       for (var item in value.items) {
         item.delete();
@@ -51,6 +68,7 @@ class Report {
       "incident data": incidentData,
     };
   }
+
 }
 
 class PersonalData {

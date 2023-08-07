@@ -15,6 +15,7 @@ class SortingMenu extends StatefulWidget {
 class _SortingMenuState extends State<SortingMenu> {
   SortingType sortingType = SortingType.byIncidentDate;
   bool isSortingReversed = false;
+  List<bool> toggleButtonsState = [true, false, false];
 
   @override
   Widget build(BuildContext context) {
@@ -108,50 +109,54 @@ class _SortingMenuState extends State<SortingMenu> {
                   },
                 ),
                 const Divider(),
-                DropdownButtonFormField(
-                  items: const [
-                    DropdownMenuItem(
-                      value: SortingType.byIncidentDate,
-                      child: Text("Data zdarzenia"),
-                    ),
-                    DropdownMenuItem(
-                      value: SortingType.byReportDate,
-                      child: Text("Data zgłoszenia"),
-                    ),
-                    DropdownMenuItem(
-                      value: SortingType.byCategory,
-                      child: Text("Katrgoria"),
-                    )
-                  ],
-                  onChanged: (value) {
+                ToggleButtons(
+                  isSelected: toggleButtonsState,
+                  onPressed: (index) {
                     setState(() {
-                      switch (value) {
-                        case SortingType.byIncidentDate:
+                      switch (index) {
+                        case 0:
                           sortingType = SortingType.byIncidentDate;
+                          toggleButtonsState = [true, false, false];
                           context
                               .read<DataAndSelectionManager>()
                               .sortReportsByIncidentTimestamp(
-                                  isSortingReversed);
+                              isSortingReversed);
                           break;
-                        case SortingType.byReportDate:
+                        case 1:
                           sortingType = SortingType.byReportDate;
+                          toggleButtonsState = [false, true, false];
                           context
                               .read<DataAndSelectionManager>()
                               .sortReportsByReportTimestamp(isSortingReversed);
                           break;
-                        case SortingType.byCategory:
+                        case 2:
                           sortingType = SortingType.byCategory;
+                          toggleButtonsState = [false, false, true];
                           context
                               .read<DataAndSelectionManager>()
                               .sortReportsByCategory(isSortingReversed);
                           break;
                         default:
+                          break;
+
                       }
-                      print(sortingType);
                     });
                   },
-                  decoration: const InputDecoration(label: Text("Sortuj po:")),
-                )
+                  children: const [
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text("Data zdażenia"),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text("Data zgłoszenia"),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text("Kategoria"),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
