@@ -30,6 +30,7 @@ class Report {
   final DateTime reportTimestamp;
   final Map<String, dynamic> personalData;
   final Map<String, dynamic> incidentData;
+  late final List<String> imageUrls = [];
 
   void moveToTrash(pageType) {
     switch (pageType) {
@@ -90,6 +91,20 @@ class Report {
       "personal data": personalData,
       "incident data": incidentData,
     };
+  }
+
+  Future<List<String>> getImageUrls() async {
+    if (imageUrls.isNotEmpty) {
+      return imageUrls;
+    }
+    else {
+      ListResult imageRef = await FirebaseStorage.instance.ref().child("images/$id").listAll();
+      for (var image in imageRef.items) {
+        imageUrls.add(await image.getDownloadURL());
+      }
+      print(imageUrls);
+      return imageUrls;
+    }
   }
 
 }

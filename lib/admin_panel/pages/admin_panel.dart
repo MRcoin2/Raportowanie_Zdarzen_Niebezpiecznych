@@ -64,6 +64,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                           .reports
                           .length);
                       return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           const SideMenuBar(),

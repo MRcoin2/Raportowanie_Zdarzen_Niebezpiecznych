@@ -60,6 +60,7 @@ class _TrashPageState extends State<TrashPage> {
                         return const CircularProgressIndicator();
                       }
                       return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           const SideMenuBar(),

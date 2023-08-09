@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/authentication/auth_dialog.dart';
@@ -163,7 +165,8 @@ class _MainFormState extends State<MainForm> {
                 controller: _phoneController,
                 labelText: "Numer Telefonu (opcjonalnie)",
                 validator: (value) {
-                  if (value!.isNotEmpty && !RegExp(r'^\d{9}$').hasMatch(value)) {
+                  if (value!.isNotEmpty &&
+                      !RegExp(r'^\d{9}$').hasMatch(value)) {
                     return 'Proszę wprowadzić poprawny numer telefonu lub nie wprowadzać nic';
                   }
                   return null;
@@ -221,7 +224,7 @@ class _MainFormState extends State<MainForm> {
                   Expanded(
                       child: DatePickerFormField(
                     dateController: _dateController,
-                        labelText: "Data zdarzenia",
+                    labelText: "Data zdarzenia",
                   )),
                   Expanded(
                       child: TimePickerFormField(
@@ -317,27 +320,33 @@ class _MainFormState extends State<MainForm> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: OutlinedButton(
-                  onPressed: () {
-                    _picker
-                        .pickImage(
-                            source: ImageSource.gallery, imageQuality: 50)
-                        .then((file) {
-                      if (file != null) {
-                        setState(() {
-                          _images.add(file);
-                          for (var element in _images) {
-                            print(element.name);
-                          }
-                        });
-                      }
-                    });
-                  },
+                  // disable button when more then 10 imabes uploaded
+                  onPressed: _images.length >= 10
+                      ? null
+                      : () {
+                          _picker
+                              .pickMultiImage(imageQuality: 50)
+                              .then((files) {
+                            if (files.length + _images.length > 10) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content:
+                                      Text("Można dodać maksymalnie 10 zdjęć"),
+                                ),
+                              );
+                            } else {
+                              setState(() {
+                                _images.addAll(files);
+                              });
+                            }
+                          });
+                        },
                   child: const Text("Dodaj Zdjęcia (opcjonalne)"),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text("Dodano ${_images.length} zdjęć"),
+                child: Text("Dodano ${_images.length}/10 zdjęć"),
               ),
               //clear added images
               IconButton(
@@ -350,6 +359,51 @@ class _MainFormState extends State<MainForm> {
               ),
             ],
           ),
+          _images.isEmpty
+              ? Container()
+              : SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.3,
+                  width: MediaQuery.of(context).size.height /
+                              MediaQuery.of(context).size.width <
+                          1
+                      ? MediaQuery.of(context).size.width * 0.50
+                      : double.infinity,
+                  child: GridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 5,
+                    ),
+                    itemCount: _images.length,
+                    itemBuilder: (context, index) {
+                      return FutureBuilder(
+                        future: _images[index].readAsBytes(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return Stack(children: [
+                              Card(
+                                elevation: 4,
+                                child: AspectRatio(
+                                  aspectRatio: 1,
+                                  child: Image.memory(
+                                    snapshot.data as Uint8List,
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _images.removeAt(index);
+                                    });
+                                  },
+                                  icon: const Icon(Icons.clear))
+                            ]);
+                          }
+                          return const CircularProgressIndicator();
+                        },
+                      );
+                    },
+                  ),
+                ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: FilledButton(
@@ -372,8 +426,9 @@ class _MainFormState extends State<MainForm> {
                             "status": _chosenStatus,
                           },
                           incidentData: {
-                            "incident timestamp": DateFormat('dd.MM.yyyy hh:mm').parse(
-                                "${_dateController.text} ${_timeController.text}"),
+                            "incident timestamp": DateFormat('dd.MM.yyyy hh:mm')
+                                .parse(
+                                    "${_dateController.text} ${_timeController.text}"),
                             "date": _dateController.text,
                             "time": _timeController.text,
                             "location": _placeController.text,

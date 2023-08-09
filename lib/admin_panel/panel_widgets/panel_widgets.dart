@@ -1,3 +1,4 @@
+import 'package:firebase/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:intl/intl.dart';
@@ -81,7 +82,7 @@ class _ReportListElementState extends State<ReportListElement> {
                                   .read<DataAndSelectionManager>()
                                   .archiveReport(widget.report);
                             },
-                            icon: const Icon(Icons.archive_outlined)),
+                            icon: const Icon(Icons.check)),
                         IconButton(
                             onPressed: () {
                               showDialog(
@@ -205,7 +206,9 @@ class _TrashListElementState extends State<TrashListElement> {
                         IconButton(
                             tooltip: 'Przywróć',
                             onPressed: () {
-                              context.read<DataAndSelectionManager>().restoreFromTrash(widget.report);
+                              context
+                                  .read<DataAndSelectionManager>()
+                                  .restoreFromTrash(widget.report);
                             },
                             icon: const Icon(Icons.restore_outlined)),
                         Checkbox(
@@ -304,7 +307,7 @@ class _ArchiveListElementState extends State<ArchiveListElement> {
                                   .read<DataAndSelectionManager>()
                                   .unarchiveReport(widget.report);
                             },
-                            icon: const Icon(Icons.unarchive_outlined)),
+                            icon: const Icon(Icons.close_outlined)),
                         IconButton(
                             onPressed: () {
                               showDialog(
@@ -530,8 +533,8 @@ class _TopMenuBarState extends State<TopMenuBar> {
                                           .read<DataAndSelectionManager>()
                                           .archiveSelected();
                                     },
-                                    icon: const Icon(Icons.archive_outlined),
-                                    tooltip: "Archiwizuj wszystkie zaznaczone",
+                                    icon: const Icon(Icons.checklist_sharp),
+                                    tooltip: "Zatwierdź wszystkie zaznaczone",
                                   )
                                 : IconButton(
                                     onPressed: () {
@@ -539,9 +542,9 @@ class _TopMenuBarState extends State<TopMenuBar> {
                                           .read<DataAndSelectionManager>()
                                           .unarchiveSelected();
                                     },
-                                    icon: const Icon(Icons.unarchive_outlined),
+                                    icon: const Icon(Icons.close_outlined),
                                     tooltip:
-                                        "Przywróć z archiwum wszystkie zaznaczone",
+                                        "Przywróć z zatwierdzonych wszystkie zaznaczone",
                                   ),
                             IconButton(
                               onPressed: () {
@@ -635,8 +638,8 @@ class SideMenuBar extends StatelessWidget {
               ),
               const Divider(),
               ListTile(
-                leading: const Icon(Icons.archive_outlined),
-                title: const Text("Archiwum"),
+                leading: const Icon(Icons.check),
+                title: const Text("Zatwierdzone"),
                 onTap: () {
                   context.read<DataAndSelectionManager>().clearSelections();
                   Navigator.of(context).pushNamed('/admin-panel/archive');
@@ -673,118 +676,148 @@ class ReportDisplayCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return SelectionArea(
       child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(18.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                report.incidentData['category'] ?? '',
-                style: Theme.of(context).textTheme.displayMedium,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const Divider(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  const Text(
-                    "Data zgłoszenia: ",
-                    style: TextStyle(color: Colors.grey),
-                    textAlign: TextAlign.right,
-                  ),
-                  Text(
-                    ' ${DateFormat("dd.MM.yyyy").format(DateTime.fromMillisecondsSinceEpoch(report.reportTimestamp.millisecondsSinceEpoch))}',
-                    textAlign: TextAlign.right,
-                  )
-                ],
-              ),
-              // personal data
-              Row(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Dane osobowe:",
-                          style: Theme.of(context).textTheme.titleLarge),
-                      const Text(
-                        "Imię Nazwisko:",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      const Text(
-                        "Status:",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      const Text(
-                        "Sąd:",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      const Text(
-                        "Adres e-mail:",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      const Text(
-                        "Numer telefonu:",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("", style: Theme.of(context).textTheme.titleLarge),
-                      Text(
-                          "${report.personalData['name']} ${report.personalData['surname']}"),
-                      Text("${report.personalData['status']}"),
-                      Text("${report.personalData['affiliation']}"),
-                      Text("${report.personalData['email']}"),
-                      Text("${report.personalData['phoneNumber'] ?? ''}"),
-                    ],
-                  )
-                ],
-              ),
-              Text(""),
-              Row(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Dane zdarzenia:",
-                          style: Theme.of(context).textTheme.titleLarge),
-                      const Text(
-                        "Lokalizacja:",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      const Text(
-                        "Data zdarzenia:",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      const Text(
-                        "Opis:",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("", style: Theme.of(context).textTheme.titleLarge),
-                      Text("${report.incidentData["location"]}"),
-                      Text(
-                          "${report.incidentData['date']} ${report.incidentData['time']}"),
-                      Text(""),
-                    ],
-                  )
-                ],
-              ),
-              Text(""),
-              Text(
-                "${report.incidentData['description']}",
-                textAlign: TextAlign.justify,
-              ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(18.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  report.incidentData['category'] ?? '',
+                  style: Theme.of(context).textTheme.displayMedium,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const Divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    const Text(
+                      "Data zgłoszenia: ",
+                      style: TextStyle(color: Colors.grey),
+                      textAlign: TextAlign.right,
+                    ),
+                    Text(
+                      ' ${DateFormat("dd.MM.yyyy").format(DateTime.fromMillisecondsSinceEpoch(report.reportTimestamp.millisecondsSinceEpoch))}',
+                      textAlign: TextAlign.right,
+                    )
+                  ],
+                ),
+                // personal data
+                Row(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Dane osobowe:",
+                            style: Theme.of(context).textTheme.titleLarge),
+                        const Text(
+                          "Imię Nazwisko:",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        const Text(
+                          "Status:",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        const Text(
+                          "Sąd:",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        const Text(
+                          "Adres e-mail:",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        const Text(
+                          "Numer telefonu:",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("", style: Theme.of(context).textTheme.titleLarge),
+                        Text(
+                            "${report.personalData['name']} ${report.personalData['surname']}"),
+                        Text("${report.personalData['status']}"),
+                        Text("${report.personalData['affiliation']}"),
+                        Text("${report.personalData['email']}"),
+                        Text("${report.personalData['phoneNumber'] ?? ''}"),
+                      ],
+                    )
+                  ],
+                ),
+                Text(""),
+                Row(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Dane zdarzenia:",
+                            style: Theme.of(context).textTheme.titleLarge),
+                        const Text(
+                          "Lokalizacja:",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        const Text(
+                          "Data zdarzenia:",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        const Text(
+                          "Opis:",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("", style: Theme.of(context).textTheme.titleLarge),
+                        Text("${report.incidentData["location"]}"),
+                        Text(
+                            "${report.incidentData['date']} ${report.incidentData['time']}"),
+                        Text(""),
+                      ],
+                    )
+                  ],
+                ),
+                Text(""),
+                Text(
+                  "${report.incidentData['description']}",
+                  textAlign: TextAlign.justify,
+                ),
 
-              const Divider(),
-            ],
+                const Divider(),
+                // grid of images from fires storage linked to this report
+                FutureBuilder(
+                    future: report.getImageUrls(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        return GridView.builder(
+                          shrinkWrap: true,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 5),
+                          itemCount: snapshot.data?.length,
+                          itemBuilder: (context, index) {
+                            return Card(
+                              elevation: 4,
+                              child: Image.network(snapshot.data![index]),
+                            );
+                          },
+                        );
+                      } else {
+                        return Center(
+                          child: const SizedBox(
+                              width: 50,
+                              height: 50,
+                              child: CircularProgressIndicator(),
+                            ),
+                        );
+                      }
+                    })
+              ],
+            ),
           ),
         ),
       ),

@@ -29,18 +29,63 @@ class _SortingMenuState extends State<SortingMenu> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                ListTile(
-                  title: const Text("Sortowanie"),
-                  trailing: Container(
-                    width: 100,
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Icon(Icons.sort_by_alpha_outlined),
-                        Icon(Icons.arrow_downward_outlined),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    const Text("Sortuj po: "),
+                    ToggleButtons(
+                      isSelected: toggleButtonsState,
+                      onPressed: (index) {
+                        setState(() {
+                          switch (index) {
+                            case 0:
+                              sortingType = SortingType.byIncidentDate;
+                              toggleButtonsState = [true, false, false];
+                              context
+                                  .read<DataAndSelectionManager>()
+                                  .sortReportsByIncidentTimestamp(
+                                      isSortingReversed);
+                              break;
+                            case 1:
+                              sortingType = SortingType.byReportDate;
+                              toggleButtonsState = [false, true, false];
+                              context
+                                  .read<DataAndSelectionManager>()
+                                  .sortReportsByReportTimestamp(
+                                      isSortingReversed);
+                              break;
+                            case 2:
+                              sortingType = SortingType.byCategory;
+                              toggleButtonsState = [false, false, true];
+                              context
+                                  .read<DataAndSelectionManager>()
+                                  .sortReportsByCategory(isSortingReversed);
+                              break;
+                            default:
+                              break;
+                          }
+                        });
+                      },
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text("Data zdażenia"),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text("Data zgłoszenia"),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text("Kategoria"),
+                        ),
                       ],
                     ),
-                  ),
+                  ],
+                ),
+                const Divider(),
+                ListTile(
+                  title: const Text("Sortuj A → Z"),
                   onTap: () {
                     print(sortingType);
                     setState(
@@ -71,17 +116,7 @@ class _SortingMenuState extends State<SortingMenu> {
                   },
                 ),
                 ListTile(
-                  title: const Text("Sortowanie"),
-                  trailing: Container(
-                    width: 100,
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Icon(Icons.sort_by_alpha_outlined),
-                        Icon(Icons.arrow_upward_outlined),
-                      ],
-                    ),
-                  ),
+                  title: const Text("Sortuj Z → A"),
                   onTap: () {
                     setState(() {
                       print(sortingType);
@@ -107,55 +142,6 @@ class _SortingMenuState extends State<SortingMenu> {
                       }
                     });
                   },
-                ),
-                const Divider(),
-                ToggleButtons(
-                  isSelected: toggleButtonsState,
-                  onPressed: (index) {
-                    setState(() {
-                      switch (index) {
-                        case 0:
-                          sortingType = SortingType.byIncidentDate;
-                          toggleButtonsState = [true, false, false];
-                          context
-                              .read<DataAndSelectionManager>()
-                              .sortReportsByIncidentTimestamp(
-                              isSortingReversed);
-                          break;
-                        case 1:
-                          sortingType = SortingType.byReportDate;
-                          toggleButtonsState = [false, true, false];
-                          context
-                              .read<DataAndSelectionManager>()
-                              .sortReportsByReportTimestamp(isSortingReversed);
-                          break;
-                        case 2:
-                          sortingType = SortingType.byCategory;
-                          toggleButtonsState = [false, false, true];
-                          context
-                              .read<DataAndSelectionManager>()
-                              .sortReportsByCategory(isSortingReversed);
-                          break;
-                        default:
-                          break;
-
-                      }
-                    });
-                  },
-                  children: const [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text("Data zdażenia"),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text("Data zgłoszenia"),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text("Kategoria"),
-                    ),
-                  ],
                 ),
               ],
             ),

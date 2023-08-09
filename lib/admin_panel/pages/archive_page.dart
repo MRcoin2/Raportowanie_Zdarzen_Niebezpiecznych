@@ -39,7 +39,7 @@ class _ArchivePageState extends State<ArchivePage> {
               return Scaffold(
                 appBar: AppBar(
                   forceMaterialTransparency: true,
-                  title: const Text('Archiwum'),
+                  title: const Text('Zatwierdzone'),
                   actions: [
                     ElevatedButton(
                       onPressed: () async {
@@ -60,6 +60,7 @@ class _ArchivePageState extends State<ArchivePage> {
                         return const CircularProgressIndicator();
                       }
                       return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           const SideMenuBar(),
