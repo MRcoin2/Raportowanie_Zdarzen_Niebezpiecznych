@@ -51,6 +51,7 @@ dependencies:
   printing: ^5.11.0
   flutter_html_to_pdf: ^0.7.0
   flutter_portal: ^1.1.4
+  totp: ^0.0.1
 
 dev_dependencies:
   flutter_test:
