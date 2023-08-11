@@ -19,11 +19,99 @@ class Filters {
 }
 
 class DataAndSelectionManager extends ChangeNotifier {
-  //Data
-
+  //database comunication
   List<Report> _reports = [];
   List<Report> _trash = [];
   List<Report> _archivedReports = [];
+
+  Future<bool> fetchReports({refresh = false}) async {
+    print("fetching reports");
+    //TODO handle limit and load more
+    if (refresh || _reports.isEmpty) {
+      print("clearing reports");
+      _reports.clear();
+      await FirebaseFirestore.instance
+          .collection("reports")
+          .orderBy("report timestamp", descending: true)
+          .limit(100)
+          .get()
+          .then((QuerySnapshot querySnapshot) {
+        print(querySnapshot.docs.length);
+        for (var doc in querySnapshot.docs) {
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          print("adding report");
+          _reports.add(Report(
+              id: doc.id,
+              reportTimestamp: DateTime.fromMillisecondsSinceEpoch(
+                  data["report timestamp"].seconds * 1000),
+              personalData: data["personal data"],
+              incidentData: data["incident data"]));
+        }
+        notifyListeners();
+        return true;
+      });
+    }
+    notifyListeners();
+    return false;
+  }
+
+  Future fetchTrash({refresh = false}) async {
+    if (refresh || _trash.isEmpty) {
+      _trash.clear();
+      await FirebaseFirestore.instance
+          .collection("trash")
+          .orderBy("date deleted", descending: true)
+          .limit(100)
+          .get()
+          .then((QuerySnapshot querySnapshot) {
+        for (var doc in querySnapshot.docs) {
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          _trash.add(Report(
+              id: doc.id,
+              reportTimestamp: DateTime.fromMillisecondsSinceEpoch(
+                  data["report timestamp"].seconds * 1000),
+              personalData: data["personal data"],
+              incidentData: data["incident data"]));
+        }
+        notifyListeners();
+        return true;
+      });
+    } else {
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future fetchArchive({refresh = false}) async {
+    if (refresh || _archivedReports.isEmpty) {
+      print("fetching archive");
+      _archivedReports.clear();
+      await FirebaseFirestore.instance
+          .collection("archive")
+          .orderBy("report timestamp", descending: true)
+          .limit(100)
+          .get()
+          .then((QuerySnapshot querySnapshot) {
+        for (var doc in querySnapshot.docs) {
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          _archivedReports.add(Report(
+              id: doc.id,
+              reportTimestamp: DateTime.fromMillisecondsSinceEpoch(
+                  data["report timestamp"].seconds * 1000),
+              personalData: data["personal data"],
+              incidentData: data["incident data"]));
+        }
+        print(_archivedReports.length);
+        notifyListeners();
+        return true;
+      });
+    } else {
+      notifyListeners();
+      return false;
+    }
+  }
+
+  //filtering and sorting
   Filters _filters = Filters(categories: [...categories]);
 
   Filters get filters => _filters;
@@ -250,45 +338,14 @@ class DataAndSelectionManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> fetchReports({refresh = false}) async {
-    print("fetching reports");
-    //TODO handle limit and load more
-    if (refresh || _reports.isEmpty) {
-      print("clearing reports");
-      _reports.clear();
-      await FirebaseFirestore.instance
-          .collection("reports")
-          .orderBy("report timestamp", descending: true)
-          .limit(100)
-          .get()
-          .then((QuerySnapshot querySnapshot) {
-        print(querySnapshot.docs.length);
-        for (var doc in querySnapshot.docs) {
-          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-          print("adding report");
-          _reports.add(Report(
-              id: doc.id,
-              reportTimestamp: DateTime.fromMillisecondsSinceEpoch(
-                  data["report timestamp"].seconds * 1000),
-              personalData: data["personal data"],
-              incidentData: data["incident data"]));
-        }
-        notifyListeners();
-        return true;
-      });
-    }
-    notifyListeners();
-    return false;
-  }
-
-  // Selections
+  // Selections and highlighted
   final List<Report> _selected = [];
 
   UnmodifiableListView<Report> get selected => UnmodifiableListView(_selected);
 
   bool isEverythingSelected = false;
 
-  void _updateSelectionStatus(pageType) {
+  void _updateSelectionStatus(PageType pageType) {
     switch (pageType) {
       case PageType.reportsPage:
         if (_selected.length == _reports.length) {
@@ -314,7 +371,7 @@ class DataAndSelectionManager extends ChangeNotifier {
     }
   }
 
-  void toggleSelectAll(pageType) {
+  void toggleSelectAll(PageType pageType) {
     switch (pageType) {
       case PageType.reportsPage:
         if (_selected.length == _reports.length) {
@@ -345,7 +402,7 @@ class DataAndSelectionManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleSelection(Report report, pageType) {
+  void toggleSelection(Report report, PageType pageType) {
     if (_selected.contains(report)) {
       _selected.removeWhere((value) => value == report);
     } else {
@@ -355,10 +412,36 @@ class DataAndSelectionManager extends ChangeNotifier {
     notifyListeners();
   }
 
+  void clearSelections() {
+    _selected.clear();
+    isEverythingSelected = false;
+    notifyListeners();
+  }
+
   bool isSelected(Report report) {
     return _selected.contains(report);
   }
 
+  Report? _highlighted;
+
+  Report? get highlighted => _highlighted;
+
+  void toggleHighlight(Report report) {
+    if (isHighlighted(report)) {
+      _highlighted = null;
+    } else {
+      _highlighted = report;
+    }
+    notifyListeners();
+  }
+
+  bool isHighlighted(Report report) {
+    return _highlighted == report;
+  }
+
+  //folder management
+
+  //trash
   void moveReportToTrash(Report report, pageType) {
     report.moveToTrash(pageType);
     switch (pageType){
@@ -380,60 +463,6 @@ class DataAndSelectionManager extends ChangeNotifier {
     _selected.clear();
     _updateSelectionStatus(pageType);
     notifyListeners();
-  }
-
-
-
-  void clearSelections() {
-    _selected.clear();
-    isEverythingSelected = false;
-    notifyListeners();
-  }
-
-  //highlighted
-
-  Report? _highlighted;
-
-  Report? get highlighted => _highlighted;
-
-  void toggleHighlight(Report report) {
-    if (isHighlighted(report)) {
-      _highlighted = null;
-    } else {
-      _highlighted = report;
-    }
-    notifyListeners();
-  }
-
-  bool isHighlighted(Report report) {
-    return _highlighted == report;
-  }
-
-  Future fetchTrash({refresh = false}) async {
-    if (refresh || _trash.isEmpty) {
-      _trash.clear();
-      await FirebaseFirestore.instance
-          .collection("trash")
-          .orderBy("date deleted", descending: true)
-          .limit(100)
-          .get()
-          .then((QuerySnapshot querySnapshot) {
-        for (var doc in querySnapshot.docs) {
-          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-          _trash.add(Report(
-              id: doc.id,
-              reportTimestamp: DateTime.fromMillisecondsSinceEpoch(
-                  data["report timestamp"].seconds * 1000),
-              personalData: data["personal data"],
-              incidentData: data["incident data"]));
-        }
-        notifyListeners();
-        return true;
-      });
-    } else {
-      notifyListeners();
-      return false;
-    }
   }
 
   void restoreFromTrash(Report report) {
@@ -468,35 +497,7 @@ class DataAndSelectionManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future fetchArchive({refresh = false}) async {
-    if (refresh || _archivedReports.isEmpty) {
-      print("fetching archive");
-      _archivedReports.clear();
-      await FirebaseFirestore.instance
-          .collection("archive")
-          .orderBy("report timestamp", descending: true)
-          .limit(100)
-          .get()
-          .then((QuerySnapshot querySnapshot) {
-        for (var doc in querySnapshot.docs) {
-          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-          _archivedReports.add(Report(
-              id: doc.id,
-              reportTimestamp: DateTime.fromMillisecondsSinceEpoch(
-                  data["report timestamp"].seconds * 1000),
-              personalData: data["personal data"],
-              incidentData: data["incident data"]));
-        }
-        print(_archivedReports.length);
-        notifyListeners();
-        return true;
-      });
-    } else {
-      notifyListeners();
-      return false;
-    }
-  }
-
+  //archive
   void archiveReport(Report report) {
     report.archive();
     _reports.remove(report);
