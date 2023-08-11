@@ -1,4 +1,4 @@
-import 'package:firebase/firebase.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:intl/intl.dart';
@@ -8,6 +8,7 @@ import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/panel_widgets/s
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pdf_generation.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/providers.dart';
 
+import 'dart:html' as html;
 import '../../main_form/database_communication.dart';
 
 class ReportListElement extends StatefulWidget {
@@ -625,7 +626,7 @@ class SideMenuBar extends StatelessWidget {
                 title: const Text("Strona główna"),
                 onTap: () {
                   context.read<DataAndSelectionManager>().clearSelections();
-                  Navigator.of(context).pushNamed('/admin-panel');
+                  Navigator.of(context).popAndPushNamed('/admin-panel');
                 },
               ),
               ListTile(
@@ -642,7 +643,7 @@ class SideMenuBar extends StatelessWidget {
                 title: const Text("Zatwierdzone"),
                 onTap: () {
                   context.read<DataAndSelectionManager>().clearSelections();
-                  Navigator.of(context).pushNamed('/admin-panel/archive');
+                  Navigator.of(context).popAndPushNamed('/admin-panel/archive');
                 },
               ),
               ListTile(
@@ -650,7 +651,7 @@ class SideMenuBar extends StatelessWidget {
                 title: const Text("Kosz"),
                 onTap: () {
                   context.read<DataAndSelectionManager>().clearSelections();
-                  Navigator.of(context).pushNamed('/admin-panel/trash');
+                  Navigator.of(context).popAndPushNamed('/admin-panel/trash');
                 },
               ),
               const Divider(),
@@ -665,6 +666,12 @@ class SideMenuBar extends StatelessWidget {
       ),
     );
   }
+}
+
+void downloadFile(String url) {
+  html.AnchorElement anchorElement =  new html.AnchorElement(href: url);
+  anchorElement.download = url;
+  anchorElement.click();
 }
 
 class ReportDisplayCard extends StatelessWidget {
@@ -802,7 +809,64 @@ class ReportDisplayCard extends StatelessWidget {
                           itemBuilder: (context, index) {
                             return Card(
                               elevation: 4,
-                              child: Image.network(snapshot.data![index]),
+                              child: GestureDetector(
+                                  onTap: () => showDialog(
+                                      context: context,
+                                      builder: (context) => Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          SizedBox(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.8,
+                                            child: Image.network(
+                                                snapshot.data![index][0],fit: BoxFit.fill,),
+                                          ),
+                                          //card with image name and a button for downloading image
+                                          Card(
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                                children: [
+                                                  Text(
+                                                    snapshot.data![index][1],
+                                                    style: Theme.of(
+                                                            context)
+                                                        .textTheme
+                                                        .titleLarge,
+                                                  ),
+                                                  IconButton(
+                                                      onPressed: () async {
+                                                        try {
+                                                          downloadFile(
+                                                              snapshot.data![
+                                                                  index][0]);
+                                                        } catch (e) {
+                                                          ScaffoldMessenger
+                                                                  .of(
+                                                                      context)
+                                                              .showSnackBar(
+                                                                  const SnackBar(
+                                                            content: Text(
+                                                                "Nie udało się pobrać pliku"),
+                                                          ));
+                                                        }
+                                                      },
+                                                      icon: const Icon(
+                                                          Icons
+                                                              .download_outlined))
+                                                ],
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      )),
+                                  child: Image.network(snapshot.data![index][0])),
                             );
                           },
                         );

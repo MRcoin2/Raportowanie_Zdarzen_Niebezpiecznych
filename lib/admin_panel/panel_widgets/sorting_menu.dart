@@ -20,8 +20,8 @@ class _SortingMenuState extends State<SortingMenu> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.25,
-      width: MediaQuery.of(context).size.width * 0.2,
+      height: 210,
+      width: 450,
       child: Card(
         elevation: 4,
         child: Padding(

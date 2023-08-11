@@ -166,9 +166,11 @@ class DataAndSelectionManager extends ChangeNotifier {
   void sortReportsByReportTimestamp(bool reverse) {
     _reports.sort((a, b) => a.reportTimestamp.compareTo(b.reportTimestamp));
     _trash.sort((a, b) => a.reportTimestamp.compareTo(b.reportTimestamp));
+    _archivedReports.sort((a, b) => a.reportTimestamp.compareTo(b.reportTimestamp));
     if (reverse) {
       _reports = _reports.reversed.toList();
       _trash = _trash.reversed.toList();
+      _archivedReports = _archivedReports.reversed.toList();
     }
     notifyListeners();
   }
@@ -180,9 +182,13 @@ class DataAndSelectionManager extends ChangeNotifier {
     _trash.sort((a, b) =>
         a.incidentData["incident timestamp"]
             .compareTo(b.incidentData["incident timestamp"]));
+    _archivedReports.sort((a, b) =>
+        a.incidentData["incident timestamp"]
+            .compareTo(b.incidentData["incident timestamp"]));
     if (reverse) {
       _reports = _reports.reversed.toList();
       _trash = _trash.reversed.toList();
+      _archivedReports = _archivedReports.reversed.toList();
     }
     notifyListeners();
   }
@@ -196,9 +202,14 @@ class DataAndSelectionManager extends ChangeNotifier {
         a.incidentData["category"]
             .toUpperCase()
             .compareTo(b.incidentData["category"].toUpperCase()));
+    _archivedReports.sort((a, b) =>
+        a.incidentData["category"]
+            .toUpperCase()
+            .compareTo(b.incidentData["category"].toUpperCase()));
     if (reverse) {
       _reports = _reports.reversed.toList();
       _trash = _trash.reversed.toList();
+      _archivedReports = _archivedReports.reversed.toList();
     }
     notifyListeners();
   }

@@ -31,7 +31,7 @@ class _TrashPageState extends State<TrashPage> {
             } else if (snapshot.data == null || snapshot.data!.isAnonymous) {
               // No user is signed in, redirect to login page
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                Navigator.of(context).pushReplacementNamed('/admin-login');
+                Navigator.of(context).popAndPushNamed('/admin-login');
               });
               return const SizedBox.shrink();
             } else {
@@ -45,7 +45,7 @@ class _TrashPageState extends State<TrashPage> {
                       onPressed: () async {
                         await FirebaseAuth.instance.signOut();
                         Navigator.of(context)
-                            .pushReplacementNamed('/admin-login');
+                            .popAndPushNamed('/admin-login');
                       },
                       child: const Text('Wyloguj'),
                     ),
