@@ -8,7 +8,7 @@ import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/panel_widgets/s
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pdf_generation.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/providers.dart';
 
-import 'dart:html' as html;
+import 'package:universal_html/html.dart' as html;
 import '../../main_form/database_communication.dart';
 
 class ReportListElement extends StatefulWidget {
@@ -669,7 +669,7 @@ class SideMenuBar extends StatelessWidget {
 }
 
 void downloadFile(String url) {
-  html.AnchorElement anchorElement =  new html.AnchorElement(href: url);
+  html.AnchorElement anchorElement =  html.AnchorElement(href: url);
   anchorElement.download = url;
   anchorElement.click();
 }

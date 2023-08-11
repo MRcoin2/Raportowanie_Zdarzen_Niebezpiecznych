@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:raportowanie_zdarzen_niebezpiecznych/authentication/auth_dialog.dart';
+import 'package:raportowanie_zdarzen_niebezpiecznych/authentication/form_auth_dialog.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/database_communication.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form_fields.dart';
 import 'package:image_picker/image_picker.dart';
@@ -408,6 +408,7 @@ class _MainFormState extends State<MainForm> {
             padding: const EdgeInsets.all(8.0),
             child: FilledButton(
               onPressed: () {
+                //remove true when done testing
                 if (_formKey.currentState!.validate() || true) {
                   //TODO: remove true when done testing
                   ScaffoldMessenger.of(context).showSnackBar(

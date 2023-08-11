@@ -9,7 +9,7 @@ Future<void> submitForm(
     Map<String, dynamic> formData, List<XFile> images) async {
   FirebaseAuth auth = FirebaseAuth.instance;
   if (auth.currentUser == null) {
-    await auth.signInAnonymously();
+    print("email not verified");
   }
   FirebaseFirestore db = FirebaseFirestore.instance;
   final storageRef = FirebaseStorage.instance.ref();
@@ -18,9 +18,6 @@ Future<void> submitForm(
       storageRef
           .child("images/${docReference.id}/${image.name}")
           .putData((await image.readAsBytes()));
-    }
-    if (auth.currentUser?.isAnonymous ?? false) {
-      auth.currentUser?.delete();
     }
   });
 }
