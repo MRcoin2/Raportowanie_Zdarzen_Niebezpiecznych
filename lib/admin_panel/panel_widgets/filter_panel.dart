@@ -20,9 +20,7 @@ class _FilterPanelState extends State<FilterPanel> {
 
   List<bool> toggleButtonsState = [true, false];
 
-  DateTimeRange selectedDateRange = DateTimeRange(
-      start: DateTime.now().subtract(const Duration(days: 31)),
-      end: DateTime.now());
+  late DateTimeRange? selectedDateRange;
 
   Future<void> _selectDateRange(BuildContext context) async {
     final DateTimeRange? picked = await showDateRangePicker(
@@ -35,9 +33,9 @@ class _FilterPanelState extends State<FilterPanel> {
       setState(() {
         selectedDateRange = picked;
         fromDateController.text =
-            DateFormat('dd.MM.yyyy').format(selectedDateRange.start);
+            DateFormat('dd.MM.yyyy').format(selectedDateRange!.start);
         toDateController.text =
-            DateFormat('dd.MM.yyyy').format(selectedDateRange.end);
+            DateFormat('dd.MM.yyyy').format(selectedDateRange!.end);
       });
     }
   }
@@ -62,6 +60,18 @@ class _FilterPanelState extends State<FilterPanel> {
           dateRange: selectedDateRange,
           useIncidentTimestamp: toggleButtonsState[0]),
     );
+  }
+
+  @override
+  void initState() {
+    selectedDateRange = context.read<DataAndSelectionManager>().filters.dateRange;
+    if (selectedDateRange != null)
+      {
+    fromDateController.text =
+        DateFormat('dd.MM.yyyy').format(selectedDateRange!.start);
+    toDateController.text =
+        DateFormat('dd.MM.yyyy').format(selectedDateRange!.end);}
+    super.initState();
   }
 
   @override
