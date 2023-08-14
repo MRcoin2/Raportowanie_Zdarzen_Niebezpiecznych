@@ -879,7 +879,55 @@ class ReportDisplayCard extends StatelessWidget {
                             ),
                         );
                       }
-                    })
+                    }),
+                // grid of images from fires storage linked to this report
+                Row(
+                  // drukuj, pobierz, pobierz zdjęcia
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          try {
+                            await downloadReport(report);
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Nie udało się pobrać pliku")));
+                          }
+                        },
+                        child: const Text("Pobierz plik PDF"),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            try {
+                              await printReport(report);
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Nie udało się wydrukować pliku")));
+                            }
+                          },
+                          child: const Text("Drukuj"),
+                        )
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          try {
+                            await context.read<DataAndSelectionManager>().downloadImages();
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Nie udało się pobrać plików")));
+                          }
+                        },
+                        child: const Text("Pobierz zdjęcia"),
+                      ),
+                    ),
+
+                  ],
+                )
               ],
             ),
           ),

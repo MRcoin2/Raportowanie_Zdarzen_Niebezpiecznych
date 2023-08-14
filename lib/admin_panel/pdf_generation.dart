@@ -30,7 +30,8 @@ Future<Uint8List> generatePdf(Report report) async {
             "location": report.incidentData['location'],
             "date": report.incidentData['date'],
             "description": report.incidentData['description']
-          }
+          },
+          "images": report.imageUrls,
         },
       }));
   if (response.statusCode == 200) {
@@ -44,3 +45,10 @@ Future<Uint8List> generatePdf(Report report) async {
 Future<void> printReport(Report report) async {
   await Printing.layoutPdf(onLayout: (format) => generatePdf(report));
 }
+
+// download pdf
+Future<void> downloadReport(Report report) async {
+  await Printing.sharePdf(
+      bytes: await generatePdf(report), filename: 'report.pdf');
+}
+
