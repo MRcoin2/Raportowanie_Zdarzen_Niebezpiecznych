@@ -13,7 +13,7 @@ class Filters {
   DateTimeRange? dateRange;
 
   Filters(
-      {this.dateRange,
+      {this.dateRange ,
       required this.categories,
       this.useIncidentTimestamp = false});
 }
@@ -118,10 +118,16 @@ class DataAndSelectionManager extends ChangeNotifier {
 
   bool _isDateInRange(DateTime date, DateTimeRange? dateRange) {
     if (dateRange?.start != null && dateRange?.end != null) {
-      if (date.compareTo(dateRange!.start) > 0 &&
-          date.compareTo(dateRange.end) < 0) {
+      print("===========");
+      print(dateRange!.start);
+      print(dateRange.end.add(const Duration(days: 1)));
+      print(date.copyWith(hour: 0,minute: 0,second: 1,microsecond: 0,millisecond: 0));
+      if (date.copyWith(hour: 0,minute: 0,second: 1,microsecond: 0,millisecond: 0).isAfter(dateRange.start) &&
+          date.copyWith(hour: 0,minute: 0,second: 1,microsecond: 0,millisecond: 0).isBefore(dateRange.end.add(const Duration(days: 1)))) {
+        print("true");
         return true;
       } else {
+        print("false");
         return false;
       }
     }
@@ -456,7 +462,7 @@ class DataAndSelectionManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void moveSelectedToTrash(pageType) {
+  void moveSelectedToTrash(PageType pageType) {
     for (var report in _selected) {
       moveReportToTrash(report, pageType);
     }
@@ -472,12 +478,12 @@ class DataAndSelectionManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void restoreSelectedFromTrash() {
+  void restoreSelectedFromTrash({PageType pageType = PageType.trashPage}) {
     for (var report in _selected) {
       restoreFromTrash(report);
     }
     _selected.clear();
-    _updateSelectionStatus(PageType.trashPage);
+    _updateSelectionStatus(pageType);
     notifyListeners();
   }
 
@@ -529,4 +535,10 @@ class DataAndSelectionManager extends ChangeNotifier {
     _updateSelectionStatus(PageType.archivePage);
     notifyListeners();
   }
+
+  //download all images in a zip file\
+  Future<void> downloadImages() async {
+    throw NoSuchMethodError;
+  }
+
 }
