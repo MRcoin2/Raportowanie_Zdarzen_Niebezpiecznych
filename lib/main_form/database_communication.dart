@@ -9,7 +9,7 @@ Future<void> submitForm(
     Map<String, dynamic> formData, List<XFile> images) async {
   FirebaseAuth auth = FirebaseAuth.instance;
   if (auth.currentUser == null) {
-    print("email not verified");
+    throw Exception("not verified");
   }
   FirebaseFirestore db = FirebaseFirestore.instance;
   final storageRef = FirebaseStorage.instance.ref();

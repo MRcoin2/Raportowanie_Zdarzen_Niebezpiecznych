@@ -414,31 +414,41 @@ class _MainFormState extends State<MainForm> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Przetwarzanie danych...')),
                   );
-                  submitForm(
-                      Report(
-                          id: "",
-                          reportTimestamp: DateTime.now(),
-                          personalData: {
-                            "name": _nameController.text,
-                            "surname": _surnameController.text,
-                            "phone": _phoneController.text,
-                            "email": _emailController.text,
-                            "affiliation": _affiliationController.text,
-                            "status": _chosenStatus,
-                          },
-                          incidentData: {
-                            "incident timestamp": DateFormat('dd.MM.yyyy hh:mm')
-                                .parse(
-                                    "${_dateController.text} ${_timeController.text}"),
-                            "date": _dateController.text,
-                            "time": _timeController.text,
-                            "location": _placeController.text,
-                            "category": _chosenCategory == "inne..."
-                                ? _otherCategoryController.text
-                                : _chosenCategory,
-                            "description": _descriptionController.text,
-                          }).toMap(),
-                      _images);
+                  try {
+                    submitForm(
+                        Report(
+                            id: "",
+                            reportTimestamp: DateTime.now(),
+                            personalData: {
+                              "name": _nameController.text,
+                              "surname": _surnameController.text,
+                              "phone": _phoneController.text,
+                              "email": _emailController.text,
+                              "affiliation": _affiliationController.text,
+                              "status": _chosenStatus,
+                            },
+                            incidentData: {
+                              "incident timestamp": DateFormat(
+                                  'dd.MM.yyyy hh:mm')
+                                  .parse(
+                                  "${_dateController.text} ${_timeController
+                                      .text}"),
+                              "date": _dateController.text,
+                              "time": _timeController.text,
+                              "location": _placeController.text,
+                              "category": _chosenCategory == "inne..."
+                                  ? _otherCategoryController.text
+                                  : _chosenCategory,
+                              "description": _descriptionController.text,
+                            }).toMap(),
+                        _images);
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text(
+                              'Wystąpił błąd podczas wysyłania zgłoszenia')),
+                    );
+                  }
                 }
               },
               child: const Text("Wyślij"),
