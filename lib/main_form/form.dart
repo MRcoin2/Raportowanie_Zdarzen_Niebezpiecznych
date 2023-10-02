@@ -407,15 +407,15 @@ class _MainFormState extends State<MainForm> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: FilledButton(
-              onPressed: () {
+              onPressed: () async {
                 //remove true when done testing
-                if (_formKey.currentState!.validate() || true) {
-                  //TODO: remove true when done testing
+                if (_formKey.currentState!.validate()) {
+                  //TODO remove true when done testing
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Przetwarzanie danych...')),
                   );
                   try {
-                    submitForm(
+                    await submitForm(
                         Report(
                             id: "",
                             reportTimestamp: DateTime.now(),
@@ -428,11 +428,9 @@ class _MainFormState extends State<MainForm> {
                               "status": _chosenStatus,
                             },
                             incidentData: {
-                              "incident timestamp": DateFormat(
-                                  'dd.MM.yyyy hh:mm')
-                                  .parse(
-                                  "${_dateController.text} ${_timeController
-                                      .text}"),
+                              "incident timestamp":
+                                  DateFormat('dd.MM.yyyy hh:mm').parse(
+                                      "${_dateController.text} ${_timeController.text}"),
                               "date": _dateController.text,
                               "time": _timeController.text,
                               "location": _placeController.text,
@@ -442,13 +440,29 @@ class _MainFormState extends State<MainForm> {
                               "description": _descriptionController.text,
                             }).toMap(),
                         _images);
+                    //clear form
+                    _formKey.currentState?.reset();
+                    //notify user
+                    ScaffoldMessenger.of(context).clearSnackBars();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Zgłoszenie wysłano pomyślnie')),
+                    );
                   } catch (e) {
+                    print(e);
+                    ScaffoldMessenger.of(context).clearSnackBars();
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                           content: Text(
                               'Wystąpił błąd podczas wysyłania zgłoszenia')),
                     );
                   }
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content:
+                            Text('Proszę wypełnić wszystkie wymagane pola')),
+                  );
                 }
               },
               child: const Text("Wyślij"),

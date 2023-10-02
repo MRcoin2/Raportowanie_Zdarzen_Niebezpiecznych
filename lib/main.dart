@@ -184,7 +184,7 @@ class _FormPageState extends State<FormPage> {
                           child: const Center(
                             child: Padding(
                               padding: EdgeInsets.all(8.0),
-                              child: MainForm(),
+                              child: MainForm(key: Key("main-form")),
                             ),
                           ),
                         ),
