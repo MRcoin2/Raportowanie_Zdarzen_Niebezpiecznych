@@ -63,21 +63,14 @@ class _ArchivePageState extends State<ArchivePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          const SideMenuBar(),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width /
-                                MediaQuery.of(context).size.height > 1
-                                ? MediaQuery.of(context).size.width * 0.250
-                                : double.infinity,
+                          const Expanded(
+                              flex: 1,
+                              child: SideMenuBar()),
+                          Expanded(
+                            flex: 1,
                             child: Column(
                               children: [
-                                SizedBox(
-                                  width: MediaQuery.of(context).size.width /
-                                      MediaQuery.of(context).size.height > 1
-                                      ? MediaQuery.of(context).size.width * 0.250
-                                      : double.infinity,
-                                  child: const TopMenuBar(pageType: PageType.archivePage),
-                                ),
+                                const TopMenuBar(pageType: PageType.archivePage),
                                 Consumer<DataAndSelectionManager>(
                                   builder: (context, reportData, child) {
                                     return Expanded(
@@ -115,6 +108,7 @@ class _ArchivePageState extends State<ArchivePage> {
                             ),
                           ),
                           Expanded(
+                            flex: 2,
                             child: Consumer(builder: (context, reportData, _) {
                               Report? report = context
                                   .watch<DataAndSelectionManager>()

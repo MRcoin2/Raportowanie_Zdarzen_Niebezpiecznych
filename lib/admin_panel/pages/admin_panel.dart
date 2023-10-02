@@ -67,20 +67,19 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          const SideMenuBar(),
-                          SizedBox(
-                          width: MediaQuery.of(context).size.width /
-                                      MediaQuery.of(context).size.height >
-                                  1
-                              ? MediaQuery.of(context).size.width * 0.250
-                              : double.infinity,
+                          const Expanded(flex: 1, child: SideMenuBar()),
+                          Expanded(
+                            flex: 1,
                             child: Column(
                               children: [
                                 SizedBox(
                                   width: MediaQuery.of(context).size.width /
-                                              MediaQuery.of(context).size.height >
+                                              MediaQuery.of(context)
+                                                  .size
+                                                  .height >
                                           1
-                                      ? MediaQuery.of(context).size.width * 0.250
+                                      ? MediaQuery.of(context).size.width *
+                                          0.250
                                       : double.infinity,
                                   child: const TopMenuBar(),
                                 ),

@@ -614,54 +614,72 @@ class SideMenuBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.25,
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.home_outlined),
-                title: const Text("Strona główna"),
-                onTap: () {
-                  context.read<DataAndSelectionManager>().clearSelections();
-                  Navigator.of(context).popAndPushNamed('/admin-panel');
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.document_scanner_outlined),
-                title: const Text("Generowanie raportu"),
-                onTap: () {
-                  printReport(
-                      context.read<DataAndSelectionManager>().highlighted!);
-                },
-              ),
-              const Divider(),
-              ListTile(
-                leading: const Icon(Icons.check),
-                title: const Text("Zatwierdzone"),
-                onTap: () {
-                  context.read<DataAndSelectionManager>().clearSelections();
-                  Navigator.of(context).popAndPushNamed('/admin-panel/archive');
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.delete_outline),
-                title: const Text("Kosz"),
-                onTap: () {
-                  context.read<DataAndSelectionManager>().clearSelections();
-                  Navigator.of(context).popAndPushNamed('/admin-panel/trash');
-                },
-              ),
-              const Divider(),
-              ListTile(
-                leading: const Icon(Icons.settings_outlined),
-                title: const Text("Ustawienia"),
-                onTap: () {},
-              ),
-            ],
-          ),
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.home_outlined),
+              title: const Text("Strona główna"),
+              onTap: () {
+                context.read<DataAndSelectionManager>().clearSelections();
+                Navigator.of(context).pushReplacement(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation1, animation2) => const AdminPanelPage(),
+                    transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+                    transitionDuration: const Duration(milliseconds: 100),
+                    reverseTransitionDuration: const Duration(milliseconds: 100),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.document_scanner_outlined),
+              title: const Text("Generowanie raportu"),
+              onTap: () {
+                printReport(
+                    context.read<DataAndSelectionManager>().highlighted!);
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.check),
+              title: const Text("Zatwierdzone"),
+              onTap: () {
+                context.read<DataAndSelectionManager>().clearSelections();
+                Navigator.of(context).pushReplacement(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation1, animation2) => const ArchivePage(),
+                    transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+                    transitionDuration: const Duration(milliseconds: 100),
+                    reverseTransitionDuration: const Duration(milliseconds: 100),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete_outline),
+              title: const Text("Kosz"),
+              onTap: () {
+                context.read<DataAndSelectionManager>().clearSelections();
+                Navigator.of(context).pushReplacement(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation1, animation2) => const TrashPage(),
+                    transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+                    transitionDuration: const Duration(milliseconds: 100),
+                    reverseTransitionDuration: const Duration(milliseconds: 100),
+                  ),
+                );
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.settings_outlined),
+              title: const Text("Ustawienia"),
+              onTap: () {},
+            ),
+          ],
         ),
       ),
     );
