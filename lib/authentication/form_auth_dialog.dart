@@ -14,7 +14,8 @@ enum codeInputStatus {
 Future<bool> verifyCode(String code, String email) async {
   //make a POST request to API_URL/verify-otp with the email and code in the data of the https request
   //if the response is 200, sign the user in with the token returned in the response and return true, else return false
-  var response = await http.post(Uri.parse('$API_URL/verify-otp'),
+  //TODO make this more secure
+  var response = await http.post(Uri.https(API_URL,'verify-otp'),
       body: json.encode({'api_key': API_KEY, 'email': email, 'otp': code}));
   if (response.statusCode == 200) {
     try{
@@ -33,7 +34,8 @@ Future<bool> verifyCode(String code, String email) async {
 Future sendCode(String email) async {
   //make a POST request to API_URL/send-otp with the email in the data of the https request
   //if the response is 200, return true, else return false
-  var response = await http.post(Uri.parse('$API_URL/send-otp'),
+  //TODO add a timeout to prevent spamming
+  var response = await http.post(Uri.https(API_URL,'send-otp'),
       body: json.encode({"email": email, "api_key": API_KEY, "otp_length": 4}));
   if (response.statusCode == 200) {
     return true;

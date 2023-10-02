@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import '../authentication/secrets/api_key.dart';
 
 Future<Uint8List> generatePdf(Report report) async {
-  var response = await http.post(Uri.parse('$API_URL/generate-pdf'),
+  var response = await http.post(Uri.https(API_URL,'generate-pdf'),
       body: json.encode({
         'api_key': API_KEY,
         'data': {

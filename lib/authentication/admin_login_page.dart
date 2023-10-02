@@ -97,7 +97,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
       try {
-        var response = await http.post(Uri.parse('$API_URL/verify-user'),
+        var response = await http.post(Uri.https(API_URL,'verify-user'),
             body: json.encode({
               'api_key': API_KEY,
               'email': _emailController.text,
@@ -135,7 +135,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                         onPressed: () {
                           http
                               .post(
-                                Uri.parse('$API_URL/verify-totp'),
+                                Uri.https(API_URL,'verify-totp'),
                                 headers: {'Content-Type': 'application/json'},
                                 body: json.encode({
                                   'api_key': API_KEY,
