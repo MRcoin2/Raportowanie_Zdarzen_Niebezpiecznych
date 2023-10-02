@@ -1,8 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/archive_page.dart';
+import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/trash_page.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/panel_widgets/filter_panel.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/panel_widgets/sorting_menu.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pdf_generation.dart';
@@ -10,6 +11,7 @@ import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/providers.dart'
 
 import 'package:universal_html/html.dart' as html;
 import '../../main_form/database_communication.dart';
+import '../pages/admin_panel.dart';
 
 class ReportListElement extends StatefulWidget {
   final Report report;
@@ -77,14 +79,15 @@ class _ReportListElementState extends State<ReportListElement> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         IconButton(
+                            tooltip: 'Zatwierdź',
                             onPressed: () {
-                              //TODO implement archiving
                               context
                                   .read<DataAndSelectionManager>()
                                   .archiveReport(widget.report);
                             },
                             icon: const Icon(Icons.check)),
                         IconButton(
+                            tooltip: 'Usuń',
                             onPressed: () {
                               showDialog(
                                   context: context,
@@ -687,7 +690,7 @@ class SideMenuBar extends StatelessWidget {
 }
 
 void downloadFile(String url) {
-  html.AnchorElement anchorElement =  html.AnchorElement(href: url);
+  html.AnchorElement anchorElement = html.AnchorElement(href: url);
   anchorElement.download = url;
   anchorElement.click();
 }
@@ -728,7 +731,6 @@ class ReportDisplayCard extends StatelessWidget {
                     )
                   ],
                 ),
-                // personal data
                 Row(
                   children: [
                     Column(
@@ -772,6 +774,7 @@ class ReportDisplayCard extends StatelessWidget {
                     )
                   ],
                 ),
+                // personal data
                 Text(""),
                 Row(
                   children: [
@@ -811,9 +814,8 @@ class ReportDisplayCard extends StatelessWidget {
                   "${report.incidentData['description']}",
                   textAlign: TextAlign.justify,
                 ),
-
                 const Divider(),
-                // grid of images from fires storage linked to this report
+
                 FutureBuilder(
                     future: report.getImageUrls(),
                     builder: (context, snapshot) {
@@ -831,120 +833,138 @@ class ReportDisplayCard extends StatelessWidget {
                                   onTap: () => showDialog(
                                       context: context,
                                       builder: (context) => Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          SizedBox(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.8,
-                                            child: Image.network(
-                                                snapshot.data![index][0],fit: BoxFit.fill,),
-                                          ),
-                                          //card with image name and a button for downloading image
-                                          Card(
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
-                                                children: [
-                                                  Text(
-                                                    snapshot.data![index][1],
-                                                    style: Theme.of(
-                                                            context)
-                                                        .textTheme
-                                                        .titleLarge,
-                                                  ),
-                                                  IconButton(
-                                                      onPressed: () async {
-                                                        try {
-                                                          downloadFile(
-                                                              snapshot.data![
-                                                                  index][0]);
-                                                        } catch (e) {
-                                                          ScaffoldMessenger
-                                                                  .of(
-                                                                      context)
-                                                              .showSnackBar(
-                                                                  const SnackBar(
-                                                            content: Text(
-                                                                "Nie udało się pobrać pliku"),
-                                                          ));
-                                                        }
-                                                      },
-                                                      icon: const Icon(
-                                                          Icons
-                                                              .download_outlined))
-                                                ],
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              SizedBox(
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.8,
+                                                child: Image.network(
+                                                  snapshot.data![index][0],
+                                                  fit: BoxFit.fill,
+                                                ),
                                               ),
-                                            ),
-                                          )
-                                        ],
-                                      )),
-                                  child: Image.network(snapshot.data![index][0])),
+                                              //card with image name and a button for downloading image
+                                              Card(
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
+                                                    children: [
+                                                      Text(
+                                                        snapshot.data![index]
+                                                            [1],
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .titleLarge,
+                                                      ),
+                                                      IconButton(
+                                                          onPressed: () async {
+                                                            try {
+                                                              downloadFile(
+                                                                  snapshot.data![
+                                                                          index]
+                                                                      [0]);
+                                                            } catch (e) {
+                                                              ScaffoldMessenger
+                                                                      .of(
+                                                                          context)
+                                                                  .showSnackBar(
+                                                                      const SnackBar(
+                                                                content: Text(
+                                                                    "Nie udało się pobrać pliku"),
+                                                              ));
+                                                            }
+                                                          },
+                                                          icon: const Icon(Icons
+                                                              .download_outlined))
+                                                    ],
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          )),
+                                  child:
+                                      Image.network(snapshot.data![index][0])),
                             );
                           },
                         );
                       } else {
-                        return Center(
-                          child: const SizedBox(
-                              width: 50,
-                              height: 50,
-                              child: CircularProgressIndicator(),
-                            ),
+                        return const Center(
+                          child: SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: CircularProgressIndicator(),
+                          ),
                         );
                       }
                     }),
                 // grid of images from fires storage linked to this report
-                Row(
-                  // drukuj, pobierz, pobierz zdjęcia
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          try {
-                            await downloadReport(report);
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Nie udało się pobrać pliku")));
-                          }
-                        },
-                        child: const Text("Pobierz plik PDF"),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              elevation: 4,
+                            ),
+                            onPressed: () async {
+                              try {
+                                await printReport(report);
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text("Nie udało się wydrukować pliku")));
+                              }
+                            },
+                            child: const Text("Drukuj"),
+                          )
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
+                      const SizedBox(width: 10),
+                      Expanded(
                         child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            elevation: 4,
+                          ),
                           onPressed: () async {
                             try {
-                              await printReport(report);
+                              await downloadReport(report);
                             } catch (e) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Nie udało się wydrukować pliku")));
+                                  const SnackBar(content: Text("Nie udało się pobrać pliku")));
                             }
                           },
-                          child: const Text("Drukuj"),
-                        )
-                    ),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          try {
-                            await context.read<DataAndSelectionManager>().downloadImages();
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Nie udało się pobrać plików")));
-                          }
-                        },
-                        child: const Text("Pobierz zdjęcia"),
+                          child: const Text("Pobierz plik PDF"),
+                        ),
                       ),
-                    ),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            elevation: 4,
+                          ),
+                          onPressed: () async {
+                            try {
+                              //TODO add this functionality
+                              await context.read<DataAndSelectionManager>().downloadImages();
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Nie udało się pobrać plików")));
+                            }
+                          },
+                          child: const Text("Pobierz zdjęcia"),
+                        ),
+                      ),
 
-                  ],
+                    ],
+                  ),
                 )
               ],
             ),
