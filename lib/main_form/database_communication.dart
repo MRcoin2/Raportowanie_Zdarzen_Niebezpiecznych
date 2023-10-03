@@ -91,14 +91,21 @@ class Report {
   }
 
   Future<List<List<String>>> getImageUrls() async {
+    print("getting image urls");
     //returns a list of tuples (url, name)
     if (imageUrls.isNotEmpty) {
       return imageUrls;
     }
     else {
-      ListResult imageRef = await FirebaseStorage.instance.ref().child("images/$id").listAll();
-      for (var image in imageRef.items) {
-        imageUrls.add([await image.getDownloadURL(), image.name]);
+      try {
+        ListResult imageRef = await FirebaseStorage.instance.ref().child(
+            "images/$id").listAll();
+        for (var image in imageRef.items) {
+          imageUrls.add([await image.getDownloadURL(), image.name]);
+        }
+      } catch (e) {
+        print(e);
+        return [];
       }
       print(imageUrls);
       return imageUrls;
