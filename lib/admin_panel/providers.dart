@@ -13,7 +13,7 @@ class Filters {
   DateTimeRange? dateRange;
 
   Filters(
-      {this.dateRange ,
+      {this.dateRange,
       required this.categories,
       this.useIncidentTimestamp = false});
 }
@@ -21,8 +21,11 @@ class Filters {
 class DataAndSelectionManager extends ChangeNotifier {
   //database comunication
   List<Report> _reports = [];
+  DocumentSnapshot? _lastReport;
   List<Report> _trash = [];
+  DocumentSnapshot? _lastTrash;
   List<Report> _archivedReports = [];
+  DocumentSnapshot? _lastArchivedReport;
 
   Future<bool> fetchReports({refresh = false}) async {
     print("fetching reports");
@@ -33,24 +36,33 @@ class DataAndSelectionManager extends ChangeNotifier {
       await FirebaseFirestore.instance
           .collection("reports")
           .orderBy("report timestamp", descending: true)
-          .limit(100)
+          .limit(50)
           .get()
           .then((QuerySnapshot querySnapshot) {
         print(querySnapshot.docs.length);
-        for (var doc in querySnapshot.docs) {
-          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-          print("adding report");
-          _reports.add(Report(
-              id: doc.id,
-              reportTimestamp: DateTime.fromMillisecondsSinceEpoch(
-                  data["report timestamp"].seconds * 1000),
-              personalData: data["personal data"],
-              incidentData: data["incident data"]));
-        }
+        addQuerySnapshotToList(querySnapshot, _reports);
+        _lastReport = querySnapshot.docs.last;
         notifyListeners();
         return true;
       });
     }
+    notifyListeners();
+    return false;
+  }
+
+  Future<bool> fetchMoreReports({refresh = false}) async {
+    await FirebaseFirestore.instance
+        .collection("reports")
+        .orderBy("report timestamp", descending: true)
+        .startAfterDocument(_lastReport!)
+        .limit(50)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      addQuerySnapshotToList(querySnapshot, _reports);
+      _lastReport = querySnapshot.docs.last;
+      notifyListeners();
+      return true;
+    });
     notifyListeners();
     return false;
   }
@@ -61,18 +73,11 @@ class DataAndSelectionManager extends ChangeNotifier {
       await FirebaseFirestore.instance
           .collection("trash")
           .orderBy("date deleted", descending: true)
-          .limit(100)
+          .limit(50)
           .get()
           .then((QuerySnapshot querySnapshot) {
-        for (var doc in querySnapshot.docs) {
-          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-          _trash.add(Report(
-              id: doc.id,
-              reportTimestamp: DateTime.fromMillisecondsSinceEpoch(
-                  data["report timestamp"].seconds * 1000),
-              personalData: data["personal data"],
-              incidentData: data["incident data"]));
-        }
+        addQuerySnapshotToList(querySnapshot, _trash);
+        _lastTrash = querySnapshot.docs.last;
         notifyListeners();
         return true;
       });
@@ -80,6 +85,22 @@ class DataAndSelectionManager extends ChangeNotifier {
       notifyListeners();
       return false;
     }
+  }
+  Future<bool> fetchMoreTrash({refresh = false}) async {
+    await FirebaseFirestore.instance
+        .collection("trash")
+        .orderBy("date deleted", descending: true)
+        .startAfterDocument(_lastTrash!)
+        .limit(50)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      addQuerySnapshotToList(querySnapshot, _trash);
+      _lastTrash = querySnapshot.docs.last;
+      notifyListeners();
+      return true;
+    });
+    notifyListeners();
+    return false;
   }
 
   Future fetchArchive({refresh = false}) async {
@@ -89,25 +110,48 @@ class DataAndSelectionManager extends ChangeNotifier {
       await FirebaseFirestore.instance
           .collection("archive")
           .orderBy("report timestamp", descending: true)
-          .limit(100)
+          .limit(50)
           .get()
           .then((QuerySnapshot querySnapshot) {
-        for (var doc in querySnapshot.docs) {
-          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-          _archivedReports.add(Report(
-              id: doc.id,
-              reportTimestamp: DateTime.fromMillisecondsSinceEpoch(
-                  data["report timestamp"].seconds * 1000),
-              personalData: data["personal data"],
-              incidentData: data["incident data"]));
-        }
-        print(_archivedReports.length);
+        addQuerySnapshotToList(querySnapshot, _archivedReports);
+        _lastArchivedReport = querySnapshot.docs.last;
         notifyListeners();
         return true;
       });
     } else {
       notifyListeners();
       return false;
+    }
+  }
+
+  Future<bool> fetchMoreArchivedReports({refresh = false}) async {
+    print("fetching more archive");
+    await FirebaseFirestore.instance
+        .collection("archive")
+        .orderBy("report timestamp", descending: true)
+        .startAfterDocument(_lastArchivedReport!)
+        .limit(50)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      addQuerySnapshotToList(querySnapshot, _archivedReports);
+      _lastArchivedReport = querySnapshot.docs.last;
+      notifyListeners();
+      return true;
+    });
+    notifyListeners();
+    return false;
+  }
+
+
+  void addQuerySnapshotToList(QuerySnapshot querySnapshot, List<Report> list) {
+    for (var doc in querySnapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      list.add(Report(
+          id: doc.id,
+          reportTimestamp: DateTime.fromMillisecondsSinceEpoch(
+              data["report timestamp"].seconds * 1000),
+          personalData: data["personal data"],
+          incidentData: data["incident data"]));
     }
   }
 
@@ -121,9 +165,16 @@ class DataAndSelectionManager extends ChangeNotifier {
       print("===========");
       print(dateRange!.start);
       print(dateRange.end.add(const Duration(days: 1)));
-      print(date.copyWith(hour: 0,minute: 0,second: 1,microsecond: 0,millisecond: 0));
-      if (date.copyWith(hour: 0,minute: 0,second: 1,microsecond: 0,millisecond: 0).isAfter(dateRange.start) &&
-          date.copyWith(hour: 0,minute: 0,second: 1,microsecond: 0,millisecond: 0).isBefore(dateRange.end.add(const Duration(days: 1)))) {
+      print(date.copyWith(
+          hour: 0, minute: 0, second: 1, microsecond: 0, millisecond: 0));
+      if (date
+              .copyWith(
+                  hour: 0, minute: 0, second: 1, microsecond: 0, millisecond: 0)
+              .isAfter(dateRange.start) &&
+          date
+              .copyWith(
+                  hour: 0, minute: 0, second: 1, microsecond: 0, millisecond: 0)
+              .isBefore(dateRange.end.add(const Duration(days: 1)))) {
         print("true");
         return true;
       } else {
@@ -134,16 +185,15 @@ class DataAndSelectionManager extends ChangeNotifier {
     return true;
   }
 
-  UnmodifiableListView<Report> get reports =>
-      UnmodifiableListView(
+  UnmodifiableListView<Report> get reports => UnmodifiableListView(
         _reports.where(
-              (report) {
+          (report) {
             if (_filters.dateRange != null) {
               if (_filters.useIncidentTimestamp) {
                 DateTime incidentTimestamp =
-                DateTime.fromMillisecondsSinceEpoch(
-                    report.incidentData["incident timestamp"].seconds *
-                        1000);
+                    DateTime.fromMillisecondsSinceEpoch(
+                        report.incidentData["incident timestamp"].seconds *
+                            1000);
                 if (!_isDateInRange(incidentTimestamp, _filters.dateRange)) {
                   _selected.removeWhere((report) => report == report);
                   return false;
@@ -175,16 +225,15 @@ class DataAndSelectionManager extends ChangeNotifier {
         ),
       );
 
-  UnmodifiableListView<Report> get trash =>
-      UnmodifiableListView(
+  UnmodifiableListView<Report> get trash => UnmodifiableListView(
         _trash.where(
-              (report) {
+          (report) {
             if (_filters.dateRange != null) {
               if (_filters.useIncidentTimestamp) {
                 DateTime incidentTimestamp =
-                DateTime.fromMillisecondsSinceEpoch(
-                    report.incidentData["incident timestamp"].seconds *
-                        1000);
+                    DateTime.fromMillisecondsSinceEpoch(
+                        report.incidentData["incident timestamp"].seconds *
+                            1000);
                 if (!_isDateInRange(incidentTimestamp, _filters.dateRange)) {
                   _selected.removeWhere((report) => report == report);
                   return false;
@@ -216,16 +265,15 @@ class DataAndSelectionManager extends ChangeNotifier {
         ),
       );
 
-  UnmodifiableListView<Report> get archivedReports =>
-      UnmodifiableListView(
+  UnmodifiableListView<Report> get archivedReports => UnmodifiableListView(
         _archivedReports.where(
-              (report) {
+          (report) {
             if (_filters.dateRange != null) {
               if (_filters.useIncidentTimestamp) {
                 DateTime incidentTimestamp =
-                DateTime.fromMillisecondsSinceEpoch(
-                    report.incidentData["incident timestamp"].seconds *
-                        1000);
+                    DateTime.fromMillisecondsSinceEpoch(
+                        report.incidentData["incident timestamp"].seconds *
+                            1000);
                 if (!_isDateInRange(incidentTimestamp, _filters.dateRange)) {
                   _selected.removeWhere((report) => report == report);
                   return false;
@@ -260,7 +308,8 @@ class DataAndSelectionManager extends ChangeNotifier {
   void sortReportsByReportTimestamp(bool reverse) {
     _reports.sort((a, b) => a.reportTimestamp.compareTo(b.reportTimestamp));
     _trash.sort((a, b) => a.reportTimestamp.compareTo(b.reportTimestamp));
-    _archivedReports.sort((a, b) => a.reportTimestamp.compareTo(b.reportTimestamp));
+    _archivedReports
+        .sort((a, b) => a.reportTimestamp.compareTo(b.reportTimestamp));
     if (reverse) {
       _reports = _reports.reversed.toList();
       _trash = _trash.reversed.toList();
@@ -270,15 +319,12 @@ class DataAndSelectionManager extends ChangeNotifier {
   }
 
   void sortReportsByIncidentTimestamp(bool reverse) {
-    _reports.sort((a, b) =>
-        a.incidentData["incident timestamp"]
-            .compareTo(b.incidentData["incident timestamp"]));
-    _trash.sort((a, b) =>
-        a.incidentData["incident timestamp"]
-            .compareTo(b.incidentData["incident timestamp"]));
-    _archivedReports.sort((a, b) =>
-        a.incidentData["incident timestamp"]
-            .compareTo(b.incidentData["incident timestamp"]));
+    _reports.sort((a, b) => a.incidentData["incident timestamp"]
+        .compareTo(b.incidentData["incident timestamp"]));
+    _trash.sort((a, b) => a.incidentData["incident timestamp"]
+        .compareTo(b.incidentData["incident timestamp"]));
+    _archivedReports.sort((a, b) => a.incidentData["incident timestamp"]
+        .compareTo(b.incidentData["incident timestamp"]));
     if (reverse) {
       _reports = _reports.reversed.toList();
       _trash = _trash.reversed.toList();
@@ -288,18 +334,15 @@ class DataAndSelectionManager extends ChangeNotifier {
   }
 
   void sortReportsByCategory(bool reverse) {
-    _reports.sort((a, b) =>
-        a.incidentData["category"]
-            .toUpperCase()
-            .compareTo(b.incidentData["category"].toUpperCase()));
-    _trash.sort((a, b) =>
-        a.incidentData["category"]
-            .toUpperCase()
-            .compareTo(b.incidentData["category"].toUpperCase()));
-    _archivedReports.sort((a, b) =>
-        a.incidentData["category"]
-            .toUpperCase()
-            .compareTo(b.incidentData["category"].toUpperCase()));
+    _reports.sort((a, b) => a.incidentData["category"]
+        .toUpperCase()
+        .compareTo(b.incidentData["category"].toUpperCase()));
+    _trash.sort((a, b) => a.incidentData["category"]
+        .toUpperCase()
+        .compareTo(b.incidentData["category"].toUpperCase()));
+    _archivedReports.sort((a, b) => a.incidentData["category"]
+        .toUpperCase()
+        .compareTo(b.incidentData["category"].toUpperCase()));
     if (reverse) {
       _reports = _reports.reversed.toList();
       _trash = _trash.reversed.toList();
@@ -450,7 +493,7 @@ class DataAndSelectionManager extends ChangeNotifier {
   //trash
   void moveReportToTrash(Report report, pageType) {
     report.moveToTrash(pageType);
-    switch (pageType){
+    switch (pageType) {
       case PageType.reportsPage:
         _reports.remove(report);
         break;
@@ -540,5 +583,4 @@ class DataAndSelectionManager extends ChangeNotifier {
   Future<void> downloadImages() async {
     throw NoSuchMethodError;
   }
-
 }

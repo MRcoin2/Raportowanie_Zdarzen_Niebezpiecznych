@@ -87,30 +87,48 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                                   builder: (context, reportData, child) {
                                     return Expanded(
                                       child: SizedBox(
-                                        height: MediaQuery.of(context).size.height,
-                                        width: MediaQuery.of(context).size.width /
-                                                    MediaQuery.of(context)
+                                        height:
+                                            MediaQuery.of(context).size.height,
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                        MediaQuery.of(context)
+                                                            .size
+                                                            .height >
+                                                    1
+                                                ? MediaQuery.of(context)
                                                         .size
-                                                        .height >
-                                                1
-                                            ? MediaQuery.of(context).size.width *
-                                                0.250
-                                            : double.infinity,
-                                        child: ListView.builder(
-                                          itemBuilder: (context, index) {
-                                            if (index <
-                                                context
-                                                    .read<DataAndSelectionManager>()
-                                                    .reports
-                                                    .length) {
-                                              return ReportListElement(
-                                                report: context
-                                                    .read<DataAndSelectionManager>()
-                                                    .reports[index],
-                                              );
+                                                        .width *
+                                                    0.250
+                                                : double.infinity,
+                                        child: NotificationListener<ScrollEndNotification>(
+                                          onNotification: (notification) {
+                                            if (notification.metrics.pixels >
+                                                    0 &&
+                                                notification.metrics.atEdge) {
+                                              context
+                                                  .read<DataAndSelectionManager>()
+                                                  .fetchMoreReports();
                                             }
-                                            return null;
+                                            return true;
                                           },
+                                          child: ListView.builder(
+                                            itemBuilder: (context, index) {
+                                              if (index <
+                                                  context
+                                                      .read<
+                                                          DataAndSelectionManager>()
+                                                      .reports
+                                                      .length) {
+                                                return ReportListElement(
+                                                  report: context
+                                                      .read<
+                                                          DataAndSelectionManager>()
+                                                      .reports[index],
+                                                );
+                                              }
+                                              return null;
+                                            },
+                                          ),
                                         ),
                                       ),
                                     );
@@ -120,6 +138,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                             ),
                           ),
                           Expanded(
+                            flex: 2,
                             child: Consumer(builder: (context, reportData, _) {
                               Report? report = context
                                   .watch<DataAndSelectionManager>()

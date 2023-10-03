@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
@@ -21,7 +20,8 @@ class _ArchivePageState extends State<ArchivePage> {
     return Portal(
       child: MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (context) => DataAndSelectionManager()),
+          ChangeNotifierProvider(
+              create: (context) => DataAndSelectionManager()),
         ],
         child: FutureBuilder<User?>(
           future: FirebaseAuth.instance.authStateChanges().first,
@@ -44,8 +44,7 @@ class _ArchivePageState extends State<ArchivePage> {
                     ElevatedButton(
                       onPressed: () async {
                         await FirebaseAuth.instance.signOut();
-                        Navigator.of(context)
-                            .popAndPushNamed('/admin-login');
+                        Navigator.of(context).popAndPushNamed('/admin-login');
                       },
                       child: const Text('Wyloguj'),
                     ),
@@ -54,7 +53,7 @@ class _ArchivePageState extends State<ArchivePage> {
                 body: Center(
                   child: FutureBuilder(
                     future:
-                    context.read<DataAndSelectionManager>().fetchArchive(),
+                        context.read<DataAndSelectionManager>().fetchArchive(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();
@@ -63,37 +62,50 @@ class _ArchivePageState extends State<ArchivePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          const Expanded(
-                              flex: 1,
-                              child: SideMenuBar()),
+                          const Expanded(flex: 1, child: SideMenuBar()),
                           Expanded(
                             flex: 1,
                             child: Column(
                               children: [
-                                const TopMenuBar(pageType: PageType.archivePage),
+                                const TopMenuBar(
+                                    pageType: PageType.archivePage),
                                 Consumer<DataAndSelectionManager>(
                                   builder: (context, reportData, child) {
                                     return Expanded(
-                                      child: SizedBox(
-                                        height: MediaQuery.of(context).size.height,
-                                        width: MediaQuery.of(context).size.width /
-                                            MediaQuery.of(context)
-                                                .size
-                                                .height >
-                                            1
-                                            ? MediaQuery.of(context).size.width *
-                                            0.250
-                                            : double.infinity,
+                                        child: SizedBox(
+                                      height:
+                                          MediaQuery.of(context).size.height,
+                                      width: MediaQuery.of(context).size.width /
+                                                  MediaQuery.of(context)
+                                                      .size
+                                                      .height >
+                                              1
+                                          ? MediaQuery.of(context).size.width *
+                                              0.250
+                                          : double.infinity,
+                                      child: NotificationListener<
+                                          ScrollEndNotification>(
+                                        onNotification: (notification) {
+                                          if (notification.metrics.pixels > 0 &&
+                                              notification.metrics.atEdge) {
+                                            context
+                                                .read<DataAndSelectionManager>()
+                                                .fetchMoreArchivedReports();
+                                          }
+                                          return true;
+                                        },
                                         child: ListView.builder(
                                           itemBuilder: (context, index) {
                                             if (index <
                                                 context
-                                                    .read<DataAndSelectionManager>()
+                                                    .read<
+                                                        DataAndSelectionManager>()
                                                     .archivedReports
                                                     .length) {
                                               return ArchiveListElement(
                                                 report: context
-                                                    .read<DataAndSelectionManager>()
+                                                    .read<
+                                                        DataAndSelectionManager>()
                                                     .archivedReports[index],
                                               );
                                             }
@@ -101,7 +113,7 @@ class _ArchivePageState extends State<ArchivePage> {
                                           },
                                         ),
                                       ),
-                                    );
+                                    ));
                                   },
                                 ),
                               ],

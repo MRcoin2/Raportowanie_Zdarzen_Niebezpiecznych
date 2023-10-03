@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
@@ -21,7 +20,8 @@ class _TrashPageState extends State<TrashPage> {
     return Portal(
       child: MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (context) => DataAndSelectionManager()),
+          ChangeNotifierProvider(
+              create: (context) => DataAndSelectionManager()),
         ],
         child: FutureBuilder<User?>(
           future: FirebaseAuth.instance.authStateChanges().first,
@@ -44,8 +44,7 @@ class _TrashPageState extends State<TrashPage> {
                     ElevatedButton(
                       onPressed: () async {
                         await FirebaseAuth.instance.signOut();
-                        Navigator.of(context)
-                            .popAndPushNamed('/admin-login');
+                        Navigator.of(context).popAndPushNamed('/admin-login');
                       },
                       child: const Text('Wyloguj'),
                     ),
@@ -54,7 +53,7 @@ class _TrashPageState extends State<TrashPage> {
                 body: Center(
                   child: FutureBuilder(
                     future:
-                    context.read<DataAndSelectionManager>().fetchTrash(),
+                        context.read<DataAndSelectionManager>().fetchTrash(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();
@@ -63,9 +62,7 @@ class _TrashPageState extends State<TrashPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          const Expanded(
-                              flex: 1,
-                              child: SideMenuBar()),
+                          const Expanded(flex: 1, child: SideMenuBar()),
                           Expanded(
                             flex: 1,
                             child: Column(
@@ -74,26 +71,40 @@ class _TrashPageState extends State<TrashPage> {
                                 Consumer<DataAndSelectionManager>(
                                   builder: (context, reportData, child) {
                                     return Expanded(
-                                      child: SizedBox(
-                                        height: MediaQuery.of(context).size.height,
-                                        width: MediaQuery.of(context).size.width /
-                                            MediaQuery.of(context)
-                                                .size
-                                                .height >
-                                            1
-                                            ? MediaQuery.of(context).size.width *
-                                            0.250
-                                            : double.infinity,
+                                        child: SizedBox(
+                                      height:
+                                          MediaQuery.of(context).size.height,
+                                      width: MediaQuery.of(context).size.width /
+                                                  MediaQuery.of(context)
+                                                      .size
+                                                      .height >
+                                              1
+                                          ? MediaQuery.of(context).size.width *
+                                              0.250
+                                          : double.infinity,
+                                      child: NotificationListener<
+                                          ScrollEndNotification>(
+                                        onNotification: (notification) {
+                                          if (notification.metrics.pixels > 0 &&
+                                              notification.metrics.atEdge) {
+                                            context
+                                                .read<DataAndSelectionManager>()
+                                                .fetchMoreTrash();
+                                          }
+                                          return true;
+                                        },
                                         child: ListView.builder(
                                           itemBuilder: (context, index) {
                                             if (index <
                                                 context
-                                                    .read<DataAndSelectionManager>()
+                                                    .read<
+                                                        DataAndSelectionManager>()
                                                     .trash
                                                     .length) {
                                               return TrashListElement(
                                                 report: context
-                                                    .read<DataAndSelectionManager>()
+                                                    .read<
+                                                        DataAndSelectionManager>()
                                                     .trash[index],
                                               );
                                             }
@@ -101,7 +112,7 @@ class _TrashPageState extends State<TrashPage> {
                                           },
                                         ),
                                       ),
-                                    );
+                                    ));
                                   },
                                 ),
                               ],
