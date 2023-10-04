@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -6,6 +7,9 @@ import 'package:raportowanie_zdarzen_niebezpiecznych/authentication/form_auth_di
 import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/database_communication.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form_fields.dart';
 import 'package:image_picker/image_picker.dart';
+
+import '../authentication/secrets/api_key.dart';
+import 'package:http/http.dart' as http;
 
 final List<String> categories = [
   "napaść na kuratora (słowna)",
@@ -143,9 +147,8 @@ class _MainFormState extends State<MainForm> {
                               elevation: MaterialStateProperty.all(4)),
                           onPressed: () {
                             if (RegExp(r'^.*\..*@.*\.s.*\.gov\.pl$')
-                                    .hasMatch(_emailController.text) ||
-                                true) {
-                              // TODO remove true when done testing
+                                    .hasMatch(_emailController.text)) {
+                              //TODO remove true when done testing
                               _authDialogBuilder(
                                   context, _emailController.text);
                             } else {
@@ -408,38 +411,39 @@ class _MainFormState extends State<MainForm> {
             padding: const EdgeInsets.all(8.0),
             child: FilledButton(
               onPressed: () async {
-                //remove true when done testing
                 if (_formKey.currentState!.validate()) {
                   //TODO remove true when done testing
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Przetwarzanie danych...')),
                   );
                   try {
-                    await submitForm(
-                        Report(
-                            id: "",
-                            reportTimestamp: DateTime.now(),
-                            personalData: {
-                              "name": _nameController.text,
-                              "surname": _surnameController.text,
-                              "phone": _phoneController.text,
-                              "email": _emailController.text,
-                              "affiliation": _affiliationController.text,
-                              "status": _chosenStatus,
-                            },
-                            incidentData: {
-                              "incident timestamp":
-                                  DateFormat('dd.MM.yyyy hh:mm').parse(
-                                      "${_dateController.text} ${_timeController.text}"),
-                              "date": _dateController.text,
-                              "time": _timeController.text,
-                              "location": _placeController.text,
-                              "category": _chosenCategory == "inne..."
-                                  ? _otherCategoryController.text
-                                  : _chosenCategory,
-                              "description": _descriptionController.text,
-                            }).toMap(),
-                        _images);
+                    Report report = Report(
+                        id: "",
+                        reportTimestamp: DateTime.now(),
+                        personalData: {
+                          "name": _nameController.text,
+                          "surname": _surnameController.text,
+                          "phone": _phoneController.text,
+                          "email": _emailController.text,
+                          "affiliation": _affiliationController.text,
+                          "status": _chosenStatus,
+                        },
+                        incidentData: {
+                          "incident timestamp": DateFormat('dd.MM.yyyy hh:mm')
+                              .parse(
+                                  "${_dateController.text} ${_timeController.text}"),
+                          "date": _dateController.text,
+                          "time": _timeController.text,
+                          "location": _placeController.text,
+                          "category": _chosenCategory == "inne..."
+                              ? _otherCategoryController.text
+                              : _chosenCategory,
+                          "description": _descriptionController.text,
+                        });
+                    String id = await submitForm(report.toMap(), _images);
+                    report.id = id;
+                    report.imageUrls = await report.getImageUrls();
+                    print(report.toMap());
                     //clear form
                     _formKey.currentState?.reset();
                     //notify user
@@ -448,6 +452,37 @@ class _MainFormState extends State<MainForm> {
                       const SnackBar(
                           content: Text('Zgłoszenie wysłano pomyślnie')),
                     );
+                    await http.post(
+                        Uri.https(API_URL, 'confirm-submission'),
+                        body: json.encode({
+                          'api_key': API_KEY,
+                          'data': {
+                            'id': id,
+                            "report timestamp":
+                                report.reportTimestamp.millisecondsSinceEpoch /
+                                    1000,
+                            "personal data": {
+                              "phone": report.personalData['phone'],
+                              "affiliation": report.personalData['affiliation'],
+                              "name": report.personalData['name'],
+                              "status": report.personalData['status'],
+                              "email": report.personalData['email'],
+                              "surname": report.personalData['surname']
+                            },
+                            "incident data": {
+                              "incident timestamp": report
+                                      .incidentData['incident timestamp']
+                                      .millisecondsSinceEpoch /
+                                  1000,
+                              "time": report.incidentData['time'],
+                              "category": report.incidentData['category'],
+                              "location": report.incidentData['location'],
+                              "date": report.incidentData['date'],
+                              "description": report.incidentData['description']
+                            },
+                            "images": report.imageUrls,
+                          },
+                        }));
                   } catch (e) {
                     print(e);
                     ScaffoldMessenger.of(context).clearSnackBars();

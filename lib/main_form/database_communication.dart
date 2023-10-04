@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../admin_panel/providers.dart';
 
-Future<void> submitForm(
+Future<String> submitForm(
     Map<String, dynamic> formData, List<XFile> images) async {
   FirebaseAuth auth = FirebaseAuth.instance;
   if (auth.currentUser == null) {
@@ -13,21 +13,24 @@ Future<void> submitForm(
   }
   FirebaseFirestore db = FirebaseFirestore.instance;
   final storageRef = FirebaseStorage.instance.ref();
-  db.collection("reports").add(formData).then((docReference) async {
+  late var docuReference;
+  await db.collection("reports").add(formData).then((docReference) async {
+    docuReference = docReference;
     for (var image in images) {
-      storageRef
+      await storageRef
           .child("images/${docReference.id}/${image.name}")
           .putData((await image.readAsBytes()));
     }
   });
+  return docuReference.id;
 }
 
 class Report {
-  final String id;
+  String id;
   final DateTime reportTimestamp;
   final Map<String, dynamic> personalData;
   final Map<String, dynamic> incidentData;
-  late final List<List<String>> imageUrls = [];
+  late List<List<String>> imageUrls = [];
 
   void moveToTrash(pageType) {
     switch (pageType) {
@@ -84,6 +87,7 @@ class Report {
 
   Map<String, dynamic> toMap() {
     return {
+      "id": id,
       "report timestamp": reportTimestamp,
       "personal data": personalData,
       "incident data": incidentData,
