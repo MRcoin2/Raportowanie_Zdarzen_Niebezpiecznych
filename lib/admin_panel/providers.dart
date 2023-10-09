@@ -86,6 +86,7 @@ class DataAndSelectionManager extends ChangeNotifier {
       return false;
     }
   }
+
   Future<bool> fetchMoreTrash({refresh = false}) async {
     await FirebaseFirestore.instance
         .collection("trash")
@@ -142,22 +143,32 @@ class DataAndSelectionManager extends ChangeNotifier {
     return false;
   }
 
-  Future<List<Report>> fetchFilteredReportsForReportGeneration() async{
+  Future<List<Report>> fetchFilteredReportsForReportGeneration() async {
     List<Report> reports = [];
-    try{
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection("archive")
-        .orderBy("report timestamp", descending: true)
-        .where("report timestamp", isGreaterThanOrEqualTo: filters.dateRange!.start.millisecondsSinceEpoch*1000)
-        .where("report timestamp", isLessThanOrEqualTo: filters.dateRange!.end.millisecondsSinceEpoch*1000)
-        .get();
-      addQuerySnapshotToList(querySnapshot, reports);}
-      catch (e){
-        print(e);
-      }
-      notifyListeners();
-      return reports;
+    try {
+      print("fetching filtered reports");
+      print("date range: ${filters.dateRange}");
+      print("start: ${filters.dateRange!.start.millisecondsSinceEpoch / 1000}");
+      print("end: ${filters.dateRange!.end.millisecondsSinceEpoch / 1000}");
 
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection("archive")
+          .orderBy("report timestamp", descending: true)
+          .where("report timestamp",
+              isGreaterThanOrEqualTo:Timestamp.fromDate(
+                  filters.dateRange!.start))
+          .where("report timestamp",
+              isLessThanOrEqualTo:
+              Timestamp.fromDate(filters.dateRange!.end))
+          .limit(300)
+          .get();
+      addQuerySnapshotToList(querySnapshot, reports);
+      print(reports);
+    } catch (e) {
+      print(e);
+    }
+    notifyListeners();
+    return reports;
   }
 
   void addQuerySnapshotToList(QuerySnapshot querySnapshot, List<Report> list) {
@@ -202,22 +213,19 @@ class DataAndSelectionManager extends ChangeNotifier {
     return true;
   }
 
-  Iterable<Report> filterReports(List<Report> reportList){
+  Iterable<Report> filterReports(List<Report> reportList) {
     return reportList.where(
-          (report) {
+      (report) {
         if (_filters.dateRange != null) {
           if (_filters.useIncidentTimestamp) {
-            DateTime incidentTimestamp =
-            DateTime.fromMillisecondsSinceEpoch(
-                report.incidentData["incident timestamp"].seconds *
-                    1000);
+            DateTime incidentTimestamp = DateTime.fromMillisecondsSinceEpoch(
+                report.incidentData["incident timestamp"].seconds * 1000);
             if (!_isDateInRange(incidentTimestamp, _filters.dateRange)) {
               _selected.removeWhere((report) => report == report);
               return false;
             }
           } else {
-            if (!_isDateInRange(
-                report.reportTimestamp, _filters.dateRange)) {
+            if (!_isDateInRange(report.reportTimestamp, _filters.dateRange)) {
               _selected.removeWhere((report) => report == report);
               return false;
             }
@@ -231,8 +239,7 @@ class DataAndSelectionManager extends ChangeNotifier {
               !categories.contains(report.incidentData["category"])) {
             return true;
           }
-          if (_filters.categories
-              .contains(report.incidentData["category"])) {
+          if (_filters.categories.contains(report.incidentData["category"])) {
             return true;
           }
           _selected.removeWhere((report) => report == report);
@@ -242,11 +249,14 @@ class DataAndSelectionManager extends ChangeNotifier {
     );
   }
 
-  UnmodifiableListView<Report> get reports => UnmodifiableListView(filterReports(_reports));
+  UnmodifiableListView<Report> get reports =>
+      UnmodifiableListView(filterReports(_reports));
 
-  UnmodifiableListView<Report> get trash => UnmodifiableListView(filterReports(_trash));
+  UnmodifiableListView<Report> get trash =>
+      UnmodifiableListView(filterReports(_trash));
 
-  UnmodifiableListView<Report> get archivedReports => UnmodifiableListView(filterReports(_archivedReports));
+  UnmodifiableListView<Report> get archivedReports =>
+      UnmodifiableListView(filterReports(_archivedReports));
 
   void sortReportsByReportTimestamp(bool reverse) {
     _reports.sort((a, b) => a.reportTimestamp.compareTo(b.reportTimestamp));
@@ -313,8 +323,10 @@ class DataAndSelectionManager extends ChangeNotifier {
 
   void toggleFilterCategory(String category) {
     if (_filters.categories.contains(category)) {
+      print("removing category $category");
       _filters.categories.remove(category);
     } else {
+      print("adding category $category");
       _filters.categories.add(category);
     }
     notifyListeners();

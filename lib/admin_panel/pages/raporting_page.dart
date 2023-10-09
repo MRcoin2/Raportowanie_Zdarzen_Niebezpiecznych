@@ -6,6 +6,7 @@ import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form.dart';
 
 import '../../main_form/database_communication.dart';
 import '../panel_widgets/filter_panel.dart';
+import '../panel_widgets/panel_widgets.dart';
 import '../providers.dart';
 
 class ReportingPage extends StatefulWidget {
@@ -28,10 +29,11 @@ class _ReportingPageState extends State<ReportingPage> {
         appBar: AppBar(
           title: const Text('Generowanie raportów'),
         ),
-        body: Consumer(
+        body: Consumer<DataAndSelectionManager>(
           builder: (context, provider, child) => Row(
             children: [
-              Expanded(child: FilterPanel()),
+              Expanded(flex: 1, child: SideMenuBar()),
+              Expanded(flex:3, child: FilterPanel()),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text("Wybrano:${reports.length}"),
