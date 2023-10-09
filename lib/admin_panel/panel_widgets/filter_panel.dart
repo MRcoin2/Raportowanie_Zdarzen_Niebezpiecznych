@@ -18,7 +18,7 @@ class _FilterPanelState extends State<FilterPanel> {
   final TextEditingController fromDateController = TextEditingController();
   final TextEditingController toDateController = TextEditingController();
 
-  List<bool> toggleButtonsState = [true, false];
+  List<bool> toggleButtonsState = [false, true];
 
   late DateTimeRange? selectedDateRange;
 
@@ -48,7 +48,7 @@ class _FilterPanelState extends State<FilterPanel> {
         end: DateFormat('dd.MM.yyyy').parse(toDateController.text));}
     catch(e){
       if (kDebugMode) {
-        print("incorrect date format / field empty (skipping setting date range)");
+        print("Filter Panel: incorrect date format / field empty (skipping setting date range)");
       }
     }
     context.read<DataAndSelectionManager>().setFilters(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/admin_panel.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/archive_page.dart';
+import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/raporting_page.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/trash_page.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -125,7 +126,7 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       routes: {
         '/': (context) =>
-            const FormPage(title: 'Raportowanie Zdarzeń Niebezpiecznych'),
+        const FormPage(title: 'Raportowanie Zdarzeń Niebezpiecznych'),
         '/admin-login': (context) => const AdminLoginPage(),
         '/admin-panel': (context) => MultiProvider(providers: [
               ChangeNotifierProvider(
@@ -133,6 +134,7 @@ class MyApp extends StatelessWidget {
             ], child: const AdminPanelPage()),
         '/admin-panel/trash': (context) => const TrashPage(),
         '/admin-panel/archive': (context) => const ArchivePage(),
+        '/admin-panel/raport-generation': (context) => ReportingPage(),
       },
       initialRoute: '/',
       localizationsDelegates: const [GlobalMaterialLocalizations.delegate],

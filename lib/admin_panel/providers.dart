@@ -142,6 +142,23 @@ class DataAndSelectionManager extends ChangeNotifier {
     return false;
   }
 
+  Future<List<Report>> fetchFilteredReportsForReportGeneration() async{
+    List<Report> reports = [];
+    try{
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection("archive")
+        .orderBy("report timestamp", descending: true)
+        .where("report timestamp", isGreaterThanOrEqualTo: filters.dateRange!.start.millisecondsSinceEpoch*1000)
+        .where("report timestamp", isLessThanOrEqualTo: filters.dateRange!.end.millisecondsSinceEpoch*1000)
+        .get();
+      addQuerySnapshotToList(querySnapshot, reports);}
+      catch (e){
+        print(e);
+      }
+      notifyListeners();
+      return reports;
+
+  }
 
   void addQuerySnapshotToList(QuerySnapshot querySnapshot, List<Report> list) {
     for (var doc in querySnapshot.docs) {
@@ -185,125 +202,51 @@ class DataAndSelectionManager extends ChangeNotifier {
     return true;
   }
 
-  UnmodifiableListView<Report> get reports => UnmodifiableListView(
-        _reports.where(
+  Iterable<Report> filterReports(List<Report> reportList){
+    return reportList.where(
           (report) {
-            if (_filters.dateRange != null) {
-              if (_filters.useIncidentTimestamp) {
-                DateTime incidentTimestamp =
-                    DateTime.fromMillisecondsSinceEpoch(
-                        report.incidentData["incident timestamp"].seconds *
-                            1000);
-                if (!_isDateInRange(incidentTimestamp, _filters.dateRange)) {
-                  _selected.removeWhere((report) => report == report);
-                  return false;
-                }
-              } else {
-                if (!_isDateInRange(
-                    report.reportTimestamp, _filters.dateRange)) {
-                  _selected.removeWhere((report) => report == report);
-                  return false;
-                }
-              }
-            }
-            if (_filters.categories.isEmpty) {
-              _selected.removeWhere((report) => report == report);
-              return false;
-            } else {
-              if (_filters.categories.contains("inne...") &&
-                  !categories.contains(report.incidentData["category"])) {
-                return true;
-              }
-              if (_filters.categories
-                  .contains(report.incidentData["category"])) {
-                return true;
-              }
+        if (_filters.dateRange != null) {
+          if (_filters.useIncidentTimestamp) {
+            DateTime incidentTimestamp =
+            DateTime.fromMillisecondsSinceEpoch(
+                report.incidentData["incident timestamp"].seconds *
+                    1000);
+            if (!_isDateInRange(incidentTimestamp, _filters.dateRange)) {
               _selected.removeWhere((report) => report == report);
               return false;
             }
-          },
-        ),
-      );
+          } else {
+            if (!_isDateInRange(
+                report.reportTimestamp, _filters.dateRange)) {
+              _selected.removeWhere((report) => report == report);
+              return false;
+            }
+          }
+        }
+        if (_filters.categories.isEmpty) {
+          _selected.removeWhere((report) => report == report);
+          return false;
+        } else {
+          if (_filters.categories.contains("inne...") &&
+              !categories.contains(report.incidentData["category"])) {
+            return true;
+          }
+          if (_filters.categories
+              .contains(report.incidentData["category"])) {
+            return true;
+          }
+          _selected.removeWhere((report) => report == report);
+          return false;
+        }
+      },
+    );
+  }
 
-  UnmodifiableListView<Report> get trash => UnmodifiableListView(
-        _trash.where(
-          (report) {
-            if (_filters.dateRange != null) {
-              if (_filters.useIncidentTimestamp) {
-                DateTime incidentTimestamp =
-                    DateTime.fromMillisecondsSinceEpoch(
-                        report.incidentData["incident timestamp"].seconds *
-                            1000);
-                if (!_isDateInRange(incidentTimestamp, _filters.dateRange)) {
-                  _selected.removeWhere((report) => report == report);
-                  return false;
-                }
-              } else {
-                if (!_isDateInRange(
-                    report.reportTimestamp, _filters.dateRange)) {
-                  _selected.removeWhere((report) => report == report);
-                  return false;
-                }
-              }
-            }
-            if (_filters.categories.isEmpty) {
-              _selected.removeWhere((report) => report == report);
-              return false;
-            } else {
-              if (_filters.categories.contains("inne...") &&
-                  !categories.contains(report.incidentData["category"])) {
-                return true;
-              }
-              if (_filters.categories
-                  .contains(report.incidentData["category"])) {
-                return true;
-              }
-              _selected.removeWhere((report) => report == report);
-              return false;
-            }
-          },
-        ),
-      );
+  UnmodifiableListView<Report> get reports => UnmodifiableListView(filterReports(_reports));
 
-  UnmodifiableListView<Report> get archivedReports => UnmodifiableListView(
-        _archivedReports.where(
-          (report) {
-            if (_filters.dateRange != null) {
-              if (_filters.useIncidentTimestamp) {
-                DateTime incidentTimestamp =
-                    DateTime.fromMillisecondsSinceEpoch(
-                        report.incidentData["incident timestamp"].seconds *
-                            1000);
-                if (!_isDateInRange(incidentTimestamp, _filters.dateRange)) {
-                  _selected.removeWhere((report) => report == report);
-                  return false;
-                }
-              } else {
-                if (!_isDateInRange(
-                    report.reportTimestamp, _filters.dateRange)) {
-                  _selected.removeWhere((report) => report == report);
-                  return false;
-                }
-              }
-            }
-            if (_filters.categories.isEmpty) {
-              _selected.removeWhere((report) => report == report);
-              return false;
-            } else {
-              if (_filters.categories.contains("inne...") &&
-                  !categories.contains(report.incidentData["category"])) {
-                return true;
-              }
-              if (_filters.categories
-                  .contains(report.incidentData["category"])) {
-                return true;
-              }
-              _selected.removeWhere((report) => report == report);
-              return false;
-            }
-          },
-        ),
-      );
+  UnmodifiableListView<Report> get trash => UnmodifiableListView(filterReports(_trash));
+
+  UnmodifiableListView<Report> get archivedReports => UnmodifiableListView(filterReports(_archivedReports));
 
   void sortReportsByReportTimestamp(bool reverse) {
     _reports.sort((a, b) => a.reportTimestamp.compareTo(b.reportTimestamp));

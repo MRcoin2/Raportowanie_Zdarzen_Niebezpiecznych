@@ -167,6 +167,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
           );
         }
       } catch (e) {
+        print(e);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Wystąpił błąd podczas logowania')),
         );
