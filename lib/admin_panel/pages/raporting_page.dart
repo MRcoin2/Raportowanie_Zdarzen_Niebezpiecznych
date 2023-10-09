@@ -7,6 +7,7 @@ import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form.dart';
 import '../../main_form/database_communication.dart';
 import '../panel_widgets/filter_panel.dart';
 import '../panel_widgets/panel_widgets.dart';
+import '../pdf_generation.dart';
 import '../providers.dart';
 
 class ReportingPage extends StatefulWidget {
@@ -33,19 +34,34 @@ class _ReportingPageState extends State<ReportingPage> {
           builder: (context, provider, child) => Row(
             children: [
               Expanded(flex: 1, child: SideMenuBar()),
-              Expanded(flex:3, child: FilterPanel()),
+              Expanded(
+                  flex: 3,
+                  child: FilterPanel(
+                    constrainSize: false,
+                    showDateSwitch: false,
+                    onUpdate: context
+                        .read<DataAndSelectionManager>()
+                        .updateNumberOfFilteredReportsForReportGeneration,
+                  )),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text("Wybrano:${reports.length}"),
+                child: Text(
+                    "Wybrano:${context.read<DataAndSelectionManager>().numberOfReportsSelectedForReportGeneration}"),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
-                  onPressed: ()async{
-                    reports = await context
+                  onPressed: () async {
+                    Map<String, int> categoryCounts = {};
+                    for (String category in context
                         .read<DataAndSelectionManager>()
-                        .fetchFilteredReportsForReportGeneration();
-                    print(reports.length);
+                        .filters.categories) {
+                      categoryCounts[category] = await context
+                          .read<DataAndSelectionManager>()
+                          .numberOfFilteredReportsPerCategory(category);
+                    }
+                    print(categoryCounts);
+                    printPeriodicReport(categoryCounts);
                   },
                   child: const Text('Generuj raport'),
                 ),

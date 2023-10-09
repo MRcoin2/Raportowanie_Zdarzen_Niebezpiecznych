@@ -6,8 +6,15 @@ import '../../main_form/form.dart';
 import '../providers.dart';
 
 class FilterPanel extends StatefulWidget {
+  final bool constrainSize;
+  final bool showDateSwitch;
+  final Function? onUpdate;
+
   FilterPanel({
     super.key,
+    this.constrainSize = true,
+    this.showDateSwitch = true,
+    this.onUpdate,
   });
 
   @override
@@ -41,36 +48,36 @@ class _FilterPanelState extends State<FilterPanel> {
   }
 
   void updateDateRange() {
-    try{
-    selectedDateRange = DateTimeRange(
-        start:
-        DateFormat('dd.MM.yyyy').parse(fromDateController.text),
-        end: DateFormat('dd.MM.yyyy').parse(toDateController.text));}
-    catch(e){
+    try {
+      selectedDateRange = DateTimeRange(
+          start: DateFormat('dd.MM.yyyy').parse(fromDateController.text),
+          end: DateFormat('dd.MM.yyyy').parse(toDateController.text));
+    } catch (e) {
       if (kDebugMode) {
-        print("Filter Panel: incorrect date format / field empty (skipping setting date range)");
+        print(
+            "Filter Panel: incorrect date format / field empty (skipping setting date range)");
       }
     }
+    widget.onUpdate!();
     context.read<DataAndSelectionManager>().setFilters(
-      Filters(
-          categories: context
-              .read<DataAndSelectionManager>()
-              .filters
-              .categories,
-          dateRange: selectedDateRange,
-          useIncidentTimestamp: toggleButtonsState[0]),
-    );
+          Filters(
+              categories:
+                  context.read<DataAndSelectionManager>().filters.categories,
+              dateRange: selectedDateRange,
+              useIncidentTimestamp: toggleButtonsState[0]),
+        );
   }
 
   @override
   void initState() {
-    selectedDateRange = context.read<DataAndSelectionManager>().filters.dateRange;
-    if (selectedDateRange != null)
-      {
-    fromDateController.text =
-        DateFormat('dd.MM.yyyy').format(selectedDateRange!.start);
-    toDateController.text =
-        DateFormat('dd.MM.yyyy').format(selectedDateRange!.end);}
+    selectedDateRange =
+        context.read<DataAndSelectionManager>().filters.dateRange;
+    if (selectedDateRange != null) {
+      fromDateController.text =
+          DateFormat('dd.MM.yyyy').format(selectedDateRange!.start);
+      toDateController.text =
+          DateFormat('dd.MM.yyyy').format(selectedDateRange!.end);
+    }
     super.initState();
   }
 
@@ -78,8 +85,12 @@ class _FilterPanelState extends State<FilterPanel> {
   Widget build(BuildContext context) {
     //menu for managing the filters
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.5,
-      width: MediaQuery.of(context).size.width * 0.3,
+      height: widget.constrainSize
+          ? MediaQuery.of(context).size.height * 0.5
+          : double.infinity,
+      width: widget.constrainSize
+          ? MediaQuery.of(context).size.width * 0.35
+          : double.infinity,
       child: Card(
         elevation: 4,
         child: Padding(
@@ -111,36 +122,36 @@ class _FilterPanelState extends State<FilterPanel> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Row(
+                    child: widget.showDateSwitch? Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const Text("Filtruj po:"),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: ToggleButtons(
-                            isSelected: toggleButtonsState,
-                            onPressed: (index) {
-                              setState(() {
-                                if (index == 0) {
-                                  toggleButtonsState = [true, false];
-                                } else {
-                                  toggleButtonsState = [false, true];
-                                }
-                                updateDateRange();
-                              });
-                            },
-                            children: const [
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text("Data zdażenia"),
+                            const Text("Filtruj po:"),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: ToggleButtons(
+                                isSelected: toggleButtonsState,
+                                onPressed: (index) {
+                                  setState(() {
+                                    if (index == 0) {
+                                      toggleButtonsState = [true, false];
+                                    } else {
+                                      toggleButtonsState = [false, true];
+                                    }
+                                    updateDateRange();
+                                  });
+                                },
+                                children: const [
+                                  Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text("Data zdażenia"),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text("Data zgłoszenia"),
+                                  )
+                                ],
                               ),
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text("Data zgłoszenia"),
-                              )
-                            ],
-                          ),
-                        ),
+                            ),
                         Expanded(
                           child: Container(),
                         ),
@@ -155,6 +166,15 @@ class _FilterPanelState extends State<FilterPanel> {
                           child: const Text('Wyczyść filtry'),
                         ),
                       ],
+                    ):TextButton(
+                      onPressed: () {
+                        fromDateController.clear();
+                        toDateController.clear();
+                        context
+                            .read<DataAndSelectionManager>()
+                            .clearFilters();
+                      },
+                      child: const Text('Wyczyść filtry'),
                     ),
                   ),
                   const Divider(),
@@ -176,6 +196,11 @@ class _FilterPanelState extends State<FilterPanel> {
                               context
                                   .read<DataAndSelectionManager>()
                                   .toggleFilterAllCategories();
+                              print(context
+                                  .read<DataAndSelectionManager>()
+                                  .filters
+                                  .categories);
+                              widget.onUpdate!();
                             },
                           ),
                         ),
@@ -196,6 +221,7 @@ class _FilterPanelState extends State<FilterPanel> {
                                 context
                                     .read<DataAndSelectionManager>()
                                     .toggleFilterCategory(category);
+                                widget.onUpdate!();
                               },
                             ),
                           ),

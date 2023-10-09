@@ -27,6 +27,8 @@ class DataAndSelectionManager extends ChangeNotifier {
   List<Report> _archivedReports = [];
   DocumentSnapshot? _lastArchivedReport;
 
+  int numberOfReportsSelectedForReportGeneration = 0;
+
   Future<bool> fetchReports({refresh = false}) async {
     print("fetching reports");
     //TODO handle limit and load more
@@ -155,20 +157,83 @@ class DataAndSelectionManager extends ChangeNotifier {
           .collection("archive")
           .orderBy("report timestamp", descending: true)
           .where("report timestamp",
-              isGreaterThanOrEqualTo:Timestamp.fromDate(
-                  filters.dateRange!.start))
+              isGreaterThanOrEqualTo:
+                  Timestamp.fromDate(filters.dateRange!.start))
           .where("report timestamp",
-              isLessThanOrEqualTo:
-              Timestamp.fromDate(filters.dateRange!.end))
-          .limit(300)
+              isLessThanOrEqualTo: Timestamp.fromDate(filters.dateRange!.end))
+          .where("incident data.category", whereIn: filters.categories)
+          .limit(1000)
           .get();
       addQuerySnapshotToList(querySnapshot, reports);
       print(reports);
     } catch (e) {
       print(e);
+      reports = [];
     }
     notifyListeners();
     return reports;
+  }
+
+ void updateNumberOfFilteredReportsForReportGeneration() async {
+    try {
+      AggregateQuery numberOfReportsQuery = FirebaseFirestore.instance
+          .collection("archive")
+          .orderBy("report timestamp", descending: true)
+          .where("report timestamp",
+              isGreaterThanOrEqualTo:
+                  Timestamp.fromDate(filters.dateRange!.start))
+          .where("report timestamp",
+              isLessThanOrEqualTo: Timestamp.fromDate(filters.dateRange!.end))
+          .where("incident data.category", whereIn: filters.categories)
+          .limit(1000)
+          .count();
+      numberOfReportsSelectedForReportGeneration = await numberOfReportsQuery.get().then((value) => value.count);
+    } catch (e) {
+      numberOfReportsSelectedForReportGeneration = 0;
+      print(e);
+    }
+    notifyListeners();
+  }
+
+  Future<int> numberOfFilteredReportsPerCategory(String category) async {
+    int numberOfReports = 0;
+    try {
+      print("counting filtered reports");
+      print("date range: ${filters.dateRange}");
+      print("category: $category");
+      if(category=="inne..."){
+        AggregateQuery numberOfReportsQuery = await FirebaseFirestore.instance
+            .collection("archive")
+            .orderBy("report timestamp", descending: true)
+            .where("report timestamp",
+            isGreaterThanOrEqualTo:
+            Timestamp.fromDate(filters.dateRange!.start))
+            .where("report timestamp",
+            isLessThanOrEqualTo: Timestamp.fromDate(filters.dateRange!.end))
+            .where("incident data.category", whereNotIn: categories)
+            .limit(1000)
+            .count();
+      }
+      else{
+      AggregateQuery numberOfReportsQuery = await FirebaseFirestore.instance
+          .collection("archive")
+          .orderBy("report timestamp", descending: true)
+          .where("report timestamp",
+              isGreaterThanOrEqualTo:
+                  Timestamp.fromDate(filters.dateRange!.start))
+          .where("report timestamp",
+              isLessThanOrEqualTo: Timestamp.fromDate(filters.dateRange!.end))
+          .where("incident data.category", isEqualTo: category)
+          .limit(1000)
+          .count();
+      numberOfReports = await numberOfReportsQuery.get().then((value) => value.count);}
+      print(reports);
+    } catch (e) {
+      print(e);
+      numberOfReports = 0;
+    }
+    notifyListeners();
+    return numberOfReports;
   }
 
   void addQuerySnapshotToList(QuerySnapshot querySnapshot, List<Report> list) {
