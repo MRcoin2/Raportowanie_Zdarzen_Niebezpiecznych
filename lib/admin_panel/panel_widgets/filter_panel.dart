@@ -9,11 +9,13 @@ class FilterPanel extends StatefulWidget {
   final bool constrainSize;
   final bool showDateSwitch;
   final Function? onUpdate;
+  final double elevation;
 
   FilterPanel({
     super.key,
     this.constrainSize = true,
     this.showDateSwitch = true,
+    this.elevation = 4,
     this.onUpdate,
   });
 
@@ -43,6 +45,7 @@ class _FilterPanelState extends State<FilterPanel> {
             DateFormat('dd.MM.yyyy').format(selectedDateRange!.start);
         toDateController.text =
             DateFormat('dd.MM.yyyy').format(selectedDateRange!.end);
+        updateDateRange();
       });
     }
   }
@@ -92,7 +95,7 @@ class _FilterPanelState extends State<FilterPanel> {
           ? MediaQuery.of(context).size.width * 0.35
           : double.infinity,
       child: Card(
-        elevation: 4,
+        elevation: widget.elevation,
         child: Padding(
           padding: const EdgeInsets.all(18.0),
           child: SingleChildScrollView(
@@ -157,6 +160,7 @@ class _FilterPanelState extends State<FilterPanel> {
                         ),
                         TextButton(
                           onPressed: () {
+                            widget.onUpdate!();
                             fromDateController.clear();
                             toDateController.clear();
                             context
@@ -168,6 +172,7 @@ class _FilterPanelState extends State<FilterPanel> {
                       ],
                     ):TextButton(
                       onPressed: () {
+                        widget.onUpdate!();
                         fromDateController.clear();
                         toDateController.clear();
                         context

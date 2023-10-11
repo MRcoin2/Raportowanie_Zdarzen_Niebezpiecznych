@@ -42,11 +42,13 @@ Future<Uint8List> generateSingleReportPdf(Report report) async {
   }
 }
 
-Future<Uint8List> generatePeriodicReportPdf(Map<String,int> categoryCounts) async{
+Future<Uint8List> generatePeriodicReportPdf(Map<String,int> categoryCounts, String startDate, String endDate) async{
   var response = await http.post(Uri.https(API_URL,'generate-periodic-pdf'),
       body: json.encode({
         'api_key': API_KEY,
         'category_counts': categoryCounts,
+        'start_date': startDate,
+        'end_date': endDate,
       }));
   if (response.statusCode == 200) {
     return response.bodyBytes;
@@ -67,11 +69,11 @@ Future<void> downloadReport(Report report) async {
       bytes: await generateSingleReportPdf(report), filename: 'report.pdf');
 }
 
-Future<void> printPeriodicReport(Map <String,int> categoryCounts) async {
-  await Printing.layoutPdf(onLayout: (format) => generatePeriodicReportPdf(categoryCounts));
+Future<void> printPeriodicReport(Map <String,int> categoryCounts, String startDate, String endDate) async {
+  await Printing.layoutPdf(onLayout: (format) => generatePeriodicReportPdf(categoryCounts, startDate, endDate));
 }
 
-Future<void> downloadPeriodicReport(Map <String,int> categoryCounts) async {
+Future<void> downloadPeriodicReport(Map <String,int> categoryCounts, String startDate, String endDate) async {
   await Printing.sharePdf(
-      bytes: await generatePeriodicReportPdf(categoryCounts), filename: 'report.pdf');
+      bytes: await generatePeriodicReportPdf(categoryCounts, startDate, endDate), filename: 'report.pdf');
 }

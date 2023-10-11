@@ -1,8 +1,7 @@
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form.dart';
 
 import '../../main_form/database_communication.dart';
 import '../panel_widgets/filter_panel.dart';
@@ -35,35 +34,98 @@ class _ReportingPageState extends State<ReportingPage> {
             children: [
               Expanded(flex: 1, child: SideMenuBar()),
               Expanded(
-                  flex: 3,
-                  child: FilterPanel(
-                    constrainSize: false,
-                    showDateSwitch: false,
-                    onUpdate: context
-                        .read<DataAndSelectionManager>()
-                        .updateNumberOfFilteredReportsForReportGeneration,
+                  flex: 2,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        flex: 5,
+                        child: FilterPanel(
+                          constrainSize: false,
+                          showDateSwitch: false,
+                          elevation: 1,
+                          onUpdate: context
+                              .read<DataAndSelectionManager>()
+                              .updateNumberOfFilteredReportsForReportGeneration,
+                        ),
+                      ),
+                      const Expanded(
+                          flex: 1,
+                          child: Card(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text("Lorem ipsum"),
+                                )
+                              ],
+                            ),
+                          )),
+                    ],
                   )),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                    "Wybrano:${context.read<DataAndSelectionManager>().numberOfReportsSelectedForReportGeneration}"),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    Map<String, int> categoryCounts = {};
-                    for (String category in context
-                        .read<DataAndSelectionManager>()
-                        .filters.categories) {
-                      categoryCounts[category] = await context
-                          .read<DataAndSelectionManager>()
-                          .numberOfFilteredReportsPerCategory(category);
-                    }
-                    print(categoryCounts);
-                    printPeriodicReport(categoryCounts);
-                  },
-                  child: const Text('Generuj raport'),
+              Expanded(
+                flex: 1,
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                              "Wybrano:${context.read<DataAndSelectionManager>().numberOfReportsSelectedForReportGeneration}", style: TextStyle(fontSize: 20),),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              elevation: 4,
+                            ),
+                            onPressed: () async {
+                              Map<String, int> categoryCounts = {};
+                              for (String category in context
+                                  .read<DataAndSelectionManager>()
+                                  .filters
+                                  .categories) {
+                                categoryCounts[category] = await context
+                                    .read<DataAndSelectionManager>()
+                                    .numberOfFilteredReportsPerCategory(
+                                        category);
+                              }
+                              print(categoryCounts);
+                              printPeriodicReport(categoryCounts, DateFormat('dd.MM.yyyy').format(context.read<DataAndSelectionManager>().filters.dateRange!.start), DateFormat('dd.MM.yyyy').format(context.read<DataAndSelectionManager>().filters.dateRange!.end));
+                            },
+                            child: const Text('Drukuj raport'),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              elevation: 4,
+                            ),
+                            onPressed: () async {
+                              Map<String, int> categoryCounts = {};
+                              for (String category in context
+                                  .read<DataAndSelectionManager>()
+                                  .filters
+                                  .categories) {
+                                categoryCounts[category] = await context
+                                    .read<DataAndSelectionManager>()
+                                    .numberOfFilteredReportsPerCategory(
+                                        category);
+                              }
+                              print(categoryCounts);
+                              downloadPeriodicReport(categoryCounts, DateFormat('dd.MM.yyyy').format(context.read<DataAndSelectionManager>().filters.dateRange!.start), DateFormat('dd.MM.yyyy').format(context.read<DataAndSelectionManager>().filters.dateRange!.end));
+                            },
+                            child: const Text('Pobierz raport'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ],
