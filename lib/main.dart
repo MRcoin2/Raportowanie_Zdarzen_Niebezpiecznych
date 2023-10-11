@@ -10,6 +10,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'admin_panel/providers.dart';
 import 'authentication/admin_login_page.dart';
 import 'firebase_options.dart';
+import 'main_form/add_info_page.dart';
 
 Future<void> main() async {
   await Firebase.initializeApp(
@@ -133,6 +134,14 @@ class MyApp extends StatelessWidget {
             ], child: const AdminPanelPage()),
         '/admin-panel/trash': (context) => const TrashPage(),
         '/admin-panel/archive': (context) => const ArchivePage(),
+      },
+      onUnknownRoute: (route){
+        if ("add-info/".matchAsPrefix(route.name??"")!.end > 0 && route.name != null){
+          String reportId = route.name!.substring("add-info/".length);
+          return MaterialPageRoute(builder: (context) => ChangeNotifierProvider(
+              create: (context) => DataAndSelectionManager(),
+              child: AddInfoPage(reportId: reportId)));
+        }
       },
       initialRoute: '/',
       localizationsDelegates: const [GlobalMaterialLocalizations.delegate],

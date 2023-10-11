@@ -195,3 +195,46 @@ class IncidentData {
     };
   }
 }
+
+Future<Report> findReportById(String reportId){
+  //search three collections for a report
+  late Report report;
+  return FirebaseFirestore.instance.collection("reports").doc(reportId).get().then((document) {
+    if (document.exists) {
+      return Report(
+        id: reportId,
+        reportTimestamp: document.data()!["report timestamp"].toDate(),
+        personalData: document.data()!["personal data"],
+        incidentData: document.data()!["incident data"],
+      );
+    }
+    else {
+      return FirebaseFirestore.instance.collection("archive").doc(reportId).get().then((document) {
+        if (document.exists) {
+          return Report(
+            id: reportId,
+            reportTimestamp: document.data()!["report timestamp"].toDate(),
+            personalData: document.data()!["personal data"],
+            incidentData: document.data()!["incident data"],
+          );
+        }
+        else {
+          return FirebaseFirestore.instance.collection("trash").doc(reportId).get().then((document) {
+            if (document.exists) {
+              return Report(
+                id: reportId,
+                reportTimestamp: document.data()!["report timestamp"].toDate(),
+                personalData: document.data()!["personal data"],
+                incidentData: document.data()!["incident data"],
+              );
+            }
+            else {
+              throw Exception("Report not found");
+            }
+          });
+        }
+      });
+    }
+  });
+
+}

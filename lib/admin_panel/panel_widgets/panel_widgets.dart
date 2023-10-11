@@ -944,7 +944,7 @@ class ReportDisplayCard extends StatelessWidget {
                           child: const Text("Pobierz plik PDF"),
                         ),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
