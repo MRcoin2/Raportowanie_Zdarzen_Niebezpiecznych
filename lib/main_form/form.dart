@@ -147,7 +147,7 @@ class _MainFormState extends State<MainForm> {
                               elevation: MaterialStateProperty.all(4)),
                           onPressed: () {
                             if (RegExp(r'^.*\..*@.*\.s.*\.gov\.pl$')
-                                    .hasMatch(_emailController.text)) {
+                                    .hasMatch(_emailController.text)||true) {
                               //TODO remove true when done testing
                               _authDialogBuilder(
                                   context, _emailController.text);
@@ -411,7 +411,7 @@ class _MainFormState extends State<MainForm> {
             padding: const EdgeInsets.all(8.0),
             child: FilledButton(
               onPressed: () async {
-                if (_formKey.currentState!.validate()) {
+                if (_formKey.currentState!.validate()||true) {
                   //TODO remove true when done testing
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Przetwarzanie danych...')),

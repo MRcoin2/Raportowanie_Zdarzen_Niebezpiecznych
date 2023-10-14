@@ -136,8 +136,9 @@ class MyApp extends StatelessWidget {
         '/admin-panel/archive': (context) => const ArchivePage(),
       },
       onUnknownRoute: (route){
-        if ("add-info/".matchAsPrefix(route.name??"")!.end > 0 && route.name != null){
-          String reportId = route.name!.substring("add-info/".length);
+        print(route.name);
+        if ("/add-info".matchAsPrefix(route.name??"")!.end > 0 && route.name != null){
+          String reportId = route.name!.substring("/add-info/".length);
           return MaterialPageRoute(builder: (context) => ChangeNotifierProvider(
               create: (context) => DataAndSelectionManager(),
               child: AddInfoPage(reportId: reportId)));
