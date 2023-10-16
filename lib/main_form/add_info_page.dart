@@ -273,8 +273,11 @@ class _AddInfoPageState extends State<AddInfoPage> {
                                                               ScaffoldMessenger.of(context).clearSnackBars();
                                                               ScaffoldMessenger.of(context).showSnackBar(
                                                                 const SnackBar(
-                                                                    content: Text('Zgłoszenie zaktualizowane pomyślnie')),
+                                                                    content: Text('Zgłoszenie zaktualizowano pomyślnie')),
                                                               );
+                                                              //clear form
+                                                              _formKey.currentState?.reset();
+                                                                  Navigator.of(context).pushReplacementNamed("/");
                                                             } catch (e) {
                                                               print(e);
                                                               ScaffoldMessenger
