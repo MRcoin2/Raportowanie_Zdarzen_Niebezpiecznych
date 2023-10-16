@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 
 import '../authentication/secrets/api_key.dart';
 
-Future<Uint8List> generatePdf(Report report) async {
+Future<Uint8List> generateSingleReportPdf(Report report) async {
   var response = await http.post(Uri.https(API_URL,'generate-pdf'),
       body: json.encode({
         'api_key': API_KEY,
@@ -42,13 +42,38 @@ Future<Uint8List> generatePdf(Report report) async {
   }
 }
 
+Future<Uint8List> generatePeriodicReportPdf(Map<String,int> categoryCounts, String startDate, String endDate) async{
+  var response = await http.post(Uri.https(API_URL,'generate-periodic-pdf'),
+      body: json.encode({
+        'api_key': API_KEY,
+        'category_counts': categoryCounts,
+        'start_date': startDate,
+        'end_date': endDate,
+      }));
+  if (response.statusCode == 200) {
+    return response.bodyBytes;
+  }
+  else {
+    throw Exception('Failed to generate PDF');
+  }
+}
+
+// TODO make these functions general
 Future<void> printReport(Report report) async {
-  await Printing.layoutPdf(onLayout: (format) => generatePdf(report));
+  await Printing.layoutPdf(onLayout: (format) => generateSingleReportPdf(report));
 }
 
 // download pdf
 Future<void> downloadReport(Report report) async {
   await Printing.sharePdf(
-      bytes: await generatePdf(report), filename: 'report.pdf');
+      bytes: await generateSingleReportPdf(report), filename: 'report.pdf');
 }
 
+Future<void> printPeriodicReport(Map <String,int> categoryCounts, String startDate, String endDate) async {
+  await Printing.layoutPdf(onLayout: (format) => generatePeriodicReportPdf(categoryCounts, startDate, endDate));
+}
+
+Future<void> downloadPeriodicReport(Map <String,int> categoryCounts, String startDate, String endDate) async {
+  await Printing.sharePdf(
+      bytes: await generatePeriodicReportPdf(categoryCounts, startDate, endDate), filename: 'report.pdf');
+}
