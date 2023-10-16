@@ -1,6 +1,4 @@
 import 'dart:typed_data';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -262,7 +260,7 @@ class _AddInfoPageState extends State<AddInfoPage> {
                                                                       'Przetwarzanie danych...')),
                                                             );
                                                             try {
-                                                              updateReport(
+                                                              await updateReport(
                                                                   {
                                                                       "additionalInfo":
                                                                           _descriptionController
@@ -271,6 +269,12 @@ class _AddInfoPageState extends State<AddInfoPage> {
                                                                   _images,
                                                                   widget
                                                                       .reportId);
+                                                              //notify user
+                                                              ScaffoldMessenger.of(context).clearSnackBars();
+                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                const SnackBar(
+                                                                    content: Text('Zgłoszenie zaktualizowane pomyślnie')),
+                                                              );
                                                             } catch (e) {
                                                               print(e);
                                                               ScaffoldMessenger
