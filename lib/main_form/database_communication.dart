@@ -42,7 +42,7 @@ Future<void> updateReport(
       await FirebaseFirestore.instance
           .collection(collectionName)
           .doc(reportId)
-          .update(formData);
+          .update(formData).then((value) => print("updated successfully")).onError((error, stackTrace) => print("update failed"));
     }
     catch(e){
       print(e);
