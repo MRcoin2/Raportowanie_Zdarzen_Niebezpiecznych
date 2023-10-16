@@ -419,6 +419,8 @@ class _MainFormState extends State<MainForm> {
                   try {
                     Report report = Report(
                         id: "",
+                        hasBeenEdited: false,
+                        additionalInfo: "",
                         reportTimestamp: DateTime.now(),
                         personalData: {
                           "name": _nameController.text,

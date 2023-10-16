@@ -13,20 +13,63 @@ Future<String> submitForm(
   }
   FirebaseFirestore db = FirebaseFirestore.instance;
   final storageRef = FirebaseStorage.instance.ref();
-  late var docuReference;
-  await db.collection("reports").add(formData).then((docReference) async {
-    docuReference = docReference;
+  late DocumentReference<Map<String, dynamic>> docReference;
+
+  await db.collection("reports").add(formData).then((_docReference) async {
+    docReference = _docReference;
     for (var image in images) {
       await storageRef
-          .child("images/${docReference.id}/${image.name}")
+          .child("images/${_docReference.id}/${image.name}")
           .putData((await image.readAsBytes()));
     }
   });
-  return docuReference.id;
+  return docReference.id;
+}
+
+Future<void> updateReport(
+    Map<String, dynamic> formData, List<XFile> images, String reportId) async {
+  FirebaseAuth auth = FirebaseAuth.instance;
+
+  if (auth.currentUser == null) {
+    throw Exception("not verified");
+  }
+  // DocumentReference docRef = await findReportById(reportId);
+  List<String> collectionNames = ["reports", "archive", "trash"];
+  print(formData);
+
+  for (String collectionName in collectionNames) {
+    try{
+      await FirebaseFirestore.instance
+          .collection(collectionName)
+          .doc(reportId)
+          .update(formData);
+    }
+    catch(e){
+      print(e);
+      collectionNames.remove(collectionName);
+    }
+    if (collectionNames.isEmpty){
+      throw Exception("Report not found");
+    }
+  }
+
+  try {
+    final storageRef = FirebaseStorage.instance.ref();
+    for (var image in images) {
+      await storageRef
+          .child("images/$reportId/${image.name}")
+          .putData((await image.readAsBytes()));
+    }
+  } catch (e) {
+    print(e);
+    rethrow;
+  }
 }
 
 class Report {
   String id;
+  bool hasBeenEdited;
+  final String additionalInfo;
   final DateTime reportTimestamp;
   final Map<String, dynamic> personalData;
   final Map<String, dynamic> incidentData;
@@ -81,6 +124,8 @@ class Report {
 
   Report(
       {required this.id,
+        required this.additionalInfo,
+      required this.hasBeenEdited,
       required this.reportTimestamp,
       required this.personalData,
       required this.incidentData});
@@ -88,6 +133,8 @@ class Report {
   Map<String, dynamic> toMap() {
     return {
       "id": id,
+      "hasBeenEdited": hasBeenEdited,
+      "additionalInfo": additionalInfo,
       "report timestamp": reportTimestamp,
       "personal data": personalData,
       "incident data": incidentData,
@@ -99,11 +146,10 @@ class Report {
     //returns a list of tuples (url, name)
     if (imageUrls.isNotEmpty) {
       return imageUrls;
-    }
-    else {
+    } else {
       try {
-        ListResult imageRef = await FirebaseStorage.instance.ref().child(
-            "images/$id").listAll();
+        ListResult imageRef =
+            await FirebaseStorage.instance.ref().child("images/$id").listAll();
         for (var image in imageRef.items) {
           imageUrls.add([await image.getDownloadURL(), image.name]);
         }
@@ -115,7 +161,6 @@ class Report {
       return imageUrls;
     }
   }
-
 }
 
 class PersonalData {
@@ -171,7 +216,7 @@ class IncidentData {
       required this.time,
       required this.location,
       required this.category,
-      required this.description});
+      required this.description,});
 
   Map<String, dynamic> fromMap(Map<String, dynamic> map) {
     return {
@@ -196,45 +241,59 @@ class IncidentData {
   }
 }
 
-Future<Report> findReportById(String reportId){
+Future<DocumentReference> findReportById(String reportId) async {
   //search three collections for a report
-  late Report report;
-  return FirebaseFirestore.instance.collection("reports").doc(reportId).get().then((document) {
+  DocumentReference? docRef;
+  docRef = await FirebaseFirestore.instance
+      .collection("reports")
+      .doc(reportId)
+      .get()
+      .then((document) {
     if (document.exists) {
-      return Report(
-        id: reportId,
-        reportTimestamp: document.data()!["report timestamp"].toDate(),
-        personalData: document.data()!["personal data"],
-        incidentData: document.data()!["incident data"],
-      );
-    }
-    else {
-      return FirebaseFirestore.instance.collection("archive").doc(reportId).get().then((document) {
-        if (document.exists) {
-          return Report(
-            id: reportId,
-            reportTimestamp: document.data()!["report timestamp"].toDate(),
-            personalData: document.data()!["personal data"],
-            incidentData: document.data()!["incident data"],
-          );
-        }
-        else {
-          return FirebaseFirestore.instance.collection("trash").doc(reportId).get().then((document) {
-            if (document.exists) {
-              return Report(
-                id: reportId,
-                reportTimestamp: document.data()!["report timestamp"].toDate(),
-                personalData: document.data()!["personal data"],
-                incidentData: document.data()!["incident data"],
-              );
-            }
-            else {
-              throw Exception("Report not found");
-            }
-          });
-        }
-      });
+      return document.reference;
+    } else {
+      return null;
     }
   });
+  docRef ??= await FirebaseFirestore.instance
+      .collection("archive")
+      .doc(reportId)
+      .get()
+      .then((document) {
+    if (document.exists) {
+      return document.reference;
+    } else {
+      return null;
+    }
+  });
+  docRef ??= await FirebaseFirestore.instance
+      .collection("trash")
+      .doc(reportId)
+      .get()
+      .then((document) {
+    if (document.exists) {
+      return document.reference;
+    } else {
+      return null;
+    }
+  });
+  if (docRef == null) {
+    throw Exception("Report not found");
+  }
+  return docRef;
+}
 
+Future<bool> hasReportBeenEdited(String reportId) async {
+  //login anonymous user
+  FirebaseAuth.instance.setPersistence(Persistence.NONE);
+  FirebaseAuth.instance.signInAnonymously();
+  return false; //TODO create a rule in firebase to access the document here and check if it exists
+  DocumentReference docRef = await findReportById(reportId);
+  try {
+    return docRef.get().then((document) {
+      return document["hasBeenEdited"];
+    });
+  } catch (e) {
+    print(e);
+  }
 }
