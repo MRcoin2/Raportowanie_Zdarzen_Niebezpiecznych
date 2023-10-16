@@ -817,9 +817,17 @@ class ReportDisplayCard extends StatelessWidget {
                     )
                   ],
                 ),
-                Text(""),
                 Text(
                   "${report.incidentData['description']}",
+                  textAlign: TextAlign.justify,
+                ),
+                Text(""),
+                const Text(
+                  "Dodatkowe Informacje:",
+                  style: TextStyle(color: Colors.grey),
+                ),
+                Text(
+                  report.additionalInfo,
                   textAlign: TextAlign.justify,
                 ),
                 const Divider(),
@@ -952,7 +960,7 @@ class ReportDisplayCard extends StatelessWidget {
                           child: const Text("Pobierz plik PDF"),
                         ),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(

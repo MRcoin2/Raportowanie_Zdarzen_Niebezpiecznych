@@ -12,6 +12,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'admin_panel/providers.dart';
 import 'authentication/admin_login_page.dart';
 import 'firebase_options.dart';
+import 'main_form/add_info_page.dart';
 
 Future<void> main() async {
   await Firebase.initializeApp(
@@ -137,6 +138,16 @@ class MyApp extends StatelessWidget {
         '/admin-panel/archive': (context) => const ArchivePage(),
         '/admin-panel/raport-generation': (context) => ReportingPage(),
       },
+      onUnknownRoute: (route){
+        print(route.name);
+        if ("/add-info".matchAsPrefix(route.name??"")!.end > 0 && route.name != null){
+          String reportId = route.name!.substring("/add-info/".length);
+          return MaterialPageRoute(builder: (context) => ChangeNotifierProvider(
+              create: (context) => DataAndSelectionManager(),
+              child: AddInfoPage(reportId: reportId)));
+        }
+        return null;
+      },
       initialRoute: '/',
       localizationsDelegates: const [GlobalMaterialLocalizations.delegate],
       supportedLocales: const [Locale('pl')],
@@ -166,9 +177,17 @@ class _FormPageState extends State<FormPage> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      "Raportowanie Zdarzeń Niebezpiecznych",
-                      style: Theme.of(context).textTheme.headlineLarge,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "Raportowanie Zdarzeń Niebezpiecznych",
+                          style: Theme.of(context).textTheme.headlineLarge,
+                        ),Padding(
+                          padding: const EdgeInsets.only(left:8.0),
+                          child: Image.asset("assets/images/logo_krk_100.jpg", height: 100, width: 100, isAntiAlias: false),
+                        ),
+                      ],
                     ),
                   ),
                   Padding(

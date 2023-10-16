@@ -241,6 +241,8 @@ class DataAndSelectionManager extends ChangeNotifier {
       Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
       list.add(Report(
           id: doc.id,
+          hasBeenEdited: data["hasBeenEdited"],
+          additionalInfo: data["additionalInfo"],
           reportTimestamp: DateTime.fromMillisecondsSinceEpoch(
               data["report timestamp"].seconds * 1000),
           personalData: data["personal data"],
