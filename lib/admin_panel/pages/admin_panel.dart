@@ -67,7 +67,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          const Expanded(flex: 1, child: SideMenuBar()),
+                          const Expanded(flex: 1, child: SideMenuBar(description: "Strona główna panelu administracyjnego\n\nZnajdują się tu nowo dodane zgłoszenia. Można je tu przeglądać, zatwierdzić lub usunąć.",)),
                           Expanded(
                             flex: 1,
                             child: Column(

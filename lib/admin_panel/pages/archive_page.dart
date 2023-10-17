@@ -62,7 +62,7 @@ class _ArchivePageState extends State<ArchivePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          const Expanded(flex: 1, child: SideMenuBar()),
+                          const Expanded(flex: 1, child: SideMenuBar(description: "Strona zgłoszeń zatwierdzonych\n\nPowinny znajdować się tu zgłoszenia które zostały uznane przez administratora za adekwatne. Ze zgłoszeń zatwierdzonych generowane mogą być raporty okresowe.",)),
                           Expanded(
                             flex: 1,
                             child: Column(

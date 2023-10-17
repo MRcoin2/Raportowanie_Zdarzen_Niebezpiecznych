@@ -62,7 +62,7 @@ class _TrashPageState extends State<TrashPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          const Expanded(flex: 1, child: SideMenuBar()),
+                          const Expanded(flex: 1, child: SideMenuBar(description: "Strona kosza\n\nZnajdują się tu usunięte zgłoszenia. Można je z tąd usunąć trwale. Będą one tu przechowywane bezterminowo do momentu trwałego usunięcia.",)),
                           Expanded(
                             flex: 1,
                             child: Column(

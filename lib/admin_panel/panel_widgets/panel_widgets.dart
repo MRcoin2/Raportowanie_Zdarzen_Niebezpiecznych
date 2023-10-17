@@ -1,3 +1,5 @@
+import 'dart:js_interop';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:intl/intl.dart';
@@ -615,95 +617,112 @@ class _TopMenuBarState extends State<TopMenuBar> {
 }
 
 class SideMenuBar extends StatelessWidget {
-  const SideMenuBar({super.key});
+  final String? description;
+  const SideMenuBar({super.key, this.description});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.home_outlined),
-              title: const Text("Strona główna"),
-              onTap: () {
-                context.read<DataAndSelectionManager>().clearSelections();// TODO check if this line is needed if there are separate providers for each page
-                Navigator.of(context).pushReplacement(
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation1, animation2) => const AdminPanelPage(),
-                    transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
-                    transitionDuration: const Duration(milliseconds: 100),
-                    reverseTransitionDuration: const Duration(milliseconds: 100),
+    return Column(
+      children: [
+        Expanded(
+          flex:5,
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.home_outlined),
+                    title: const Text("Strona główna"),
+                    onTap: () {
+                      context.read<DataAndSelectionManager>().clearSelections();// TODO check if this line is needed if there are separate providers for each page
+                      Navigator.of(context).pushReplacement(
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation1, animation2) => const AdminPanelPage(),
+                          transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+                          transitionDuration: const Duration(milliseconds: 100),
+                          reverseTransitionDuration: const Duration(milliseconds: 100),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.check),
-              title: const Text("Zatwierdzone"),
-              onTap: () {
-                context.read<DataAndSelectionManager>().clearSelections();
-                Navigator.of(context).pushReplacement(
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation1, animation2) => const ArchivePage(),
-                    transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
-                    transitionDuration: const Duration(milliseconds: 100),
-                    reverseTransitionDuration: const Duration(milliseconds: 100),
+                  ListTile(
+                    leading: const Icon(Icons.check),
+                    title: const Text("Zatwierdzone"),
+                    onTap: () {
+                      context.read<DataAndSelectionManager>().clearSelections();
+                      Navigator.of(context).pushReplacement(
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation1, animation2) => const ArchivePage(),
+                          transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+                          transitionDuration: const Duration(milliseconds: 100),
+                          reverseTransitionDuration: const Duration(milliseconds: 100),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.delete_outline),
-              title: const Text("Kosz"),
-              onTap: () {
-                context.read<DataAndSelectionManager>().clearSelections();
-                Navigator.of(context).pushReplacement(
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation1, animation2) => const TrashPage(),
-                    transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
-                    transitionDuration: const Duration(milliseconds: 100),
-                    reverseTransitionDuration: const Duration(milliseconds: 100),
+                  ListTile(
+                    leading: const Icon(Icons.delete_outline),
+                    title: const Text("Kosz"),
+                    onTap: () {
+                      context.read<DataAndSelectionManager>().clearSelections();
+                      Navigator.of(context).pushReplacement(
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation1, animation2) => const TrashPage(),
+                          transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+                          transitionDuration: const Duration(milliseconds: 100),
+                          reverseTransitionDuration: const Duration(milliseconds: 100),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.document_scanner_outlined),
-              title: const Text("Generowanie raportu"),
-              onTap: () {
-                context.read<DataAndSelectionManager>().clearSelections();
-                Navigator.of(context).pushReplacement(
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation1, animation2) => const ReportingPage(),
-                    transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
-                    transitionDuration: const Duration(milliseconds: 100),
-                    reverseTransitionDuration: const Duration(milliseconds: 100),
+                  const Divider(),
+                  ListTile(
+                    leading: const Icon(Icons.document_scanner_outlined),
+                    title: const Text("Generowanie raportu"),
+                    onTap: () {
+                      context.read<DataAndSelectionManager>().clearSelections();
+                      Navigator.of(context).pushReplacement(
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation1, animation2) => const ReportingPage(),
+                          transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+                          transitionDuration: const Duration(milliseconds: 100),
+                          reverseTransitionDuration: const Duration(milliseconds: 100),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.settings_outlined),
-              title: const Text("Ustawienia"),
-              onTap: () {
-                context.read<DataAndSelectionManager>().clearSelections();
-                Navigator.of(context).pushReplacement(
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation1, animation2) => const SettingsPage(),
-                    transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
-                    transitionDuration: const Duration(milliseconds: 100),
-                    reverseTransitionDuration: const Duration(milliseconds: 100),
+                  const Divider(),
+                  ListTile(
+                    leading: const Icon(Icons.settings_outlined),
+                    title: const Text("Ustawienia"),
+                    onTap: () {
+                      context.read<DataAndSelectionManager>().clearSelections();
+                      Navigator.of(context).pushReplacement(
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation1, animation2) => const SettingsPage(),
+                          transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+                          transitionDuration: const Duration(milliseconds: 100),
+                          reverseTransitionDuration: const Duration(milliseconds: 100),
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
+                ],
+              ),
             ),
-          ],
+          ),
         ),
-      ),
+        description.isDefinedAndNotNull ? Expanded(
+          flex: 1,
+          child: Card(
+            child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(description ?? "", softWrap: true,),
+            ),
+          ),
+        ) : const SizedBox.shrink(),
+      ],
     );
   }
 }

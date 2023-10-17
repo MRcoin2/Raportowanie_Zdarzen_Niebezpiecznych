@@ -11,6 +11,7 @@ Future<Uint8List> generateSingleReportPdf(Report report) async {
       body: json.encode({
         'api_key': API_KEY,
         'data': {
+          "additionalInfo": report.additionalInfo,
           "report timestamp":
               report.reportTimestamp.millisecondsSinceEpoch / 1000,
           "personal data": {

@@ -5,6 +5,12 @@ import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form_widgets/form
 
 import '../main_form/database_communication.dart';
 
+class Settings{
+  final Map<String,dynamic> mainForm;
+  final Map<String,dynamic> addInfo;
+  Settings(this.mainForm, this.addInfo);
+}
+
 enum PageType { reportsPage, trashPage, archivePage }
 
 class Filters {
@@ -28,6 +34,18 @@ class DataAndSelectionManager extends ChangeNotifier {
   DocumentSnapshot? _lastArchivedReport;
 
   int numberOfReportsSelectedForReportGeneration = 0;
+
+  Future<Settings> fetchSettings() async{
+    var mainForm = await FirebaseFirestore.instance.collection("settings").doc("mainForm").get().then((value) => value.data());
+    var addInfo = await FirebaseFirestore.instance.collection("settings").doc("addInfo").get().then((value) => value.data());
+    print(mainForm);
+    return Settings(mainForm!, addInfo!);
+  }
+
+  Future<void> updateSettings(Settings settings)async {
+    FirebaseFirestore.instance.collection("settings").doc("mainForm").update(settings.mainForm);
+    FirebaseFirestore.instance.collection("settings").doc("addInfo").update(settings.addInfo);
+  }
 
   Future<bool> fetchReports({refresh = false}) async {
     print("fetching reports");
@@ -607,4 +625,5 @@ class DataAndSelectionManager extends ChangeNotifier {
   Future<void> downloadImages() async {
     throw NoSuchMethodError;
   }
+
 }

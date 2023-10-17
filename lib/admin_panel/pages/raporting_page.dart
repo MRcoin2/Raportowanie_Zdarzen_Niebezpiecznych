@@ -32,37 +32,16 @@ class _ReportingPageState extends State<ReportingPage> {
         body: Consumer<DataAndSelectionManager>(
           builder: (context, provider, child) => Row(
             children: [
-              Expanded(flex: 1, child: SideMenuBar()),
+              Expanded(flex: 1, child: SideMenuBar(description: "Strona generowania raportów zbiorczych\n\nNa tej stronie można wygenerować raport zliczający ilość zdarzeń z danych kategorii w danym okresie czasu.",)),
               Expanded(
                   flex: 2,
-                  child: Column(
-                    children: [
-                      Expanded(
-                        flex: 5,
-                        child: FilterPanel(
-                          constrainSize: false,
-                          showDateSwitch: false,
-                          elevation: 1,
-                          onUpdate: context
-                              .read<DataAndSelectionManager>()
-                              .updateNumberOfFilteredReportsForReportGeneration,
-                        ),
-                      ),
-                      const Expanded(
-                          flex: 1,
-                          child: Card(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Text("Lorem ipsum"),
-                                )
-                              ],
-                            ),
-                          )),
-                    ],
+                  child: FilterPanel(
+                    constrainSize: false,
+                    showDateSwitch: false,
+                    elevation: 1,
+                    onUpdate: context
+                        .read<DataAndSelectionManager>()
+                        .updateNumberOfFilteredReportsForReportGeneration,
                   )),
               Expanded(
                 flex: 1,
