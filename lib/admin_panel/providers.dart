@@ -5,10 +5,10 @@ import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form_widgets/form
 
 import '../main_form/database_communication.dart';
 
-class Settings{
+class InterfaceSettings{
   final Map<String,dynamic> mainForm;
   final Map<String,dynamic> addInfo;
-  Settings(this.mainForm, this.addInfo);
+  InterfaceSettings(this.mainForm, this.addInfo);
 }
 
 enum PageType { reportsPage, trashPage, archivePage }
@@ -35,23 +35,20 @@ class DataAndSelectionManager extends ChangeNotifier {
 
   int numberOfReportsSelectedForReportGeneration = 0;
 
-  Future<Settings> fetchSettings() async{
+  Future<InterfaceSettings> fetchSettings() async{
     var mainForm = await FirebaseFirestore.instance.collection("settings").doc("mainForm").get().then((value) => value.data());
     var addInfo = await FirebaseFirestore.instance.collection("settings").doc("addInfo").get().then((value) => value.data());
-    print(mainForm);
-    return Settings(mainForm!, addInfo!);
+    return InterfaceSettings(mainForm!, addInfo!);
   }
 
-  Future<void> updateSettings(Settings settings)async {
+  Future<void> updateSettings(InterfaceSettings settings)async {
     FirebaseFirestore.instance.collection("settings").doc("mainForm").update(settings.mainForm);
     FirebaseFirestore.instance.collection("settings").doc("addInfo").update(settings.addInfo);
   }
 
   Future<bool> fetchReports({refresh = false}) async {
-    print("fetching reports");
     //TODO handle limit and load more
     if (refresh || _reports.isEmpty) {
-      print("clearing reports");
       _reports.clear();
       await FirebaseFirestore.instance
           .collection("reports")
@@ -59,7 +56,6 @@ class DataAndSelectionManager extends ChangeNotifier {
           .limit(50)
           .get()
           .then((QuerySnapshot querySnapshot) {
-        print(querySnapshot.docs.length);
         addQuerySnapshotToList(querySnapshot, _reports);
         _lastReport = querySnapshot.docs.last;
         notifyListeners();
@@ -126,7 +122,6 @@ class DataAndSelectionManager extends ChangeNotifier {
 
   Future fetchArchive({refresh = false}) async {
     if (refresh || _archivedReports.isEmpty) {
-      print("fetching archive");
       _archivedReports.clear();
       await FirebaseFirestore.instance
           .collection("archive")
@@ -146,7 +141,6 @@ class DataAndSelectionManager extends ChangeNotifier {
   }
 
   Future<bool> fetchMoreArchivedReports({refresh = false}) async {
-    print("fetching more archive");
     await FirebaseFirestore.instance
         .collection("archive")
         .orderBy("report timestamp", descending: true)
@@ -166,11 +160,6 @@ class DataAndSelectionManager extends ChangeNotifier {
   Future<List<Report>> fetchFilteredReportsForReportGeneration() async {
     List<Report> reports = [];
     try {
-      print("fetching filtered reports");
-      print("date range: ${filters.dateRange}");
-      print("start: ${filters.dateRange!.start.millisecondsSinceEpoch / 1000}");
-      print("end: ${filters.dateRange!.end.millisecondsSinceEpoch / 1000}");
-
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection("archive")
           .orderBy("report timestamp", descending: true)
@@ -183,9 +172,7 @@ class DataAndSelectionManager extends ChangeNotifier {
           .limit(1000)
           .get();
       addQuerySnapshotToList(querySnapshot, reports);
-      print(reports);
     } catch (e) {
-      print(e);
       reports = [];
     }
     notifyListeners();
@@ -209,7 +196,6 @@ class DataAndSelectionManager extends ChangeNotifier {
           await numberOfReportsQuery.get().then((value) => value.count);
     } catch (e) {
       numberOfReportsSelectedForReportGeneration = 0;
-      print(e);
     }
     notifyListeners();
   }
@@ -217,9 +203,6 @@ class DataAndSelectionManager extends ChangeNotifier {
   Future<int> numberOfFilteredReportsPerCategory(String category) async {
     int numberOfReports = 0;
     try {
-      print("counting filtered reports");
-      print("date range: ${filters.dateRange}");
-      print("category: $category");
       if (category == "inne...") {
         AggregateQuery numberOfReportsQuery = FirebaseFirestore.instance
             .collection("archive")
@@ -247,9 +230,7 @@ class DataAndSelectionManager extends ChangeNotifier {
             .count();
         numberOfReports = await numberOfReportsQuery.get().then((value) => value.count);
       }
-      print(reports);
     } catch (e) {
-      print(e);
       numberOfReports = 0;
     }
     notifyListeners();
@@ -277,23 +258,16 @@ class DataAndSelectionManager extends ChangeNotifier {
 
   bool _isDateInRange(DateTime date, DateTimeRange? dateRange) {
     if (dateRange?.start != null && dateRange?.end != null) {
-      print("===========");
-      print(dateRange!.start);
-      print(dateRange.end.add(const Duration(days: 1)));
-      print(date.copyWith(
-          hour: 0, minute: 0, second: 1, microsecond: 0, millisecond: 0));
       if (date
               .copyWith(
                   hour: 0, minute: 0, second: 1, microsecond: 0, millisecond: 0)
-              .isAfter(dateRange.start) &&
+              .isAfter(dateRange!.start) &&
           date
               .copyWith(
                   hour: 0, minute: 0, second: 1, microsecond: 0, millisecond: 0)
               .isBefore(dateRange.end.add(const Duration(days: 1)))) {
-        print("true");
         return true;
       } else {
-        print("false");
         return false;
       }
     }
@@ -410,10 +384,8 @@ class DataAndSelectionManager extends ChangeNotifier {
 
   void toggleFilterCategory(String category) {
     if (_filters.categories.contains(category)) {
-      print("removing category $category");
       _filters.categories.remove(category);
     } else {
-      print("adding category $category");
       _filters.categories.add(category);
     }
     notifyListeners();

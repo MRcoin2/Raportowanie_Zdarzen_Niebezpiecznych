@@ -35,7 +35,6 @@ Future<void> updateReport(
   }
   // DocumentReference docRef = await findReportById(reportId);
   List<String> collectionNames = ["reports", "archive", "trash"];
-  print(formData);
 
   for (String collectionName in collectionNames) {
     try{
@@ -45,7 +44,6 @@ Future<void> updateReport(
           .update(formData).then((value) => print("updated successfully")).onError((error, stackTrace) => print("update failed"));
     }
     catch(e){
-      print(e);
       collectionNames.remove(collectionName);
     }
     if (collectionNames.isEmpty){
@@ -61,7 +59,6 @@ Future<void> updateReport(
           .putData((await image.readAsBytes()));
     }
   } catch (e) {
-    print(e);
     rethrow;
   }
 }
@@ -142,7 +139,6 @@ class Report {
   }
 
   Future<List<List<String>>> getImageUrls() async {
-    print("getting image urls");
     //returns a list of tuples (url, name)
     if (imageUrls.isNotEmpty) {
       return imageUrls;
@@ -154,10 +150,8 @@ class Report {
           imageUrls.add([await image.getDownloadURL(), image.name]);
         }
       } catch (e) {
-        print(e);
         return [];
       }
-      print(imageUrls);
       return imageUrls;
     }
   }
@@ -294,6 +288,6 @@ Future<bool> hasReportBeenEdited(String reportId) async {
       return document["hasBeenEdited"];
     });
   } catch (e) {
-    print(e);
+    rethrow;
   }
 }

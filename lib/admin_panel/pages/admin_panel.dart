@@ -42,7 +42,7 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                   actions: [
                     ElevatedButton(
                       onPressed: () async {
-                        await FirebaseAuth.instance.signOut();
+                        FirebaseAuth.instance.signOut();
                         Navigator.of(context)
                             .pushReplacementNamed('/admin-login');
                       },
@@ -55,19 +55,14 @@ class _AdminPanelPageState extends State<AdminPanelPage> {
                     future:
                         context.read<DataAndSelectionManager>().fetchReports(),
                     builder: (context, snapshot) {
-                      print("building admin panel");
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();
                       }
-                      print(context
-                          .read<DataAndSelectionManager>()
-                          .reports
-                          .length);
                       return Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          const Expanded(flex: 1, child: SideMenuBar(description: "Strona główna panelu administracyjnego\n\nZnajdują się tu nowo dodane zgłoszenia. Można je tu przeglądać, zatwierdzić lub usunąć.",)),
+                          const Expanded(flex: 1, child: SideMenuBar(description: "Strona główna panelu administracyjnego\n\nZnajdują się tu nowo dodane zgłoszenia. Można je tu przeglądać, zatwierdzić lub usunąć. Po lewej stronie znajduje się pasek nawigacyjny pozwalający na poruszanie się po panelu.",)),
                           Expanded(
                             flex: 1,
                             child: Column(

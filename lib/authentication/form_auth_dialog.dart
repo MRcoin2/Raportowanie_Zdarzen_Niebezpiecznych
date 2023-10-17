@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'secrets/api_key.dart';
 
-enum codeInputStatus {
+enum CodeInputStatus {
   inputting,
   pendingVerification,
   verificationSuccess,
@@ -23,7 +23,6 @@ Future<bool> verifyCode(String code, String email) async {
     await FirebaseAuth.instance.signInWithCustomToken(response.body);
     return true;}
         catch(e){
-      print("user verification failed");
       return false;
     }
   } else {
@@ -56,7 +55,7 @@ class AuthDialog extends StatefulWidget {
 class _AuthDialogState extends State<AuthDialog> {
   String _code = "";
   bool _verified = false;
-  codeInputStatus _status = codeInputStatus.inputting;
+  CodeInputStatus _status = CodeInputStatus.inputting;
   final TextEditingController _codeController = TextEditingController();
 
   @override
@@ -73,14 +72,14 @@ class _AuthDialogState extends State<AuthDialog> {
         padding: const EdgeInsets.all(8.0),
         child: Builder(
           builder: (context) {
-            if (_status == codeInputStatus.pendingVerification) {
+            if (_status == CodeInputStatus.pendingVerification) {
               return FutureBuilder(
                 future: verifyCode(_code, widget.email).then((value) {
                   if (value) {
                     _verified = true;
-                    _status = codeInputStatus.verificationSuccess;
+                    _status = CodeInputStatus.verificationSuccess;
                   } else {
-                    _status = codeInputStatus.verificationFailure;
+                    _status = CodeInputStatus.verificationFailure;
                   }
                 }),
                 builder: (context, snapshot) {
@@ -97,14 +96,14 @@ class _AuthDialogState extends State<AuthDialog> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              _status == codeInputStatus.verificationSuccess
+                              _status == CodeInputStatus.verificationSuccess
                                   ? const Text("E-mail zweryfikowano.")
                                   : const Text(
                                       "Nie udało się zweryfikować tożsamości"),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: _status ==
-                                        codeInputStatus.verificationSuccess
+                                        CodeInputStatus.verificationSuccess
                                     ? const Icon(Icons.check_circle_outline,
                                         size: 48.0, color: Colors.green)
                                     : Icon(Icons.no_accounts,
@@ -169,7 +168,7 @@ class _AuthDialogState extends State<AuthDialog> {
                         onEditingComplete: () {
                           setState(() {
                             _code = _codeController.text;
-                            _status = codeInputStatus.pendingVerification;
+                            _status = CodeInputStatus.pendingVerification;
                           });
                         },
                       ),
@@ -183,7 +182,7 @@ class _AuthDialogState extends State<AuthDialog> {
                               onPressed: () {
                                 setState(() {
                                   _code = _codeController.text;
-                                  _status = codeInputStatus.pendingVerification;
+                                  _status = CodeInputStatus.pendingVerification;
                                 });
                               },
                               child: const Text("Zweryfikuj")),

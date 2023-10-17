@@ -43,7 +43,7 @@ class _ArchivePageState extends State<ArchivePage> {
                   actions: [
                     ElevatedButton(
                       onPressed: () async {
-                        await FirebaseAuth.instance.signOut();
+                        FirebaseAuth.instance.signOut();
                         Navigator.of(context).popAndPushNamed('/admin-login');
                       },
                       child: const Text('Wyloguj'),

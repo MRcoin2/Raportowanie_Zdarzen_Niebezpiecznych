@@ -2,9 +2,9 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/admin_panel.dart';
-import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/archive_page.dart';
-import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/raporting_page.dart';
-import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/trash_page.dart';
+// import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/archive_page.dart';
+// import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/raporting_page.dart';
+// import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/trash_page.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'admin_panel/providers.dart';
@@ -133,12 +133,11 @@ class MyApp extends StatelessWidget {
               ChangeNotifierProvider(
                   create: (context) => DataAndSelectionManager()),
             ], child: const AdminPanelPage()),
-        '/admin-panel/trash': (context) => const TrashPage(),
-        '/admin-panel/archive': (context) => const ArchivePage(),
-        '/admin-panel/raport-generation': (context) => ReportingPage(),
+        // '/admin-panel/trash': (context) => const TrashPage(),
+        // '/admin-panel/archive': (context) => const ArchivePage(),
+        // '/admin-panel/raport-generation': (context) => const ReportingPage(),
       },
       onUnknownRoute: (route){
-        print(route.name);
         if ("/add-info".matchAsPrefix(route.name??"")!.end > 0 && route.name != null){
           String reportId = route.name!.substring("/add-info/".length);
           return MaterialPageRoute(builder: (context) => ChangeNotifierProvider(
@@ -148,7 +147,9 @@ class MyApp extends StatelessWidget {
         return null;
       },
       initialRoute: '/',
-      localizationsDelegates: const [GlobalMaterialLocalizations.delegate],
+      localizationsDelegates: const [GlobalCupertinoLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,],
       supportedLocales: const [Locale('pl')],
     );
   }

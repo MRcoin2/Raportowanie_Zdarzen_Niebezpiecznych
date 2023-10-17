@@ -1,5 +1,3 @@
-import 'dart:js_interop';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:intl/intl.dart';
@@ -448,7 +446,7 @@ class _TopMenuBarState extends State<TopMenuBar> {
                         follower: Alignment.topLeft,
                         target: Alignment.topRight,
                       ),
-                      portalFollower: FilterPanel(),
+                      portalFollower: const FilterPanel(),
                       child: IconButton(
                           onPressed: () {
                             toggleFilterMenu();
@@ -625,7 +623,7 @@ class SideMenuBar extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-          flex:5,
+          flex:4,
           child: Card(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -635,7 +633,7 @@ class SideMenuBar extends StatelessWidget {
                     leading: const Icon(Icons.home_outlined),
                     title: const Text("Strona główna"),
                     onTap: () {
-                      context.read<DataAndSelectionManager>().clearSelections();// TODO check if this line is needed if there are separate providers for each page
+                      context.read<DataAndSelectionManager>().clearSelections(); // TODO check if this line is needed if there are separate providers for each page
                       Navigator.of(context).pushReplacement(
                         PageRouteBuilder(
                           pageBuilder: (context, animation1, animation2) => const AdminPanelPage(),
@@ -713,11 +711,11 @@ class SideMenuBar extends StatelessWidget {
             ),
           ),
         ),
-        description.isDefinedAndNotNull ? Expanded(
+        description!.isNotEmpty ? Expanded(
           flex: 1,
           child: Card(
             child: Padding(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               child: Text(description ?? "", softWrap: true,),
             ),
           ),
@@ -813,7 +811,7 @@ class ReportDisplayCard extends StatelessWidget {
                   ],
                 ),
                 // personal data
-                Text(""),
+                const Text(""),
                 Row(
                   children: [
                     Column(
@@ -842,7 +840,7 @@ class ReportDisplayCard extends StatelessWidget {
                         Text("${report.incidentData["location"]}"),
                         Text(
                             "${report.incidentData['date']} ${report.incidentData['time']}"),
-                        Text(""),
+                        const Text(""),
                       ],
                     )
                   ],
@@ -851,7 +849,7 @@ class ReportDisplayCard extends StatelessWidget {
                   "${report.incidentData['description']}",
                   textAlign: TextAlign.justify,
                 ),
-                Text(""),
+                const Text(""),
                 const Text(
                   "Dodatkowe Informacje:",
                   style: TextStyle(color: Colors.grey),

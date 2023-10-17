@@ -32,7 +32,7 @@ class _ReportingPageState extends State<ReportingPage> {
         body: Consumer<DataAndSelectionManager>(
           builder: (context, provider, child) => Row(
             children: [
-              Expanded(flex: 1, child: SideMenuBar(description: "Strona generowania raportów zbiorczych\n\nNa tej stronie można wygenerować raport zliczający ilość zdarzeń z danych kategorii w danym okresie czasu.",)),
+              const Expanded(flex: 1, child: SideMenuBar(description: "Strona generowania raportów zbiorczych\n\nNa tej stronie można wygenerować raport zliczający ilość zdarzeń z danych kategorii w danym okresie czasu.",)),
               Expanded(
                   flex: 2,
                   child: FilterPanel(
@@ -54,7 +54,7 @@ class _ReportingPageState extends State<ReportingPage> {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                              "Wybrano:${context.read<DataAndSelectionManager>().numberOfReportsSelectedForReportGeneration}", style: TextStyle(fontSize: 20),),
+                              "Wybrano:${context.read<DataAndSelectionManager>().numberOfReportsSelectedForReportGeneration}", style: const TextStyle(fontSize: 20),),
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -73,7 +73,6 @@ class _ReportingPageState extends State<ReportingPage> {
                                     .numberOfFilteredReportsPerCategory(
                                         category);
                               }
-                              print(categoryCounts);
                               printPeriodicReport(categoryCounts, DateFormat('dd.MM.yyyy').format(context.read<DataAndSelectionManager>().filters.dateRange!.start), DateFormat('dd.MM.yyyy').format(context.read<DataAndSelectionManager>().filters.dateRange!.end));
                             },
                             child: const Text('Drukuj raport'),
@@ -96,7 +95,6 @@ class _ReportingPageState extends State<ReportingPage> {
                                     .numberOfFilteredReportsPerCategory(
                                         category);
                               }
-                              print(categoryCounts);
                               downloadPeriodicReport(categoryCounts, DateFormat('dd.MM.yyyy').format(context.read<DataAndSelectionManager>().filters.dateRange!.start), DateFormat('dd.MM.yyyy').format(context.read<DataAndSelectionManager>().filters.dateRange!.end));
                             },
                             child: const Text('Pobierz raport'),

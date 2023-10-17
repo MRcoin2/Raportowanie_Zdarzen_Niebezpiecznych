@@ -87,7 +87,6 @@ class _SortingMenuState extends State<SortingMenu> {
                 ListTile(
                   title: const Text("Sortuj A → Z"),
                   onTap: () {
-                    print(sortingType);
                     setState(
                       () {
                         isSortingReversed = false;
@@ -119,7 +118,6 @@ class _SortingMenuState extends State<SortingMenu> {
                   title: const Text("Sortuj Z → A"),
                   onTap: () {
                     setState(() {
-                      print(sortingType);
                       isSortingReversed = true;
                       switch (sortingType) {
                         case SortingType.byIncidentDate:

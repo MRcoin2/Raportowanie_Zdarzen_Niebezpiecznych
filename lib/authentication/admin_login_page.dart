@@ -9,10 +9,10 @@ class AdminLoginPage extends StatefulWidget {
   const AdminLoginPage({super.key});
 
   @override
-  _AdminLoginPageState createState() => _AdminLoginPageState();
+  AdminLoginPageState createState() => AdminLoginPageState();
 }
 
-class _AdminLoginPageState extends State<AdminLoginPage> {
+class AdminLoginPageState extends State<AdminLoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -166,7 +166,6 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 );
               }).then((value) async {
             try {
-              print(value.body);
               await FirebaseAuth.instance.signInWithCustomToken(value.body);
               Navigator.of(context).popAndPushNamed('/admin-panel');
             } catch (e) {
@@ -181,7 +180,6 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
           );
         }
       } catch (e) {
-        print(e);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Wystąpił błąd podczas logowania')),
         );

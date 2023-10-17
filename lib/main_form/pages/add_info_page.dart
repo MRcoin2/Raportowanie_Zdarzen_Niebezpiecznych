@@ -38,51 +38,65 @@ class _AddInfoPageState extends State<AddInfoPage> {
                         height: 50,
                         child: CircularProgressIndicator()));
               } else {
-                print("document edited: $snapshot.data");
                 if (snapshot.data == false) {
                   return SizedBox(
                     width: double.infinity,
                     child: Center(
                       child: Column(
                         children: [
-                          Card(
-                            elevation: 2,
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 8.0, bottom: 8.0, left: 18.0, right: 18.0),
-                              child: SizedBox(
-                                width: MediaQuery.of(context).size.height /
-                                    MediaQuery.of(context).size.width <
-                                    1
-                                    ? MediaQuery.of(context).size.width * 0.50
-                                    : double.infinity,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: FutureBuilder(
-                                    future: FirebaseFirestore.instance
-                                        .collection("settings")
-                                        .doc("addInfo")
-                                        .get(),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return const SizedBox(width: 50,height: 50, child: Center(child: CircularProgressIndicator()));
-                                      } else {
-                                        return Text(
-                                            snapshot.data!.data()?["description"]);
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
                               "Dodawanie informacji do zgłoszenia: ${widget.reportId}",
                               style: Theme.of(context).textTheme.headlineLarge,
                             ),
+                          ),
+                          FutureBuilder(
+                            future: FirebaseFirestore.instance
+                                .collection("settings")
+                                .doc("addInfo")
+                                .get(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const SizedBox(
+                                    width: 50,
+                                    height: 50,
+                                    child: Center(
+                                        child: CircularProgressIndicator()));
+                              } else if(snapshot.data!.data()?["description"] != "") {
+                                return Card(
+                                  elevation: 2,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 8.0,
+                                        bottom: 8.0,
+                                        left: 18.0,
+                                        right: 18.0),
+                                    child: SizedBox(
+                                      width: MediaQuery.of(context)
+                                          .size
+                                          .height /
+                                          MediaQuery.of(context)
+                                              .size
+                                              .width <
+                                          1
+                                          ? MediaQuery.of(context).size.width *
+                                          0.50
+                                          : double.infinity,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(snapshot.data!
+                                            .data()?["description"]),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                              else {
+                                return const SizedBox.shrink();
+                              }
+                            },
                           ),
                           //
                           Padding(
@@ -295,24 +309,33 @@ class _AddInfoPageState extends State<AddInfoPage> {
                                                             try {
                                                               await updateReport(
                                                                   {
-                                                                      "additionalInfo":
-                                                                          _descriptionController
-                                                                              .text,
-                                                                    },
+                                                                    "additionalInfo":
+                                                                        _descriptionController
+                                                                            .text,
+                                                                  },
                                                                   _images,
                                                                   widget
                                                                       .reportId);
                                                               //notify user
-                                                              ScaffoldMessenger.of(context).clearSnackBars();
-                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                              ScaffoldMessenger
+                                                                      .of(context)
+                                                                  .clearSnackBars();
+                                                              ScaffoldMessenger
+                                                                      .of(context)
+                                                                  .showSnackBar(
                                                                 const SnackBar(
-                                                                    content: Text('Zgłoszenie zaktualizowano pomyślnie')),
+                                                                    content: Text(
+                                                                        'Zgłoszenie zaktualizowano pomyślnie')),
                                                               );
                                                               //clear form
-                                                              _formKey.currentState?.reset();
-                                                                  Navigator.of(context).pushReplacementNamed("/");
+                                                              _formKey
+                                                                  .currentState
+                                                                  ?.reset();
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pushReplacementNamed(
+                                                                      "/");
                                                             } catch (e) {
-                                                              print(e);
                                                               ScaffoldMessenger
                                                                       .of(context)
                                                                   .clearSnackBars();

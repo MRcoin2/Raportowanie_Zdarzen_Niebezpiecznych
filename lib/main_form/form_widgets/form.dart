@@ -486,7 +486,6 @@ class _MainFormState extends State<MainForm> {
                           },
                         }));
                   } catch (e) {
-                    print(e);
                     ScaffoldMessenger.of(context).clearSnackBars();
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(

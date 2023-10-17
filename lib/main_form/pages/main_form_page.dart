@@ -34,43 +34,47 @@ class _FormPageState extends State<FormPage> {
                         ),
                         Padding(
                           padding: const EdgeInsets.only(left: 8.0),
-                          child: Image.asset("assets/images/logo_krk_100.jpg",
+                          child: Image.asset("assets/images/logo_krk_100.png",
                               height: 100, width: 100, isAntiAlias: false),
                         ),
                       ],
                     ),
                   ),
-                  Card(
-                    elevation: 2,
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          top: 8.0, bottom: 8.0, left: 18.0, right: 18.0),
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.height /
-                                    MediaQuery.of(context).size.width <
-                                1
-                            ? MediaQuery.of(context).size.width * 0.50
-                            : double.infinity,
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: FutureBuilder(
-                            future: FirebaseFirestore.instance
-                                .collection("settings")
-                                .doc("mainForm")
-                                .get(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const SizedBox(width: 50,height: 50, child: Center(child: CircularProgressIndicator()));
-                              } else {
-                                return Text(
-                                    snapshot.data!.data()?["description"]);
-                              }
-                            },
+                  FutureBuilder(
+                    future: FirebaseFirestore.instance
+                        .collection("settings")
+                        .doc("mainForm")
+                        .get(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: Center(child: CircularProgressIndicator()));
+                      } else if (snapshot.data!.data()?["description"] != "") {
+                        return Card(
+                          elevation: 2,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                top: 8.0, bottom: 8.0, left: 18.0, right: 18.0),
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.height /
+                                          MediaQuery.of(context).size.width <
+                                      1
+                                  ? MediaQuery.of(context).size.width * 0.50
+                                  : double.infinity,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child:
+                                    Text(snapshot.data!.data()?["description"]),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
+                        );
+                      } else {
+                        return const SizedBox.shrink();
+                      }
+                    },
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0, bottom: 18.0),

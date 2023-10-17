@@ -11,7 +11,7 @@ class FilterPanel extends StatefulWidget {
   final Function? onUpdate;
   final double elevation;
 
-  FilterPanel({
+  const FilterPanel({
     super.key,
     this.constrainSize = true,
     this.showDateSwitch = true,
@@ -201,10 +201,6 @@ class _FilterPanelState extends State<FilterPanel> {
                               context
                                   .read<DataAndSelectionManager>()
                                   .toggleFilterAllCategories();
-                              print(context
-                                  .read<DataAndSelectionManager>()
-                                  .filters
-                                  .categories);
                               widget.onUpdate!();
                             },
                           ),
