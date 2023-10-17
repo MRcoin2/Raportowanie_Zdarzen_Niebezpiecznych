@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../../main_form/form.dart';
+import '../../main_form/form_widgets/form.dart';
 import '../providers.dart';
 
 class FilterPanel extends StatefulWidget {

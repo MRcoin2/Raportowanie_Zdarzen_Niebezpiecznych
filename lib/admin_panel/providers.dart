@@ -1,7 +1,7 @@
 import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form.dart';
+import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form_widgets/form.dart';
 
 import '../main_form/database_communication.dart';
 
@@ -174,7 +174,7 @@ class DataAndSelectionManager extends ChangeNotifier {
     return reports;
   }
 
- void updateNumberOfFilteredReportsForReportGeneration() async {
+  void updateNumberOfFilteredReportsForReportGeneration() async {
     try {
       AggregateQuery numberOfReportsQuery = FirebaseFirestore.instance
           .collection("archive")
@@ -187,7 +187,8 @@ class DataAndSelectionManager extends ChangeNotifier {
           .where("incident data.category", whereIn: filters.categories)
           .limit(1000)
           .count();
-      numberOfReportsSelectedForReportGeneration = await numberOfReportsQuery.get().then((value) => value.count);
+      numberOfReportsSelectedForReportGeneration =
+          await numberOfReportsQuery.get().then((value) => value.count);
     } catch (e) {
       numberOfReportsSelectedForReportGeneration = 0;
       print(e);
@@ -201,32 +202,33 @@ class DataAndSelectionManager extends ChangeNotifier {
       print("counting filtered reports");
       print("date range: ${filters.dateRange}");
       print("category: $category");
-      if(category=="inne..."){
-        AggregateQuery numberOfReportsQuery = await FirebaseFirestore.instance
+      if (category == "inne...") {
+        AggregateQuery numberOfReportsQuery = FirebaseFirestore.instance
             .collection("archive")
             .orderBy("report timestamp", descending: true)
             .where("report timestamp",
-            isGreaterThanOrEqualTo:
-            Timestamp.fromDate(filters.dateRange!.start))
+                isGreaterThanOrEqualTo:
+                    Timestamp.fromDate(filters.dateRange!.start))
             .where("report timestamp",
-            isLessThanOrEqualTo: Timestamp.fromDate(filters.dateRange!.end))
+                isLessThanOrEqualTo: Timestamp.fromDate(filters.dateRange!.end))
             .where("incident data.category", whereNotIn: categories)
             .limit(1000)
             .count();
+        numberOfReports = await numberOfReportsQuery.get().then((value) => value.count);
+      } else {
+        AggregateQuery numberOfReportsQuery = FirebaseFirestore.instance
+            .collection("archive")
+            .orderBy("report timestamp", descending: true)
+            .where("report timestamp",
+                isGreaterThanOrEqualTo:
+                    Timestamp.fromDate(filters.dateRange!.start))
+            .where("report timestamp",
+                isLessThanOrEqualTo: Timestamp.fromDate(filters.dateRange!.end))
+            .where("incident data.category", isEqualTo: category)
+            .limit(1000)
+            .count();
+        numberOfReports = await numberOfReportsQuery.get().then((value) => value.count);
       }
-      else{
-      AggregateQuery numberOfReportsQuery = await FirebaseFirestore.instance
-          .collection("archive")
-          .orderBy("report timestamp", descending: true)
-          .where("report timestamp",
-              isGreaterThanOrEqualTo:
-                  Timestamp.fromDate(filters.dateRange!.start))
-          .where("report timestamp",
-              isLessThanOrEqualTo: Timestamp.fromDate(filters.dateRange!.end))
-          .where("incident data.category", isEqualTo: category)
-          .limit(1000)
-          .count();
-      numberOfReports = await numberOfReportsQuery.get().then((value) => value.count);}
       print(reports);
     } catch (e) {
       print(e);

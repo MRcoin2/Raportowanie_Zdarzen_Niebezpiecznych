@@ -115,6 +115,20 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                     child: Column(
                       children: [
                         TextFormField(
+                          autofocus: true,
+                          onFieldSubmitted: (_) =>http
+                              .post(
+                            Uri.https(API_URL,'verify-totp'),
+                            headers: {'Content-Type': 'application/json'},
+                            body: json.encode({
+                              'api_key': API_KEY,
+                              'email': _emailController.text,
+                              'password': _passwordController.text,
+                              'totp': _totpController.text,
+                            }),
+                          )
+                              .then(
+                                  (value) => Navigator.of(context).pop(value)),
                           decoration:
                               const InputDecoration(labelText: 'Kod 2FA'),
                           controller: _totpController,

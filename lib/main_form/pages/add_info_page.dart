@@ -1,9 +1,10 @@
 import 'dart:typed_data';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'database_communication.dart';
-import 'form_fields.dart';
+import '../database_communication.dart';
+import '../form_widgets/form_fields.dart';
 
 class AddInfoPage extends StatefulWidget {
   final String reportId;
@@ -31,7 +32,7 @@ class _AddInfoPageState extends State<AddInfoPage> {
             future: hasReportBeenEdited(widget.reportId),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
+                return const Center(
                     child: SizedBox(
                         width: 50,
                         height: 50,
@@ -44,6 +45,38 @@ class _AddInfoPageState extends State<AddInfoPage> {
                     child: Center(
                       child: Column(
                         children: [
+                          Card(
+                            elevation: 2,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 8.0, bottom: 8.0, left: 18.0, right: 18.0),
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.height /
+                                    MediaQuery.of(context).size.width <
+                                    1
+                                    ? MediaQuery.of(context).size.width * 0.50
+                                    : double.infinity,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: FutureBuilder(
+                                    future: FirebaseFirestore.instance
+                                        .collection("settings")
+                                        .doc("addInfo")
+                                        .get(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return const SizedBox(width: 50,height: 50, child: Center(child: CircularProgressIndicator()));
+                                      } else {
+                                        return Text(
+                                            snapshot.data!.data()?["description"]);
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
@@ -76,7 +109,7 @@ class _AddInfoPageState extends State<AddInfoPage> {
                                         : double.infinity,
                                     child: Center(
                                       child: Padding(
-                                        padding: EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.all(8.0),
                                         child: Form(
                                           key: _formKey,
                                           child: Column(

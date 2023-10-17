@@ -13,6 +13,7 @@ import 'package:universal_html/html.dart' as html;
 import '../../main_form/database_communication.dart';
 import '../pages/admin_panel.dart';
 import '../pages/raporting_page.dart';
+import '../pages/settings_page.dart';
 
 class ReportListElement extends StatefulWidget {
   final Report report;
@@ -627,7 +628,7 @@ class SideMenuBar extends StatelessWidget {
               leading: const Icon(Icons.home_outlined),
               title: const Text("Strona główna"),
               onTap: () {
-                context.read<DataAndSelectionManager>().clearSelections();
+                context.read<DataAndSelectionManager>().clearSelections();// TODO check if this line is needed if there are separate providers for each page
                 Navigator.of(context).pushReplacement(
                   PageRouteBuilder(
                     pageBuilder: (context, animation1, animation2) => const AdminPanelPage(),
@@ -638,22 +639,6 @@ class SideMenuBar extends StatelessWidget {
                 );
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.document_scanner_outlined),
-              title: const Text("Generowanie raportu"),
-              onTap: () {
-                context.read<DataAndSelectionManager>().clearSelections();
-                Navigator.of(context).pushReplacement(
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation1, animation2) => const ReportingPage(),
-                    transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
-                    transitionDuration: const Duration(milliseconds: 100),
-                    reverseTransitionDuration: const Duration(milliseconds: 100),
-                  ),
-                );
-              },
-            ),
-            const Divider(),
             ListTile(
               leading: const Icon(Icons.check),
               title: const Text("Zatwierdzone"),
@@ -686,9 +671,35 @@ class SideMenuBar extends StatelessWidget {
             ),
             const Divider(),
             ListTile(
+              leading: const Icon(Icons.document_scanner_outlined),
+              title: const Text("Generowanie raportu"),
+              onTap: () {
+                context.read<DataAndSelectionManager>().clearSelections();
+                Navigator.of(context).pushReplacement(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation1, animation2) => const ReportingPage(),
+                    transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+                    transitionDuration: const Duration(milliseconds: 100),
+                    reverseTransitionDuration: const Duration(milliseconds: 100),
+                  ),
+                );
+              },
+            ),
+            const Divider(),
+            ListTile(
               leading: const Icon(Icons.settings_outlined),
               title: const Text("Ustawienia"),
-              onTap: () {},
+              onTap: () {
+                context.read<DataAndSelectionManager>().clearSelections();
+                Navigator.of(context).pushReplacement(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation1, animation2) => const SettingsPage(),
+                    transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+                    transitionDuration: const Duration(milliseconds: 100),
+                    reverseTransitionDuration: const Duration(milliseconds: 100),
+                  ),
+                );
+              },
             ),
           ],
         ),

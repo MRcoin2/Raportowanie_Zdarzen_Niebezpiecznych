@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -6,13 +5,13 @@ import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/admin_pan
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/archive_page.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/raporting_page.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pages/trash_page.dart';
-import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'admin_panel/providers.dart';
 import 'authentication/admin_login_page.dart';
 import 'firebase_options.dart';
-import 'main_form/add_info_page.dart';
+import 'main_form/pages/add_info_page.dart';
+import 'main_form/pages/main_form_page.dart';
 
 Future<void> main() async {
   await Firebase.initializeApp(
@@ -151,74 +150,6 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       localizationsDelegates: const [GlobalMaterialLocalizations.delegate],
       supportedLocales: const [Locale('pl')],
-    );
-  }
-}
-
-class FormPage extends StatefulWidget {
-  const FormPage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<FormPage> createState() => _FormPageState();
-}
-
-class _FormPageState extends State<FormPage> {
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: SizedBox(
-            width: double.infinity,
-            child: Center(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "Raportowanie Zdarzeń Niebezpiecznych",
-                          style: Theme.of(context).textTheme.headlineLarge,
-                        ),Padding(
-                          padding: const EdgeInsets.only(left:8.0),
-                          child: Image.asset("assets/images/logo_krk_100.jpg", height: 100, width: 100, isAntiAlias: false),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 18.0, bottom: 18.0),
-                    child: Card(
-                      elevation: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                            top: 8.0, bottom: 8.0, left: 18.0, right: 18.0),
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.height /
-                                      MediaQuery.of(context).size.width <
-                                  1
-                              ? MediaQuery.of(context).size.width * 0.50
-                              : double.infinity,
-                          child: const Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: MainForm(key: Key("main-form")),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

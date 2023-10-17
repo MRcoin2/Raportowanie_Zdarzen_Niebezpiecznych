@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/authentication/form_auth_dialog.dart';
 import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/database_communication.dart';
-import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form_fields.dart';
+import 'package:raportowanie_zdarzen_niebezpiecznych/main_form/form_widgets/form_fields.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../authentication/secrets/api_key.dart';
+import '../../authentication/secrets/api_key.dart';
 import 'package:http/http.dart' as http;
 
 final List<String> categories = [
