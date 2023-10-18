@@ -43,7 +43,7 @@ class _ReportListElementState extends State<ReportListElement> {
                   .read<DataAndSelectionManager>()
                   .isHighlighted(widget.report)
               ? Border.all(
-                  color: Colors.blue,
+                  color: Theme.of(context).primaryColor,
                   width: 2,
                 )
               : null,
@@ -52,7 +52,7 @@ class _ReportListElementState extends State<ReportListElement> {
           surfaceTintColor: context
                   .read<DataAndSelectionManager>()
                   .isHighlighted(widget.report)
-              ? Colors.blue
+              ? Theme.of(context).primaryColor
               : Theme.of(context).cardTheme.color,
           elevation: context
                   .read<DataAndSelectionManager>()
@@ -183,10 +183,22 @@ class _TrashListElementState extends State<TrashListElement> {
       onTap: () {
         context.read<DataAndSelectionManager>().toggleHighlight(widget.report);
       },
+      child: Container(
+      decoration: BoxDecoration(
+      borderRadius: const BorderRadius.all(Radius.circular(20)),
+      border: context
+          .read<DataAndSelectionManager>()
+          .isHighlighted(widget.report)
+      ? Border.all(
+      color: Theme.of(context).primaryColor,
+      width: 2,
+      )
+          : null,
+      ),
       child: Card(
         surfaceTintColor:
             context.read<DataAndSelectionManager>().isHighlighted(widget.report)
-                ? Colors.blue
+                ? Theme.of(context).primaryColor
                 : Theme.of(context).cardTheme.color,
         elevation:
             context.read<DataAndSelectionManager>().isHighlighted(widget.report)
@@ -259,7 +271,7 @@ class _TrashListElementState extends State<TrashListElement> {
             ],
           ),
         ),
-      ),
+      ),),
     );
   }
 }
@@ -280,10 +292,22 @@ class _ArchiveListElementState extends State<ArchiveListElement> {
       onTap: () {
         context.read<DataAndSelectionManager>().toggleHighlight(widget.report);
       },
+      child: Container(
+      decoration: BoxDecoration(
+      borderRadius: const BorderRadius.all(Radius.circular(20)),
+      border: context
+          .read<DataAndSelectionManager>()
+          .isHighlighted(widget.report)
+      ? Border.all(
+      color: Theme.of(context).primaryColor,
+      width: 2,
+      )
+          : null,
+      ),
       child: Card(
         surfaceTintColor:
             context.read<DataAndSelectionManager>().isHighlighted(widget.report)
-                ? Colors.blue
+                ? Theme.of(context).primaryColor
                 : Theme.of(context).cardTheme.color,
         elevation:
             context.read<DataAndSelectionManager>().isHighlighted(widget.report)
@@ -387,7 +411,7 @@ class _ArchiveListElementState extends State<ArchiveListElement> {
             ],
           ),
         ),
-      ),
+      ),),
     );
   }
 }

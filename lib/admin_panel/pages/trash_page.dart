@@ -69,14 +69,6 @@ class _TrashPageState extends State<TrashPage> {
                                       child: SizedBox(
                                     height:
                                         MediaQuery.of(context).size.height,
-                                    width: MediaQuery.of(context).size.width /
-                                                MediaQuery.of(context)
-                                                    .size
-                                                    .height >
-                                            1
-                                        ? MediaQuery.of(context).size.width *
-                                            0.250
-                                        : double.infinity,
                                     child: NotificationListener<
                                         ScrollEndNotification>(
                                       onNotification: (notification) {
