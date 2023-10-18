@@ -418,6 +418,7 @@ class _MainFormState extends State<MainForm> {
                   );
                   BuildContext? dialogContext;
                   showDialog(
+                      barrierDismissible: false,
                       context: context,
                       builder: (context) {
                         dialogContext = context;
@@ -478,6 +479,7 @@ class _MainFormState extends State<MainForm> {
                     ScaffoldMessenger.of(context).clearSnackBars();
                     Navigator.pop(dialogContext!);
                     showDialog(
+                        barrierDismissible: false,
                         context: context,
                         builder: (context) {
                           dialogContext = context;
@@ -534,6 +536,7 @@ class _MainFormState extends State<MainForm> {
                     ScaffoldMessenger.of(context).clearSnackBars();
                     Navigator.pop(dialogContext!);
                     showDialog(
+                      barrierDismissible: false,
                         context: context,
                         builder: (context) {
                           dialogContext = context;

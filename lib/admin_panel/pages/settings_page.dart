@@ -83,7 +83,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               "Strona ustawień\n\nNa tej stronie można zmienić wiadomości wyświetlane nad główną ankietą i nad panelem dodawania informacji do zgłoszenia, oraz można dodać nowego administratora.",
                             )),
                         Expanded(
-                          flex: 2,
+                          flex: 3,
                           child: Card(
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -239,7 +239,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             ),
                           ),
                         ),
-                        const Spacer(flex: 1,)
+                        const Spacer(flex: 2,)
                       ],
                     );
                   }

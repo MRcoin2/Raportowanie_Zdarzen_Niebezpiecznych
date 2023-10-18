@@ -59,7 +59,7 @@ class _TrashPageState extends State<TrashPage> {
                       children: [
                         const Expanded(flex: 1, child: SideMenuBar(description: "Strona kosza\n\nZnajdują się tu usunięte zgłoszenia. Można je z tąd usunąć trwale. Będą one tu przechowywane bezterminowo do momentu trwałego usunięcia.",)),
                         Expanded(
-                          flex: 1,
+                          flex: 2,
                           child: Column(
                             children: [
                               const TopMenuBar(pageType: PageType.trashPage),
@@ -114,7 +114,7 @@ class _TrashPageState extends State<TrashPage> {
                           ),
                         ),
                         Expanded(
-                          flex: 2,
+                          flex: 3,
                           child: Consumer(builder: (context, reportData, _) {
                             Report? report = context
                                 .watch<DataAndSelectionManager>()

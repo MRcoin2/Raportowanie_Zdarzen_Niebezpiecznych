@@ -36,112 +36,124 @@ class _ReportListElementState extends State<ReportListElement> {
       onTap: () {
         context.read<DataAndSelectionManager>().toggleHighlight(widget.report);
       },
-      child: Card(
-        surfaceTintColor:
-            context.read<DataAndSelectionManager>().isHighlighted(widget.report)
-                ? Colors.blue
-                : Theme.of(context).cardTheme.color,
-        elevation:
-            context.read<DataAndSelectionManager>().isHighlighted(widget.report)
-                ? 5
-                : 2,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      widget.report.incidentData['category'],
-                      style: Theme.of(context).textTheme.titleLarge,
-                      softWrap: true,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                    ),
-                    Text(
-                      widget.report.incidentData['date'].toString(),
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
-                    Text(
-                      widget.report.incidentData['description'],
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                      softWrap: true,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                    )
-                  ],
+      child: Container(
+        decoration: BoxDecoration(
+
+          borderRadius: const BorderRadius.all(Radius.circular(20)),
+          border: context
+              .read<DataAndSelectionManager>()
+              .isHighlighted(widget.report) ? Border.all(
+            color: Colors.blue,
+            width: 2,
+          ) : null,
+        ),
+        child: Card(
+          surfaceTintColor:
+              context.read<DataAndSelectionManager>().isHighlighted(widget.report)
+                  ? Colors.blue
+                  : Theme.of(context).cardTheme.color,
+          elevation:
+              context.read<DataAndSelectionManager>().isHighlighted(widget.report)
+                  ? 5
+                  : 2,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        widget.report.incidentData['category'],
+                        style: Theme.of(context).textTheme.titleLarge,
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      ),
+                      Text(
+                        widget.report.incidentData['date'].toString(),
+                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                      Text(
+                        widget.report.incidentData['description'],
+                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      )
+                    ],
+                  ),
                 ),
-              ),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                            tooltip: 'Zatwierdź',
-                            onPressed: () {
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                              tooltip: 'Zatwierdź',
+                              onPressed: () {
+                                context
+                                    .read<DataAndSelectionManager>()
+                                    .archiveReport(widget.report);
+                              },
+                              icon: const Icon(Icons.check)),
+                          IconButton(
+                              tooltip: 'Usuń',
+                              onPressed: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: const Text(
+                                            'Czy na pewno chcesz usunąć to zgłoszenie?'),
+                                        actions: [
+                                          TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop(false);
+                                              },
+                                              child: const Text('Nie')),
+                                          TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop(true);
+                                              },
+                                              child: const Text('Tak')),
+                                        ],
+                                      );
+                                    }).then((value) {
+                                  if (value) {
+                                    context
+                                        .read<DataAndSelectionManager>()
+                                        .moveReportToTrash(
+                                            widget.report, PageType.reportsPage);
+                                  }
+                                });
+                              },
+                              icon: const Icon(Icons.delete_outline)),
+                          Checkbox(
+                            value: context
+                                .watch<DataAndSelectionManager>()
+                                .isSelected(widget.report),
+                            onChanged: (value) {
                               context
                                   .read<DataAndSelectionManager>()
-                                  .archiveReport(widget.report);
+                                  .toggleSelection(
+                                      widget.report, PageType.reportsPage);
                             },
-                            icon: const Icon(Icons.check)),
-                        IconButton(
-                            tooltip: 'Usuń',
-                            onPressed: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: const Text(
-                                          'Czy na pewno chcesz usunąć to zgłoszenie?'),
-                                      actions: [
-                                        TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop(false);
-                                            },
-                                            child: const Text('Nie')),
-                                        TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop(true);
-                                            },
-                                            child: const Text('Tak')),
-                                      ],
-                                    );
-                                  }).then((value) {
-                                if (value) {
-                                  context
-                                      .read<DataAndSelectionManager>()
-                                      .moveReportToTrash(
-                                          widget.report, PageType.reportsPage);
-                                }
-                              });
-                            },
-                            icon: const Icon(Icons.delete_outline)),
-                        Checkbox(
-                          value: context
-                              .watch<DataAndSelectionManager>()
-                              .isSelected(widget.report),
-                          onChanged: (value) {
-                            context
-                                .read<DataAndSelectionManager>()
-                                .toggleSelection(
-                                    widget.report, PageType.reportsPage);
-                          },
-                        )
-                      ],
-                    )
-                  ],
-                ),
-              )
-            ],
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -376,8 +388,11 @@ class _ArchiveListElementState extends State<ArchiveListElement> {
 
 class TopMenuBar extends StatefulWidget {
   final PageType pageType;
+  final bool sortingEnabled;
+  // sorting is currently broken and should not be used
+  // maybe it should be removed entirely
 
-  const TopMenuBar({super.key, this.pageType = PageType.reportsPage});
+  const TopMenuBar({super.key, this.pageType = PageType.reportsPage, this.sortingEnabled = false});
 
   @override
   State<TopMenuBar> createState() => _TopMenuBarState();
@@ -411,7 +426,7 @@ class _TopMenuBarState extends State<TopMenuBar> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  PortalTarget(
+                  widget.sortingEnabled ? PortalTarget(
                     visible: isSortingMenuOpen,
                     portalFollower: GestureDetector(
                       behavior: HitTestBehavior.opaque,
@@ -434,7 +449,7 @@ class _TopMenuBarState extends State<TopMenuBar> {
                           },
                           icon: const Icon(Icons.sort)),
                     ),
-                  ),
+                  ):SizedBox.shrink(),
                   PortalTarget(
                     visible: isFilterMenuOpen,
                     portalFollower: GestureDetector(
@@ -629,107 +644,109 @@ class SideMenuBar extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-          flex: 4,
+          flex: 3,
           child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.home_outlined),
-                    title: const Text("Strona główna"),
-                    onTap: () {
-                      context
-                          .read<DataAndSelectionManager>()
-                          .clearSelections();
-                      Navigator.of(context).pushReplacement(
-                        PageRouteBuilder(
-                          pageBuilder: (context, animation1, animation2) =>
-                              const AdminPanelPage(),
-                          transitionsBuilder: (_, a, __, c) =>
-                              FadeTransition(opacity: a, child: c),
-                          transitionDuration: const Duration(milliseconds: 100),
-                          reverseTransitionDuration:
-                              const Duration(milliseconds: 100),
-                        ),
-                      );
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.check),
-                    title: const Text("Zatwierdzone"),
-                    onTap: () {
-                      context.read<DataAndSelectionManager>().clearSelections();
-                      Navigator.of(context).pushReplacement(
-                        PageRouteBuilder(
-                          pageBuilder: (context, animation1, animation2) =>
-                              const ArchivePage(),
-                          transitionsBuilder: (_, a, __, c) =>
-                              FadeTransition(opacity: a, child: c),
-                          transitionDuration: const Duration(milliseconds: 100),
-                          reverseTransitionDuration:
-                              const Duration(milliseconds: 100),
-                        ),
-                      );
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.delete_outline),
-                    title: const Text("Kosz"),
-                    onTap: () {
-                      context.read<DataAndSelectionManager>().clearSelections();
-                      Navigator.of(context).pushReplacement(
-                        PageRouteBuilder(
-                          pageBuilder: (context, animation1, animation2) =>
-                              const TrashPage(),
-                          transitionsBuilder: (_, a, __, c) =>
-                              FadeTransition(opacity: a, child: c),
-                          transitionDuration: const Duration(milliseconds: 100),
-                          reverseTransitionDuration:
-                              const Duration(milliseconds: 100),
-                        ),
-                      );
-                    },
-                  ),
-                  const Divider(),
-                  ListTile(
-                    leading: const Icon(Icons.document_scanner_outlined),
-                    title: const Text("Generowanie raportu"),
-                    onTap: () {
-                      context.read<DataAndSelectionManager>().clearSelections();
-                      Navigator.of(context).pushReplacement(
-                        PageRouteBuilder(
-                          pageBuilder: (context, animation1, animation2) =>
-                              const ReportingPage(),
-                          transitionsBuilder: (_, a, __, c) =>
-                              FadeTransition(opacity: a, child: c),
-                          transitionDuration: const Duration(milliseconds: 100),
-                          reverseTransitionDuration:
-                              const Duration(milliseconds: 100),
-                        ),
-                      );
-                    },
-                  ),
-                  const Divider(),
-                  ListTile(
-                    leading: const Icon(Icons.settings_outlined),
-                    title: const Text("Ustawienia"),
-                    onTap: () {
-                      context.read<DataAndSelectionManager>().clearSelections();
-                      Navigator.of(context).pushReplacement(
-                        PageRouteBuilder(
-                          pageBuilder: (context, animation1, animation2) =>
-                              const SettingsPage(),
-                          transitionsBuilder: (_, a, __, c) =>
-                              FadeTransition(opacity: a, child: c),
-                          transitionDuration: const Duration(milliseconds: 100),
-                          reverseTransitionDuration:
-                              const Duration(milliseconds: 100),
-                        ),
-                      );
-                    },
-                  ),
-                ],
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.home_outlined),
+                      title: const Text("Strona główna"),
+                      onTap: () {
+                        context
+                            .read<DataAndSelectionManager>()
+                            .clearSelections();
+                        Navigator.of(context).pushReplacement(
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) =>
+                                const AdminPanelPage(),
+                            transitionsBuilder: (_, a, __, c) =>
+                                FadeTransition(opacity: a, child: c),
+                            transitionDuration: const Duration(milliseconds: 100),
+                            reverseTransitionDuration:
+                                const Duration(milliseconds: 100),
+                          ),
+                        );
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.check),
+                      title: const Text("Zatwierdzone"),
+                      onTap: () {
+                        context.read<DataAndSelectionManager>().clearSelections();
+                        Navigator.of(context).pushReplacement(
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) =>
+                                const ArchivePage(),
+                            transitionsBuilder: (_, a, __, c) =>
+                                FadeTransition(opacity: a, child: c),
+                            transitionDuration: const Duration(milliseconds: 100),
+                            reverseTransitionDuration:
+                                const Duration(milliseconds: 100),
+                          ),
+                        );
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.delete_outline),
+                      title: const Text("Kosz"),
+                      onTap: () {
+                        context.read<DataAndSelectionManager>().clearSelections();
+                        Navigator.of(context).pushReplacement(
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) =>
+                                const TrashPage(),
+                            transitionsBuilder: (_, a, __, c) =>
+                                FadeTransition(opacity: a, child: c),
+                            transitionDuration: const Duration(milliseconds: 100),
+                            reverseTransitionDuration:
+                                const Duration(milliseconds: 100),
+                          ),
+                        );
+                      },
+                    ),
+                    const Divider(),
+                    ListTile(
+                      leading: const Icon(Icons.document_scanner_outlined),
+                      title: const Text("Generowanie raportu"),
+                      onTap: () {
+                        context.read<DataAndSelectionManager>().clearSelections();
+                        Navigator.of(context).pushReplacement(
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) =>
+                                const ReportingPage(),
+                            transitionsBuilder: (_, a, __, c) =>
+                                FadeTransition(opacity: a, child: c),
+                            transitionDuration: const Duration(milliseconds: 100),
+                            reverseTransitionDuration:
+                                const Duration(milliseconds: 100),
+                          ),
+                        );
+                      },
+                    ),
+                    const Divider(),
+                    ListTile(
+                      leading: const Icon(Icons.settings_outlined),
+                      title: const Text("Ustawienia"),
+                      onTap: () {
+                        context.read<DataAndSelectionManager>().clearSelections();
+                        Navigator.of(context).pushReplacement(
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) =>
+                                const SettingsPage(),
+                            transitionsBuilder: (_, a, __, c) =>
+                                FadeTransition(opacity: a, child: c),
+                            transitionDuration: const Duration(milliseconds: 100),
+                            reverseTransitionDuration:
+                                const Duration(milliseconds: 100),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -740,9 +757,11 @@ class SideMenuBar extends StatelessWidget {
                 child: Card(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      description ?? "",
-                      softWrap: true,
+                    child: SingleChildScrollView(
+                      child: Text(
+                        description ?? "",
+                        softWrap: true,
+                      ),
                     ),
                   ),
                 ),
@@ -1012,6 +1031,7 @@ class ReportDisplayCard extends StatelessWidget {
                         onPressed: () async {
                           BuildContext? dialogContext;
                           showDialog(
+                              barrierDismissible: false,
                               context: context,
                               builder: (context) {
                                 dialogContext = context;
@@ -1054,6 +1074,7 @@ class ReportDisplayCard extends StatelessWidget {
                           onPressed: () async {
                             BuildContext? dialogContext;
                             showDialog(
+                                barrierDismissible: false,
                                 context: context,
                                 builder: (context) {
                                   dialogContext = context;
@@ -1097,6 +1118,7 @@ class ReportDisplayCard extends StatelessWidget {
                           onPressed: () async {
                             BuildContext? dialogContext;
                             showDialog(
+                                barrierDismissible: false,
                                 context: context,
                                 builder: (context) {
                                   dialogContext = context;

@@ -30,7 +30,7 @@ class _ReportingPageState extends State<ReportingPage> {
           children: [
             const Expanded(flex: 1, child: SideMenuBar(description: "Strona generowania raportów zbiorczych\n\nNa tej stronie można wygenerować raport zliczający ilość zdarzeń z danych kategorii w danym okresie czasu.",)),
             Expanded(
-                flex: 2,
+                flex: 4,
                 child: FilterPanel(
                   constrainSize: false,
                   showDateSwitch: false,

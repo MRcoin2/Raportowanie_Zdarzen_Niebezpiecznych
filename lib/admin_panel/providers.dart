@@ -477,6 +477,7 @@ class DataAndSelectionManager extends ChangeNotifier {
 
   void clearSelections() {
     _selected.clear();
+    _highlighted = null;
     isEverythingSelected = false;
     notifyListeners();
   }

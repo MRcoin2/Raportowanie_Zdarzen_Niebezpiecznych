@@ -59,7 +59,7 @@ class _ArchivePageState extends State<ArchivePage> {
                       children: [
                         const Expanded(flex: 1, child: SideMenuBar(description: "Strona zgłoszeń zatwierdzonych\n\nPowinny znajdować się tu zgłoszenia które zostały uznane przez administratora za adekwatne. Ze zgłoszeń zatwierdzonych generowane mogą być raporty okresowe.",)),
                         Expanded(
-                          flex: 1,
+                          flex: 2,
                           child: Column(
                             children: [
                               const TopMenuBar(
@@ -70,14 +70,6 @@ class _ArchivePageState extends State<ArchivePage> {
                                       child: SizedBox(
                                     height:
                                         MediaQuery.of(context).size.height,
-                                    width: MediaQuery.of(context).size.width /
-                                                MediaQuery.of(context)
-                                                    .size
-                                                    .height >
-                                            1
-                                        ? MediaQuery.of(context).size.width *
-                                            0.250
-                                        : double.infinity,
                                     child: NotificationListener<
                                         ScrollEndNotification>(
                                       onNotification: (notification) {
@@ -115,7 +107,7 @@ class _ArchivePageState extends State<ArchivePage> {
                           ),
                         ),
                         Expanded(
-                          flex: 2,
+                          flex: 3,
                           child: Consumer(builder: (context, reportData, _) {
                             Report? report = context
                                 .watch<DataAndSelectionManager>()
