@@ -38,24 +38,27 @@ class _ReportListElementState extends State<ReportListElement> {
       },
       child: Container(
         decoration: BoxDecoration(
-
           borderRadius: const BorderRadius.all(Radius.circular(20)),
           border: context
-              .read<DataAndSelectionManager>()
-              .isHighlighted(widget.report) ? Border.all(
-            color: Colors.blue,
-            width: 2,
-          ) : null,
+                  .read<DataAndSelectionManager>()
+                  .isHighlighted(widget.report)
+              ? Border.all(
+                  color: Colors.blue,
+                  width: 2,
+                )
+              : null,
         ),
         child: Card(
-          surfaceTintColor:
-              context.read<DataAndSelectionManager>().isHighlighted(widget.report)
-                  ? Colors.blue
-                  : Theme.of(context).cardTheme.color,
-          elevation:
-              context.read<DataAndSelectionManager>().isHighlighted(widget.report)
-                  ? 5
-                  : 2,
+          surfaceTintColor: context
+                  .read<DataAndSelectionManager>()
+                  .isHighlighted(widget.report)
+              ? Colors.blue
+              : Theme.of(context).cardTheme.color,
+          elevation: context
+                  .read<DataAndSelectionManager>()
+                  .isHighlighted(widget.report)
+              ? 5
+              : 2,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -75,11 +78,13 @@ class _ReportListElementState extends State<ReportListElement> {
                       ),
                       Text(
                         widget.report.incidentData['date'].toString(),
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
                       Text(
                         widget.report.incidentData['description'],
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey),
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,
@@ -116,7 +121,8 @@ class _ReportListElementState extends State<ReportListElement> {
                                         actions: [
                                           TextButton(
                                               onPressed: () {
-                                                Navigator.of(context).pop(false);
+                                                Navigator.of(context)
+                                                    .pop(false);
                                               },
                                               child: const Text('Nie')),
                                           TextButton(
@@ -130,8 +136,8 @@ class _ReportListElementState extends State<ReportListElement> {
                                   if (value) {
                                     context
                                         .read<DataAndSelectionManager>()
-                                        .moveReportToTrash(
-                                            widget.report, PageType.reportsPage);
+                                        .moveReportToTrash(widget.report,
+                                            PageType.reportsPage);
                                   }
                                 });
                               },
@@ -389,10 +395,14 @@ class _ArchiveListElementState extends State<ArchiveListElement> {
 class TopMenuBar extends StatefulWidget {
   final PageType pageType;
   final bool sortingEnabled;
+
   // sorting is currently broken and should not be used
   // maybe it should be removed entirely
 
-  const TopMenuBar({super.key, this.pageType = PageType.reportsPage, this.sortingEnabled = false});
+  const TopMenuBar(
+      {super.key,
+      this.pageType = PageType.reportsPage,
+      this.sortingEnabled = false});
 
   @override
   State<TopMenuBar> createState() => _TopMenuBarState();
@@ -426,30 +436,32 @@ class _TopMenuBarState extends State<TopMenuBar> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  widget.sortingEnabled ? PortalTarget(
-                    visible: isSortingMenuOpen,
-                    portalFollower: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        setState(() {
-                          isSortingMenuOpen = false;
-                        });
-                      },
-                    ),
-                    child: PortalTarget(
-                      visible: isSortingMenuOpen,
-                      anchor: const Aligned(
-                        follower: Alignment.topLeft,
-                        target: Alignment.topRight,
-                      ),
-                      portalFollower: const SortingMenu(),
-                      child: IconButton(
-                          onPressed: () {
-                            toggleSortingMenu();
-                          },
-                          icon: const Icon(Icons.sort)),
-                    ),
-                  ):SizedBox.shrink(),
+                  widget.sortingEnabled
+                      ? PortalTarget(
+                          visible: isSortingMenuOpen,
+                          portalFollower: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () {
+                              setState(() {
+                                isSortingMenuOpen = false;
+                              });
+                            },
+                          ),
+                          child: PortalTarget(
+                            visible: isSortingMenuOpen,
+                            anchor: const Aligned(
+                              follower: Alignment.topLeft,
+                              target: Alignment.topRight,
+                            ),
+                            portalFollower: const SortingMenu(),
+                            child: IconButton(
+                                onPressed: () {
+                                  toggleSortingMenu();
+                                },
+                                icon: const Icon(Icons.sort)),
+                          ),
+                        )
+                      : SizedBox.shrink(),
                   PortalTarget(
                     visible: isFilterMenuOpen,
                     portalFollower: GestureDetector(
@@ -661,10 +673,19 @@ class SideMenuBar extends StatelessWidget {
                         Navigator.of(context).pushReplacement(
                           PageRouteBuilder(
                             pageBuilder: (context, animation1, animation2) =>
-                                const AdminPanelPage(),
+                                MultiProvider(
+                              providers: [
+                                ChangeNotifierProvider(
+                                  create: (context) =>
+                                      DataAndSelectionManager(),
+                                ),
+                              ],
+                              child: const AdminPanelPage(),
+                            ),
                             transitionsBuilder: (_, a, __, c) =>
                                 FadeTransition(opacity: a, child: c),
-                            transitionDuration: const Duration(milliseconds: 100),
+                            transitionDuration:
+                                const Duration(milliseconds: 100),
                             reverseTransitionDuration:
                                 const Duration(milliseconds: 100),
                           ),
@@ -675,14 +696,24 @@ class SideMenuBar extends StatelessWidget {
                       leading: const Icon(Icons.check),
                       title: const Text("Zatwierdzone"),
                       onTap: () {
-                        context.read<DataAndSelectionManager>().clearSelections();
+                        context
+                            .read<DataAndSelectionManager>()
+                            .clearSelections();
                         Navigator.of(context).pushReplacement(
                           PageRouteBuilder(
                             pageBuilder: (context, animation1, animation2) =>
-                                const ArchivePage(),
+                                MultiProvider(
+                                  providers: [
+                                    ChangeNotifierProvider(
+                                      create: (context) =>
+                                          DataAndSelectionManager(),
+                                    ),
+                                  ],
+                                  child: const ArchivePage(),),
                             transitionsBuilder: (_, a, __, c) =>
                                 FadeTransition(opacity: a, child: c),
-                            transitionDuration: const Duration(milliseconds: 100),
+                            transitionDuration:
+                                const Duration(milliseconds: 100),
                             reverseTransitionDuration:
                                 const Duration(milliseconds: 100),
                           ),
@@ -693,14 +724,24 @@ class SideMenuBar extends StatelessWidget {
                       leading: const Icon(Icons.delete_outline),
                       title: const Text("Kosz"),
                       onTap: () {
-                        context.read<DataAndSelectionManager>().clearSelections();
+                        context
+                            .read<DataAndSelectionManager>()
+                            .clearSelections();
                         Navigator.of(context).pushReplacement(
                           PageRouteBuilder(
                             pageBuilder: (context, animation1, animation2) =>
-                                const TrashPage(),
+                                MultiProvider(
+                                  providers: [
+                                    ChangeNotifierProvider(
+                                      create: (context) =>
+                                          DataAndSelectionManager(),
+                                    ),
+                                  ],
+                                  child: const TrashPage(),),
                             transitionsBuilder: (_, a, __, c) =>
                                 FadeTransition(opacity: a, child: c),
-                            transitionDuration: const Duration(milliseconds: 100),
+                            transitionDuration:
+                                const Duration(milliseconds: 100),
                             reverseTransitionDuration:
                                 const Duration(milliseconds: 100),
                           ),
@@ -712,14 +753,24 @@ class SideMenuBar extends StatelessWidget {
                       leading: const Icon(Icons.document_scanner_outlined),
                       title: const Text("Generowanie raportu"),
                       onTap: () {
-                        context.read<DataAndSelectionManager>().clearSelections();
+                        context
+                            .read<DataAndSelectionManager>()
+                            .clearSelections();
                         Navigator.of(context).pushReplacement(
                           PageRouteBuilder(
                             pageBuilder: (context, animation1, animation2) =>
-                                const ReportingPage(),
+                                MultiProvider(
+                                  providers: [
+                                    ChangeNotifierProvider(
+                                      create: (context) =>
+                                          DataAndSelectionManager(),
+                                    ),
+                                  ],
+                                  child: const ReportingPage(),),
                             transitionsBuilder: (_, a, __, c) =>
                                 FadeTransition(opacity: a, child: c),
-                            transitionDuration: const Duration(milliseconds: 100),
+                            transitionDuration:
+                                const Duration(milliseconds: 100),
                             reverseTransitionDuration:
                                 const Duration(milliseconds: 100),
                           ),
@@ -731,14 +782,24 @@ class SideMenuBar extends StatelessWidget {
                       leading: const Icon(Icons.settings_outlined),
                       title: const Text("Ustawienia"),
                       onTap: () {
-                        context.read<DataAndSelectionManager>().clearSelections();
+                        context
+                            .read<DataAndSelectionManager>()
+                            .clearSelections();
                         Navigator.of(context).pushReplacement(
                           PageRouteBuilder(
                             pageBuilder: (context, animation1, animation2) =>
-                                const SettingsPage(),
+                                MultiProvider(
+                                  providers: [
+                                    ChangeNotifierProvider(
+                                      create: (context) =>
+                                          DataAndSelectionManager(),
+                                    ),
+                                  ],
+                                  child: const SettingsPage(),),
                             transitionsBuilder: (_, a, __, c) =>
                                 FadeTransition(opacity: a, child: c),
-                            transitionDuration: const Duration(milliseconds: 100),
+                            transitionDuration:
+                                const Duration(milliseconds: 100),
                             reverseTransitionDuration:
                                 const Duration(milliseconds: 100),
                           ),
@@ -785,8 +846,8 @@ Future<void> downloadZippedImages(List<List<String>> urlsWithNames) async {
   ZipEncoder encoder = ZipEncoder();
   for (List<String> urlWithName in urlsWithNames) {
     await http.get(Uri.parse(urlWithName[0])).then((value) {
-      files.add(ArchiveFile(urlWithName[1],
-          value.bodyBytes.length, value.bodyBytes));
+      files.add(
+          ArchiveFile(urlWithName[1], value.bodyBytes.length, value.bodyBytes));
     });
   }
   for (ArchiveFile file in files) {
@@ -795,8 +856,10 @@ Future<void> downloadZippedImages(List<List<String>> urlsWithNames) async {
   Uint8List archiveBytes = Uint8List.fromList(encoder.encode(archive)!);
 //download the file
   html.AnchorElement(
-          href: "data:application/octet-stream;charset=utf-16le;base64,${base64.encode(archiveBytes)}")..setAttribute("download", "zdjecia.zip")
-      ..click();
+      href:
+          "data:application/octet-stream;charset=utf-16le;base64,${base64.encode(archiveBytes)}")
+    ..setAttribute("download", "zdjecia.zip")
+    ..click();
   return;
 }
 

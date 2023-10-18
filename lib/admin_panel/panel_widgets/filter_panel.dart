@@ -87,155 +87,159 @@ class _FilterPanelState extends State<FilterPanel> {
   @override
   Widget build(BuildContext context) {
     //menu for managing the filters
-    return SizedBox(
-      height: widget.constrainSize
-          ? MediaQuery.of(context).size.height * 0.5
-          : double.infinity,
-      width: widget.constrainSize
-          ? MediaQuery.of(context).size.width * 0.35
-          : double.infinity,
-      child: Card(
-        elevation: widget.elevation,
-        child: Padding(
-          padding: const EdgeInsets.all(18.0),
-          child: SingleChildScrollView(
-            child: Form(
-              onChanged: () {
-                updateDateRange();
-              },
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: DateTextFormField(
-                            labelText: "Od",
-                            dateController: fromDateController),
-                      ),
-                      Expanded(
-                        child: DateTextFormField(
-                            labelText: "Do", dateController: toDateController),
-                      ),
-                      IconButton(
-                        onPressed: () => _selectDateRange(context),
-                        icon: const Icon(Icons.calendar_month),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: widget.showDateSwitch? Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+    return Consumer<DataAndSelectionManager>(
+      builder: (context, _, child) {
+        return SizedBox(
+        height: widget.constrainSize
+            ? MediaQuery.of(context).size.height * 0.5
+            : double.infinity,
+        width: widget.constrainSize
+            ? MediaQuery.of(context).size.width * 0.35
+            : double.infinity,
+        child: Card(
+          elevation: widget.elevation,
+          child: Padding(
+            padding: const EdgeInsets.all(18.0),
+            child: SingleChildScrollView(
+              child: Form(
+                onChanged: () {
+                  updateDateRange();
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
                       children: [
-                            const Text("Filtruj po:"),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: ToggleButtons(
-                                isSelected: toggleButtonsState,
-                                onPressed: (index) {
-                                  setState(() {
-                                    if (index == 0) {
-                                      toggleButtonsState = [true, false];
-                                    } else {
-                                      toggleButtonsState = [false, true];
-                                    }
-                                    updateDateRange();
-                                  });
-                                },
-                                children: const [
-                                  Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text("Data zdażenia"),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text("Data zgłoszenia"),
-                                  )
-                                ],
-                              ),
-                            ),
                         Expanded(
-                          child: Container(),
+                          child: DateTextFormField(
+                              labelText: "Od",
+                              dateController: fromDateController),
                         ),
-                        TextButton(
-                          onPressed: () {
-                            widget.onUpdate!();
-                            fromDateController.clear();
-                            toDateController.clear();
-                            context
-                                .read<DataAndSelectionManager>()
-                                .clearFilters();
-                          },
-                          child: const Text('Wyczyść filtry'),
+                        Expanded(
+                          child: DateTextFormField(
+                              labelText: "Do", dateController: toDateController),
+                        ),
+                        IconButton(
+                          onPressed: () => _selectDateRange(context),
+                          icon: const Icon(Icons.calendar_month),
                         ),
                       ],
-                    ):TextButton(
-                      onPressed: () {
-                        widget.onUpdate!();
-                        fromDateController.clear();
-                        toDateController.clear();
-                        context
-                            .read<DataAndSelectionManager>()
-                            .clearFilters();
-                      },
-                      child: const Text('Wyczyść filtry'),
                     ),
-                  ),
-                  const Divider(),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ListTile(
-                          title: const Text(
-                            "zaznacz wszystkie",
-                            textAlign: TextAlign.right,
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: widget.showDateSwitch? Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                              const Text("Filtruj po:"),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: ToggleButtons(
+                                  isSelected: toggleButtonsState,
+                                  onPressed: (index) {
+                                    setState(() {
+                                      if (index == 0) {
+                                        toggleButtonsState = [true, false];
+                                      } else {
+                                        toggleButtonsState = [false, true];
+                                      }
+                                      updateDateRange();
+                                    });
+                                  },
+                                  children: const [
+                                    Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Text("Data zdażenia"),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Text("Data zgłoszenia"),
+                                    )
+                                  ],
+                                ),
+                              ),
+                          Expanded(
+                            child: Container(),
                           ),
-                          trailing: Checkbox(
-                            value: context
-                                .read<DataAndSelectionManager>()
-                                .isEveryCategoryFilterSelected,
-                            onChanged: (value) {
+                          TextButton(
+                            onPressed: () {
+                              widget.onUpdate!();
+                              fromDateController.clear();
+                              toDateController.clear();
                               context
                                   .read<DataAndSelectionManager>()
-                                  .toggleFilterAllCategories();
-                              widget.onUpdate!();
+                                  .clearFilters();
                             },
+                            child: const Text('Wyczyść filtry'),
                           ),
-                        ),
-                        ...categories.map(
-                          (category) => ListTile(
-                            title: Text(
-                              category,
-                              style: const TextStyle(
-                                  overflow: TextOverflow.ellipsis),
+                        ],
+                      ):TextButton(
+                        onPressed: () {
+                          widget.onUpdate!();
+                          fromDateController.clear();
+                          toDateController.clear();
+                          context
+                              .read<DataAndSelectionManager>()
+                              .clearFilters();
+                        },
+                        child: const Text('Wyczyść filtry'),
+                      ),
+                    ),
+                    const Divider(),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ListTile(
+                            title: const Text(
+                              "zaznacz wszystkie",
+                              textAlign: TextAlign.right,
                             ),
                             trailing: Checkbox(
                               value: context
                                   .read<DataAndSelectionManager>()
-                                  .filters
-                                  .categories
-                                  .contains(category),
+                                  .isEveryCategoryFilterSelected,
                               onChanged: (value) {
                                 context
                                     .read<DataAndSelectionManager>()
-                                    .toggleFilterCategory(category);
+                                    .toggleFilterAllCategories();
                                 widget.onUpdate!();
                               },
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
+                          ...categories.map(
+                            (category) => ListTile(
+                              title: Text(
+                                category,
+                                style: const TextStyle(
+                                    overflow: TextOverflow.ellipsis),
+                              ),
+                              trailing: Checkbox(
+                                value: context
+                                    .read<DataAndSelectionManager>()
+                                    .filters
+                                    .categories
+                                    .contains(category),
+                                onChanged: (value) {
+                                  context
+                                      .read<DataAndSelectionManager>()
+                                      .toggleFilterCategory(category);
+                                  widget.onUpdate!();
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           ),
         ),
-      ),
+      );
+      },
     );
   }
 }
