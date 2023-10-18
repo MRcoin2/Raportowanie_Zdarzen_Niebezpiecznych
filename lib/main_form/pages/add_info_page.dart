@@ -7,9 +7,9 @@ import '../database_communication.dart';
 import '../form_widgets/form_fields.dart';
 
 class AddInfoPage extends StatefulWidget {
-  final String reportId;
+  String? reportId;
 
-  AddInfoPage({super.key, required this.reportId});
+  AddInfoPage({super.key, this.reportId});
 
   @override
   State<AddInfoPage> createState() => _AddInfoPageState();
@@ -19,6 +19,7 @@ class _AddInfoPageState extends State<AddInfoPage> {
   final _formKey = GlobalKey<FormState>();
 
   final _descriptionController = TextEditingController();
+  final _reportIdController = TextEditingController();
 
   final List<XFile> _images = [];
 
@@ -28,8 +29,98 @@ class _AddInfoPageState extends State<AddInfoPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: FutureBuilder(
-            future: hasReportBeenEdited(widget.reportId),
+        body: widget.reportId == null ? SizedBox(
+        width: double.infinity,
+        child: Center(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Dodawanie informacji do zgłoszenia",
+                  style: Theme.of(context).textTheme.headlineLarge,
+                ),
+              ),
+              Padding(
+                padding:
+                const EdgeInsets.only(top: 18.0, bottom: 18.0),
+                child: Card(
+                  elevation: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        top: 8.0,
+                        bottom: 8.0,
+                        left: 18.0,
+                        right: 18.0),
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.height /
+                          MediaQuery.of(context)
+                              .size
+                              .width <
+                          1
+                          ? MediaQuery.of(context).size.width *
+                          0.50
+                          : double.infinity,
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              mainAxisAlignment:
+                              MainAxisAlignment.center,
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                MainFormField(
+                                  controller:
+                                  _reportIdController,
+                                  labelText:
+                                  "Numer zgłoszenia",
+                                  maxLines: 1,
+                                  validator: (value) {
+                                    if (value ==
+                                        null ||
+                                        value
+                                            .isEmpty || value.length != 20) {
+                                      return 'Proszę wprowadzić numer zgłoszenia';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                Padding(
+                                  padding:
+                                  const EdgeInsets.all(
+                                      8.0),
+                                  child: FilledButton(
+                                    onPressed: () async {
+                                      if (_formKey
+                                          .currentState!
+                                          .validate()) {
+                                        setState(() {
+                                          widget.reportId = _reportIdController.text;
+                                        });
+                                      }
+                                    },
+                                    child: const Text(
+                                        "Uzupełnij zgłoszenie"),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ) : FutureBuilder(
+            future: hasReportBeenEdited(widget.reportId??""),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(
@@ -315,7 +406,7 @@ class _AddInfoPageState extends State<AddInfoPage> {
                                                                   },
                                                                   _images,
                                                                   widget
-                                                                      .reportId);
+                                                                      .reportId??'');
                                                               //notify user
                                                               ScaffoldMessenger
                                                                       .of(context)

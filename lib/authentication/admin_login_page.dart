@@ -97,7 +97,7 @@ class AdminLoginPageState extends State<AdminLoginPage> {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
       try {
-        var response = await http.post(Uri.https(API_URL,'verify-user'),
+        var response = await http.post(Uri.https(API_URL, 'verify-user'),
             body: json.encode({
               'api_key': API_KEY,
               'email': _emailController.text,
@@ -116,17 +116,17 @@ class AdminLoginPageState extends State<AdminLoginPage> {
                       children: [
                         TextFormField(
                           autofocus: true,
-                          onFieldSubmitted: (_) =>http
+                          onFieldSubmitted: (_) => http
                               .post(
-                            Uri.https(API_URL,'verify-totp'),
-                            headers: {'Content-Type': 'application/json'},
-                            body: json.encode({
-                              'api_key': API_KEY,
-                              'email': _emailController.text,
-                              'password': _passwordController.text,
-                              'totp': _totpController.text,
-                            }),
-                          )
+                                Uri.https(API_URL, 'verify-totp'),
+                                headers: {'Content-Type': 'application/json'},
+                                body: json.encode({
+                                  'api_key': API_KEY,
+                                  'email': _emailController.text,
+                                  'password': _passwordController.text,
+                                  'totp': _totpController.text,
+                                }),
+                              )
                               .then(
                                   (value) => Navigator.of(context).pop(value)),
                           decoration:
@@ -149,7 +149,7 @@ class AdminLoginPageState extends State<AdminLoginPage> {
                         onPressed: () {
                           http
                               .post(
-                                Uri.https(API_URL,'verify-totp'),
+                                Uri.https(API_URL, 'verify-totp'),
                                 headers: {'Content-Type': 'application/json'},
                                 body: json.encode({
                                   'api_key': API_KEY,
@@ -170,7 +170,8 @@ class AdminLoginPageState extends State<AdminLoginPage> {
               Navigator.of(context).popAndPushNamed('/admin-panel');
             } catch (e) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Wprowadzono nieprawidłowy kod 2FA')),
+                const SnackBar(
+                    content: Text('Wprowadzono nieprawidłowy kod 2FA')),
               );
             }
           });

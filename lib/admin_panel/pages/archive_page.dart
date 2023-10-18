@@ -18,129 +18,123 @@ class _ArchivePageState extends State<ArchivePage> {
   @override
   Widget build(BuildContext context) {
     return Portal(
-      child: MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-              create: (context) => DataAndSelectionManager()),
-        ],
-        child: FutureBuilder<User?>(
-          future: FirebaseAuth.instance.authStateChanges().first,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            } else if (snapshot.data == null || snapshot.data!.isAnonymous) {
-              // No user is signed in, redirect to login page
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                Navigator.of(context).popAndPushNamed('/admin-login');
-              });
-              return const SizedBox.shrink();
-            } else {
-              // User is signed in, show admin panel
-              return Scaffold(
-                appBar: AppBar(
-                  forceMaterialTransparency: true,
-                  title: const Text('Zatwierdzone'),
-                  actions: [
-                    ElevatedButton(
-                      onPressed: () async {
-                        FirebaseAuth.instance.signOut();
-                        Navigator.of(context).popAndPushNamed('/admin-login');
-                      },
-                      child: const Text('Wyloguj'),
-                    ),
-                  ],
-                ),
-                body: Center(
-                  child: FutureBuilder(
-                    future:
-                        context.read<DataAndSelectionManager>().fetchArchive(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      }
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const Expanded(flex: 1, child: SideMenuBar(description: "Strona zgłoszeń zatwierdzonych\n\nPowinny znajdować się tu zgłoszenia które zostały uznane przez administratora za adekwatne. Ze zgłoszeń zatwierdzonych generowane mogą być raporty okresowe.",)),
-                          Expanded(
-                            flex: 1,
-                            child: Column(
-                              children: [
-                                const TopMenuBar(
-                                    pageType: PageType.archivePage),
-                                Consumer<DataAndSelectionManager>(
-                                  builder: (context, reportData, child) {
-                                    return Expanded(
-                                        child: SizedBox(
-                                      height:
-                                          MediaQuery.of(context).size.height,
-                                      width: MediaQuery.of(context).size.width /
-                                                  MediaQuery.of(context)
-                                                      .size
-                                                      .height >
-                                              1
-                                          ? MediaQuery.of(context).size.width *
-                                              0.250
-                                          : double.infinity,
-                                      child: NotificationListener<
-                                          ScrollEndNotification>(
-                                        onNotification: (notification) {
-                                          if (notification.metrics.pixels > 0 &&
-                                              notification.metrics.atEdge) {
-                                            context
-                                                .read<DataAndSelectionManager>()
-                                                .fetchMoreArchivedReports();
-                                          }
-                                          return true;
-                                        },
-                                        child: ListView.builder(
-                                          itemBuilder: (context, index) {
-                                            if (index <
-                                                context
-                                                    .read<
-                                                        DataAndSelectionManager>()
-                                                    .archivedReports
-                                                    .length) {
-                                              return ArchiveListElement(
-                                                report: context
-                                                    .read<
-                                                        DataAndSelectionManager>()
-                                                    .archivedReports[index],
-                                              );
-                                            }
-                                            return null;
-                                          },
-                                        ),
-                                      ),
-                                    ));
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: Consumer(builder: (context, reportData, _) {
-                              Report? report = context
-                                  .watch<DataAndSelectionManager>()
-                                  .highlighted;
-                              if (report == null) {
-                                return const SizedBox.shrink();
-                              } else {
-                                return ReportDisplayCard(report);
-                              }
-                            }),
-                          ),
-                        ],
-                      );
+      child: FutureBuilder<User?>(
+        future: FirebaseAuth.instance.authStateChanges().first,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          } else if (snapshot.data == null || snapshot.data!.isAnonymous) {
+            // No user is signed in, redirect to login page
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Navigator.of(context).popAndPushNamed('/admin-login');
+            });
+            return const SizedBox.shrink();
+          } else {
+            // User is signed in, show admin panel
+            return Scaffold(
+              appBar: AppBar(
+                forceMaterialTransparency: true,
+                title: const Text('Zatwierdzone'),
+                actions: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      FirebaseAuth.instance.signOut();
+                      Navigator.of(context).popAndPushNamed('/admin-login');
                     },
+                    child: const Text('Wyloguj'),
                   ),
+                ],
+              ),
+              body: Center(
+                child: FutureBuilder(
+                  future:
+                      context.read<DataAndSelectionManager>().fetchArchive(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    }
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Expanded(flex: 1, child: SideMenuBar(description: "Strona zgłoszeń zatwierdzonych\n\nPowinny znajdować się tu zgłoszenia które zostały uznane przez administratora za adekwatne. Ze zgłoszeń zatwierdzonych generowane mogą być raporty okresowe.",)),
+                        Expanded(
+                          flex: 1,
+                          child: Column(
+                            children: [
+                              const TopMenuBar(
+                                  pageType: PageType.archivePage),
+                              Consumer<DataAndSelectionManager>(
+                                builder: (context, reportData, child) {
+                                  return Expanded(
+                                      child: SizedBox(
+                                    height:
+                                        MediaQuery.of(context).size.height,
+                                    width: MediaQuery.of(context).size.width /
+                                                MediaQuery.of(context)
+                                                    .size
+                                                    .height >
+                                            1
+                                        ? MediaQuery.of(context).size.width *
+                                            0.250
+                                        : double.infinity,
+                                    child: NotificationListener<
+                                        ScrollEndNotification>(
+                                      onNotification: (notification) {
+                                        if (notification.metrics.pixels > 0 &&
+                                            notification.metrics.atEdge) {
+                                          context
+                                              .read<DataAndSelectionManager>()
+                                              .fetchMoreArchivedReports();
+                                        }
+                                        return true;
+                                      },
+                                      child: ListView.builder(
+                                        itemBuilder: (context, index) {
+                                          if (index <
+                                              context
+                                                  .read<
+                                                      DataAndSelectionManager>()
+                                                  .archivedReports
+                                                  .length) {
+                                            return ArchiveListElement(
+                                              report: context
+                                                  .read<
+                                                      DataAndSelectionManager>()
+                                                  .archivedReports[index],
+                                            );
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                  ));
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Consumer(builder: (context, reportData, _) {
+                            Report? report = context
+                                .watch<DataAndSelectionManager>()
+                                .highlighted;
+                            if (report == null) {
+                              return const SizedBox.shrink();
+                            } else {
+                              return ReportDisplayCard(report);
+                            }
+                          }),
+                        ),
+                      ],
+                    );
+                  },
                 ),
-              );
-            }
-          },
-        ),
+              ),
+            );
+          }
+        },
       ),
     );
   }

@@ -460,6 +460,8 @@ class _MainFormState extends State<MainForm> {
                           'api_key': API_KEY,
                           'data': {
                             'id': id,
+                            'additionalInfo': '',
+                            'hasBeenEdited': false,
                             "report timestamp":
                                 report.reportTimestamp.millisecondsSinceEpoch /
                                     1000,

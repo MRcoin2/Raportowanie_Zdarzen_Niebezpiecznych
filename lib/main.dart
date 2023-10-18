@@ -26,7 +26,11 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MultiProvider(
+        providers: [
+        ChangeNotifierProvider(create: (context) => DataAndSelectionManager()),
+    ],
+    child: MaterialApp(
       title: 'Raportowanie Zdarzeń Niebezpiecznych',
       theme: FlexThemeData.light(
         colors: const FlexSchemeColor(
@@ -129,10 +133,8 @@ class MyApp extends StatelessWidget {
         '/': (context) =>
         const FormPage(title: 'Raportowanie Zdarzeń Niebezpiecznych'),
         '/admin-login': (context) => const AdminLoginPage(),
-        '/admin-panel': (context) => MultiProvider(providers: [
-              ChangeNotifierProvider(
-                  create: (context) => DataAndSelectionManager()),
-            ], child: const AdminPanelPage()),
+        '/admin-panel': (context) => const AdminPanelPage(),
+        '/add-info': (context) => AddInfoPage(),
         // '/admin-panel/trash': (context) => const TrashPage(),
         // '/admin-panel/archive': (context) => const ArchivePage(),
         // '/admin-panel/raport-generation': (context) => const ReportingPage(),
@@ -140,6 +142,7 @@ class MyApp extends StatelessWidget {
       onUnknownRoute: (route){
         if ("/add-info".matchAsPrefix(route.name??"")!.end > 0 && route.name != null){
           String reportId = route.name!.substring("/add-info/".length);
+          print("navigate to add info page with id: $reportId");
           return MaterialPageRoute(builder: (context) => ChangeNotifierProvider(
               create: (context) => DataAndSelectionManager(),
               child: AddInfoPage(reportId: reportId)));
@@ -151,6 +154,6 @@ class MyApp extends StatelessWidget {
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,],
       supportedLocales: const [Locale('pl')],
-    );
+    ),);
   }
 }
