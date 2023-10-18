@@ -142,7 +142,6 @@ class MyApp extends StatelessWidget {
       onUnknownRoute: (route){
         if ("/add-info".matchAsPrefix(route.name??"")!.end > 0 && route.name != null){
           String reportId = route.name!.substring("/add-info/".length);
-          print("navigate to add info page with id: $reportId");
           return MaterialPageRoute(builder: (context) => ChangeNotifierProvider(
               create: (context) => DataAndSelectionManager(),
               child: AddInfoPage(reportId: reportId)));

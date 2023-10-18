@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:archive/archive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:intl/intl.dart';
@@ -10,6 +14,7 @@ import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/pdf_generation.
 import 'package:raportowanie_zdarzen_niebezpiecznych/admin_panel/providers.dart';
 
 import 'package:universal_html/html.dart' as html;
+import 'package:http/http.dart' as http;
 import '../../main_form/database_communication.dart';
 import '../pages/admin_panel.dart';
 import '../pages/raporting_page.dart';
@@ -616,6 +621,7 @@ class _TopMenuBarState extends State<TopMenuBar> {
 
 class SideMenuBar extends StatelessWidget {
   final String? description;
+
   const SideMenuBar({super.key, this.description});
 
   @override
@@ -623,7 +629,7 @@ class SideMenuBar extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-          flex:4,
+          flex: 4,
           child: Card(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -633,13 +639,18 @@ class SideMenuBar extends StatelessWidget {
                     leading: const Icon(Icons.home_outlined),
                     title: const Text("Strona główna"),
                     onTap: () {
-                      context.read<DataAndSelectionManager>().clearSelections(); // TODO check if this line is needed if there are separate providers for each page
+                      context
+                          .read<DataAndSelectionManager>()
+                          .clearSelections();
                       Navigator.of(context).pushReplacement(
                         PageRouteBuilder(
-                          pageBuilder: (context, animation1, animation2) => const AdminPanelPage(),
-                          transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+                          pageBuilder: (context, animation1, animation2) =>
+                              const AdminPanelPage(),
+                          transitionsBuilder: (_, a, __, c) =>
+                              FadeTransition(opacity: a, child: c),
                           transitionDuration: const Duration(milliseconds: 100),
-                          reverseTransitionDuration: const Duration(milliseconds: 100),
+                          reverseTransitionDuration:
+                              const Duration(milliseconds: 100),
                         ),
                       );
                     },
@@ -651,10 +662,13 @@ class SideMenuBar extends StatelessWidget {
                       context.read<DataAndSelectionManager>().clearSelections();
                       Navigator.of(context).pushReplacement(
                         PageRouteBuilder(
-                          pageBuilder: (context, animation1, animation2) => const ArchivePage(),
-                          transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+                          pageBuilder: (context, animation1, animation2) =>
+                              const ArchivePage(),
+                          transitionsBuilder: (_, a, __, c) =>
+                              FadeTransition(opacity: a, child: c),
                           transitionDuration: const Duration(milliseconds: 100),
-                          reverseTransitionDuration: const Duration(milliseconds: 100),
+                          reverseTransitionDuration:
+                              const Duration(milliseconds: 100),
                         ),
                       );
                     },
@@ -666,10 +680,13 @@ class SideMenuBar extends StatelessWidget {
                       context.read<DataAndSelectionManager>().clearSelections();
                       Navigator.of(context).pushReplacement(
                         PageRouteBuilder(
-                          pageBuilder: (context, animation1, animation2) => const TrashPage(),
-                          transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+                          pageBuilder: (context, animation1, animation2) =>
+                              const TrashPage(),
+                          transitionsBuilder: (_, a, __, c) =>
+                              FadeTransition(opacity: a, child: c),
                           transitionDuration: const Duration(milliseconds: 100),
-                          reverseTransitionDuration: const Duration(milliseconds: 100),
+                          reverseTransitionDuration:
+                              const Duration(milliseconds: 100),
                         ),
                       );
                     },
@@ -682,10 +699,13 @@ class SideMenuBar extends StatelessWidget {
                       context.read<DataAndSelectionManager>().clearSelections();
                       Navigator.of(context).pushReplacement(
                         PageRouteBuilder(
-                          pageBuilder: (context, animation1, animation2) => const ReportingPage(),
-                          transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+                          pageBuilder: (context, animation1, animation2) =>
+                              const ReportingPage(),
+                          transitionsBuilder: (_, a, __, c) =>
+                              FadeTransition(opacity: a, child: c),
                           transitionDuration: const Duration(milliseconds: 100),
-                          reverseTransitionDuration: const Duration(milliseconds: 100),
+                          reverseTransitionDuration:
+                              const Duration(milliseconds: 100),
                         ),
                       );
                     },
@@ -698,10 +718,13 @@ class SideMenuBar extends StatelessWidget {
                       context.read<DataAndSelectionManager>().clearSelections();
                       Navigator.of(context).pushReplacement(
                         PageRouteBuilder(
-                          pageBuilder: (context, animation1, animation2) => const SettingsPage(),
-                          transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+                          pageBuilder: (context, animation1, animation2) =>
+                              const SettingsPage(),
+                          transitionsBuilder: (_, a, __, c) =>
+                              FadeTransition(opacity: a, child: c),
                           transitionDuration: const Duration(milliseconds: 100),
-                          reverseTransitionDuration: const Duration(milliseconds: 100),
+                          reverseTransitionDuration:
+                              const Duration(milliseconds: 100),
                         ),
                       );
                     },
@@ -711,15 +734,20 @@ class SideMenuBar extends StatelessWidget {
             ),
           ),
         ),
-        description!.isNotEmpty ? Expanded(
-          flex: 1,
-          child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(description ?? "", softWrap: true,),
-            ),
-          ),
-        ) : const SizedBox.shrink(),
+        description!.isNotEmpty
+            ? Expanded(
+                flex: 1,
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      description ?? "",
+                      softWrap: true,
+                    ),
+                  ),
+                ),
+              )
+            : const SizedBox.shrink(),
       ],
     );
   }
@@ -729,6 +757,28 @@ void downloadFile(String url) {
   html.AnchorElement anchorElement = html.AnchorElement(href: url);
   anchorElement.download = url;
   anchorElement.click();
+}
+
+Future<void> downloadZippedImages(List<List<String>> urlsWithNames) async {
+  // download all images and pack them into a zip file and download it
+  List<ArchiveFile> files = [];
+  Archive archive = Archive();
+  ZipEncoder encoder = ZipEncoder();
+  for (List<String> urlWithName in urlsWithNames) {
+    await http.get(Uri.parse(urlWithName[0])).then((value) {
+      files.add(ArchiveFile(urlWithName[1],
+          value.bodyBytes.length, value.bodyBytes));
+    });
+  }
+  for (ArchiveFile file in files) {
+    archive.addFile(file);
+  }
+  Uint8List archiveBytes = Uint8List.fromList(encoder.encode(archive)!);
+//download the file
+  html.AnchorElement(
+          href: "data:application/octet-stream;charset=utf-16le;base64,${base64.encode(archiveBytes)}")..setAttribute("download", "zdjecia.zip")
+      ..click();
+  return;
 }
 
 class ReportDisplayCard extends StatelessWidget {
@@ -859,7 +909,7 @@ class ReportDisplayCard extends StatelessWidget {
                   textAlign: TextAlign.justify,
                 ),
                 const Divider(),
-
+                // grid of images from firebase storage linked to this report
                 FutureBuilder(
                     future: report.getImageUrls(),
                     builder: (context, snapshot) {
@@ -950,27 +1000,51 @@ class ReportDisplayCard extends StatelessWidget {
                         );
                       }
                     }),
-                // grid of images from fires storage linked to this report
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                   child: Row(
                     children: [
                       Expanded(
                           child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              elevation: 4,
-                            ),
-                            onPressed: () async {
-                              try {
-                                await printReport(report);
-                              } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Nie udało się wydrukować pliku")));
-                              }
-                            },
-                            child: const Text("Drukuj"),
-                          )
-                      ),
+                        style: ElevatedButton.styleFrom(
+                          elevation: 4,
+                        ),
+                        onPressed: () async {
+                          BuildContext? dialogContext;
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                dialogContext = context;
+                                return const AlertDialog(
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                          "Generowanie raportu...\n(może to chwilę zająć, szczególnie w przypadku dużej ilości zdjęć)"),
+                                      SizedBox(
+                                        width: 50,
+                                        height: 50,
+                                        child: Center(
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              });
+                          try {
+                            await printReport(report);
+                            Navigator.of(dialogContext!).pop();
+                          } catch (e) {
+                            Navigator.of(dialogContext!).pop();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        "Nie udało się wydrukować pliku")));
+                          }
+                        },
+                        child: const Text("Drukuj"),
+                      )),
                       const SizedBox(width: 10),
                       Expanded(
                         child: ElevatedButton(
@@ -978,11 +1052,37 @@ class ReportDisplayCard extends StatelessWidget {
                             elevation: 4,
                           ),
                           onPressed: () async {
+                            BuildContext? dialogContext;
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  dialogContext = context;
+                                  return const AlertDialog(
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                            "Generowanie raportu...\n(może to chwilę zająć, szczególnie w przypadku dużej ilości zdjęć)"),
+                                        SizedBox(
+                                          width: 50,
+                                          height: 50,
+                                          child: Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                });
                             try {
                               await downloadReport(report);
+                              Navigator.of(dialogContext!).pop();
                             } catch (e) {
+                              Navigator.of(dialogContext!).pop();
                               ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Nie udało się pobrać pliku")));
+                                  const SnackBar(
+                                      content:
+                                          Text("Nie udało się pobrać pliku")));
                             }
                           },
                           child: const Text("Pobierz plik PDF"),
@@ -995,18 +1095,43 @@ class ReportDisplayCard extends StatelessWidget {
                             elevation: 4,
                           ),
                           onPressed: () async {
+                            BuildContext? dialogContext;
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  dialogContext = context;
+                                  return const AlertDialog(
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                            "Pakowanie zdjęć do pliku zip...\n(może to chwilę zająć, szczególnie w przypadku dużej ilości zdjęć)"),
+                                        SizedBox(
+                                          width: 50,
+                                          height: 50,
+                                          child: Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                });
                             try {
-                              //TODO add this functionality
-                              await context.read<DataAndSelectionManager>().downloadImages();
+                              await downloadZippedImages(
+                                  await report.getImageUrls());
+                              Navigator.of(dialogContext!).pop();
                             } catch (e) {
+                              Navigator.of(dialogContext!).pop();
                               ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Nie udało się pobrać plików")));
+                                  const SnackBar(
+                                      content:
+                                          Text("Nie udało się pobrać plików")));
                             }
                           },
                           child: const Text("Pobierz zdjęcia"),
                         ),
                       ),
-
                     ],
                   ),
                 )

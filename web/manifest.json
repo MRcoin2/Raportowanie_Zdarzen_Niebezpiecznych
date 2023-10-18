@@ -1,6 +1,6 @@
 {
-    "name": "raportowanie_zdarzen_niebezpiecznych",
-    "short_name": "raportowanie_zdarzen_niebezpiecznych",
+    "name": "Raportowanie zdarzeń niebezpiecznych",
+    "short_name": "Raportowanie KRK",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

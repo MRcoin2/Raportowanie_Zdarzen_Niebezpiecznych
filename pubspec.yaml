@@ -54,6 +54,7 @@ dependencies:
   totp: ^0.0.1
   universal_html: ^2.2.3
   qr_flutter: ^4.1.0
+  archive: ^3.4.6
 
 dev_dependencies:
   flutter_test:

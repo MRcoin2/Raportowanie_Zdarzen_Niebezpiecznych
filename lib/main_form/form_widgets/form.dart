@@ -147,7 +147,7 @@ class _MainFormState extends State<MainForm> {
                               elevation: MaterialStateProperty.all(4)),
                           onPressed: () {
                             if (RegExp(r'^.*\..*@.*\.s.*\.gov\.pl$')
-                                    .hasMatch(_emailController.text)||true) {
+                                    .hasMatch(_emailController.text)) {
                               //TODO remove true when done testing
                               _authDialogBuilder(
                                   context, _emailController.text);
@@ -411,11 +411,26 @@ class _MainFormState extends State<MainForm> {
             padding: const EdgeInsets.all(8.0),
             child: FilledButton(
               onPressed: () async {
-                if (_formKey.currentState!.validate()||true) {
+                if (_formKey.currentState!.validate()) {
                   //TODO remove true when done testing
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Przetwarzanie danych...')),
                   );
+                  BuildContext? dialogContext;
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        dialogContext = context;
+                        return const AlertDialog(
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text("Przetwarzanie danych...\n(może to chwilę zająć - proszę czekać)"),
+                              SizedBox(width:50,height: 50, child: Center(child: CircularProgressIndicator())),
+                            ],
+                          ),
+                        );
+                      });
                   try {
                     Report report = Report(
                         id: "",
@@ -445,17 +460,45 @@ class _MainFormState extends State<MainForm> {
                     String id = await submitForm(report.toMap(), _images);
                     report.id = id;
                     report.imageUrls = await report.getImageUrls();
-                    print(report.toMap());
                     //clear form
+                    _nameController.clear();
+                    _surnameController.clear();
+                    _emailController.clear();
+                    _phoneController.clear();
+                    _affiliationController.clear();
+                    _dateController.clear();
+                    _timeController.clear();
+                    _placeController.clear();
+                    _descriptionController.clear();
+                    _otherCategoryController.clear();
+                    _images.clear();
                     _formKey.currentState?.reset();
+
                     //notify user
                     ScaffoldMessenger.of(context).clearSnackBars();
+                    Navigator.pop(dialogContext!);
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          dialogContext = context;
+                          return AlertDialog(
+                            icon: const Icon(Icons.check),
+                            actions: [
+                              ElevatedButton(
+                                  onPressed: () {
+
+                                    Navigator.of(context).pushReplacementNamed("/");
+                                  },
+                                  child: const Text("Ok"))],
+                            content:
+                                  const Text("Zgłoszenie wysłano pomyślnie.\nNa podany adres email wysłano potwierdzenie z linkiem do dodania informacji o zakończeniu zdarzenia."),
+                          );
+                        });
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                           content: Text('Zgłoszenie wysłano pomyślnie')),
                     );
-                    await http.post(
-                        Uri.https(API_URL, 'confirm-submission'),
+                    await http.post(Uri.https(API_URL, 'confirm-submission'),
                         body: json.encode({
                           'api_key': API_KEY,
                           'data': {
@@ -489,6 +532,24 @@ class _MainFormState extends State<MainForm> {
                         }));
                   } catch (e) {
                     ScaffoldMessenger.of(context).clearSnackBars();
+                    Navigator.pop(dialogContext!);
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          dialogContext = context;
+                          return AlertDialog(
+                            icon: const Icon(Icons.error),
+                            actions: [
+                              ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text("Ok"))],
+                            content: const Center(
+                              child: Text("Wystąpił błąd podczas wysyłania zgłoszenia"),
+                            ),
+                          );
+                        });
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                           content: Text(
