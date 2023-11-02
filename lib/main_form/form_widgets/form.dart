@@ -54,6 +54,8 @@ class _MainFormState extends State<MainForm> {
   bool _isCategoryOther = false;
 
   bool _verificationStatus = false;
+
+  bool _agreementStatus = false;
   String _lastVerifiedEmail = "";
 
   Future<void> _authDialogBuilder(BuildContext context, String email) {
@@ -147,7 +149,7 @@ class _MainFormState extends State<MainForm> {
                               elevation: MaterialStateProperty.all(4)),
                           onPressed: () {
                             if (RegExp(r'^.*\..*@.*\.s.*\.gov\.pl$')
-                                    .hasMatch(_emailController.text)) {
+                                .hasMatch(_emailController.text)) {
                               //TODO remove true when done testing
                               _authDialogBuilder(
                                   context, _emailController.text);
@@ -407,6 +409,19 @@ class _MainFormState extends State<MainForm> {
                     },
                   ),
                 ),
+          CheckboxFormField(
+            title: const Text(
+                "Zgadzam się na przetwarzanie moich danych osobowych w celu zbierania informacji o niebezpieczeństwach w pracy kuratora."),
+            onSaved: (value) => setState(() {
+              _agreementStatus = value!;
+            }),
+            validator: (value) {
+              if (value == null || !value) {
+                return 'Proszę wyrazić zgodę na przetwarzanie danych osobowych';
+              }
+              return null;
+            },
+          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: FilledButton(
@@ -426,8 +441,13 @@ class _MainFormState extends State<MainForm> {
                           content: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text("Przetwarzanie danych...\n(może to chwilę zająć - proszę czekać)"),
-                              SizedBox(width:50,height: 50, child: Center(child: CircularProgressIndicator())),
+                              Text(
+                                  "Przetwarzanie danych...\n(może to chwilę zająć - proszę czekać)"),
+                              SizedBox(
+                                  width: 50,
+                                  height: 50,
+                                  child: Center(
+                                      child: CircularProgressIndicator())),
                             ],
                           ),
                         );
@@ -488,12 +508,13 @@ class _MainFormState extends State<MainForm> {
                             actions: [
                               ElevatedButton(
                                   onPressed: () {
-
-                                    Navigator.of(context).pushReplacementNamed("/");
+                                    Navigator.of(context)
+                                        .pushReplacementNamed("/");
                                   },
-                                  child: const Text("Ok"))],
-                            content:
-                                  const Text("Zgłoszenie wysłano pomyślnie.\nNa podany adres email wysłano potwierdzenie z linkiem do dodania informacji o zakończeniu zdarzenia."),
+                                  child: const Text("Ok"))
+                            ],
+                            content: const Text(
+                                "Zgłoszenie wysłano pomyślnie.\nNa podany adres email wysłano potwierdzenie z linkiem do dodania informacji o zakończeniu zdarzenia."),
                           );
                         });
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -536,7 +557,7 @@ class _MainFormState extends State<MainForm> {
                     ScaffoldMessenger.of(context).clearSnackBars();
                     Navigator.pop(dialogContext!);
                     showDialog(
-                      barrierDismissible: false,
+                        barrierDismissible: false,
                         context: context,
                         builder: (context) {
                           dialogContext = context;
@@ -547,9 +568,11 @@ class _MainFormState extends State<MainForm> {
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   },
-                                  child: const Text("Ok"))],
+                                  child: const Text("Ok"))
+                            ],
                             content: const Center(
-                              child: Text("Wystąpił błąd podczas wysyłania zgłoszenia"),
+                              child: Text(
+                                  "Wystąpił błąd podczas wysyłania zgłoszenia"),
                             ),
                           );
                         });

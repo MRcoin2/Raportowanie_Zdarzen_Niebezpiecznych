@@ -61,7 +61,8 @@ class _FilterPanelState extends State<FilterPanel> {
             "Filter Panel: incorrect date format / field empty (skipping setting date range)");
       }
     }
-    widget.onUpdate!();
+    if (widget.onUpdate != null){
+    widget.onUpdate!();}
     context.read<DataAndSelectionManager>().setFilters(
           Filters(
               categories:
@@ -162,7 +163,8 @@ class _FilterPanelState extends State<FilterPanel> {
                           ),
                           TextButton(
                             onPressed: () {
-                              widget.onUpdate!();
+                              if (widget.onUpdate != null){
+                                widget.onUpdate!();}
                               fromDateController.clear();
                               toDateController.clear();
                               context
@@ -174,7 +176,8 @@ class _FilterPanelState extends State<FilterPanel> {
                         ],
                       ):TextButton(
                         onPressed: () {
-                          widget.onUpdate!();
+                          if (widget.onUpdate != null){
+                            widget.onUpdate!();}
                           fromDateController.clear();
                           toDateController.clear();
                           context
@@ -203,7 +206,8 @@ class _FilterPanelState extends State<FilterPanel> {
                                 context
                                     .read<DataAndSelectionManager>()
                                     .toggleFilterAllCategories();
-                                widget.onUpdate!();
+                                if (widget.onUpdate != null){
+                                  widget.onUpdate!();}
                               },
                             ),
                           ),
@@ -224,7 +228,8 @@ class _FilterPanelState extends State<FilterPanel> {
                                   context
                                       .read<DataAndSelectionManager>()
                                       .toggleFilterCategory(category);
-                                  widget.onUpdate!();
+                                  if (widget.onUpdate != null){
+                                    widget.onUpdate!();}
                                 },
                               ),
                             ),

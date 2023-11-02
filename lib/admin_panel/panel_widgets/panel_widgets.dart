@@ -65,6 +65,7 @@ class _ReportListElementState extends State<ReportListElement> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
+                  flex: 1,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
@@ -77,10 +78,15 @@ class _ReportListElementState extends State<ReportListElement> {
                         maxLines: 2,
                       ),
                       Text(
-                        widget.report.incidentData['date'].toString(),
+                        "Zgłoszono: ${DateFormat('dd.MM.yyyy').format(widget.report.reportTimestamp)}",
+                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                      Text(
+                        "Data zdarzenia: ${widget.report.incidentData['date'].toString()}",
                         style:
                             const TextStyle(fontSize: 12, color: Colors.grey),
                       ),
+                      Divider(),
                       Text(
                         widget.report.incidentData['description'],
                         style:
@@ -92,71 +98,63 @@ class _ReportListElementState extends State<ReportListElement> {
                     ],
                   ),
                 ),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          IconButton(
-                              tooltip: 'Zatwierdź',
-                              onPressed: () {
-                                context
-                                    .read<DataAndSelectionManager>()
-                                    .archiveReport(widget.report);
-                              },
-                              icon: const Icon(Icons.check)),
-                          IconButton(
-                              tooltip: 'Usuń',
-                              onPressed: () {
-                                showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        title: const Text(
-                                            'Czy na pewno chcesz usunąć to zgłoszenie?'),
-                                        actions: [
-                                          TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context)
-                                                    .pop(false);
-                                              },
-                                              child: const Text('Nie')),
-                                          TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop(true);
-                                              },
-                                              child: const Text('Tak')),
-                                        ],
-                                      );
-                                    }).then((value) {
-                                  if (value) {
-                                    context
-                                        .read<DataAndSelectionManager>()
-                                        .moveReportToTrash(widget.report,
-                                            PageType.reportsPage);
-                                  }
-                                });
-                              },
-                              icon: const Icon(Icons.delete_outline)),
-                          Checkbox(
-                            value: context
-                                .watch<DataAndSelectionManager>()
-                                .isSelected(widget.report),
-                            onChanged: (value) {
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                        tooltip: 'Zatwierdź',
+                        onPressed: () {
+                          context
+                              .read<DataAndSelectionManager>()
+                              .archiveReport(widget.report);
+                        },
+                        icon: const Icon(Icons.check)),
+                    IconButton(
+                        tooltip: 'Usuń',
+                        onPressed: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: const Text(
+                                      'Czy na pewno chcesz usunąć to zgłoszenie?'),
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context)
+                                              .pop(false);
+                                        },
+                                        child: const Text('Nie')),
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(true);
+                                        },
+                                        child: const Text('Tak')),
+                                  ],
+                                );
+                              }).then((value) {
+                            if (value) {
                               context
                                   .read<DataAndSelectionManager>()
-                                  .toggleSelection(
-                                      widget.report, PageType.reportsPage);
-                            },
-                          )
-                        ],
-                      )
-                    ],
-                  ),
+                                  .moveReportToTrash(widget.report,
+                                      PageType.reportsPage);
+                            }
+                          });
+                        },
+                        icon: const Icon(Icons.delete_outline)),
+                    Checkbox(
+                      value: context
+                          .watch<DataAndSelectionManager>()
+                          .isSelected(widget.report),
+                      onChanged: (value) {
+                        context
+                            .read<DataAndSelectionManager>()
+                            .toggleSelection(
+                                widget.report, PageType.reportsPage);
+                      },
+                    )
+                  ],
                 )
               ],
             ),
@@ -210,6 +208,7 @@ class _TrashListElementState extends State<TrashListElement> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
+                flex: 1,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -222,9 +221,14 @@ class _TrashListElementState extends State<TrashListElement> {
                       maxLines: 2,
                     ),
                     Text(
-                      widget.report.incidentData['date'].toString(),
+                      "Zgłoszono: ${DateFormat('dd.MM.yyyy').format(widget.report.reportTimestamp)}",
                       style: const TextStyle(fontSize: 12, color: Colors.grey),
                     ),
+                    Text(
+                      "Data zdarzenia: ${widget.report.incidentData['date'].toString()}",
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                    Divider(),
                     Text(
                       widget.report.incidentData['description'],
                       style: const TextStyle(fontSize: 12, color: Colors.grey),
@@ -235,38 +239,30 @@ class _TrashListElementState extends State<TrashListElement> {
                   ],
                 ),
               ),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                            tooltip: 'Przywróć',
-                            onPressed: () {
-                              context
-                                  .read<DataAndSelectionManager>()
-                                  .restoreFromTrash(widget.report);
-                            },
-                            icon: const Icon(Icons.restore_outlined)),
-                        Checkbox(
-                          value: context
-                              .watch<DataAndSelectionManager>()
-                              .isSelected(widget.report),
-                          onChanged: (value) {
-                            context
-                                .read<DataAndSelectionManager>()
-                                .toggleSelection(
-                                    widget.report, PageType.trashPage);
-                          },
-                        )
-                      ],
-                    )
-                  ],
-                ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                      tooltip: 'Przywróć',
+                      onPressed: () {
+                        context
+                            .read<DataAndSelectionManager>()
+                            .restoreFromTrash(widget.report);
+                      },
+                      icon: const Icon(Icons.restore_outlined)),
+                  Checkbox(
+                    value: context
+                        .watch<DataAndSelectionManager>()
+                        .isSelected(widget.report),
+                    onChanged: (value) {
+                      context
+                          .read<DataAndSelectionManager>()
+                          .toggleSelection(
+                              widget.report, PageType.trashPage);
+                    },
+                  )
+                ],
               )
             ],
           ),
@@ -319,6 +315,7 @@ class _ArchiveListElementState extends State<ArchiveListElement> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
+                flex: 1,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -331,9 +328,14 @@ class _ArchiveListElementState extends State<ArchiveListElement> {
                       maxLines: 2,
                     ),
                     Text(
-                      widget.report.incidentData['date'].toString(),
+                      "Zgłoszono: ${DateFormat('dd.MM.yyyy').format(widget.report.reportTimestamp)}",
                       style: const TextStyle(fontSize: 12, color: Colors.grey),
                     ),
+                    Text(
+                      "Data zdarzenia: ${widget.report.incidentData['date'].toString()}",
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                    Divider(),
                     Text(
                       widget.report.incidentData['description'],
                       style: const TextStyle(fontSize: 12, color: Colors.grey),
@@ -344,69 +346,61 @@ class _ArchiveListElementState extends State<ArchiveListElement> {
                   ],
                 ),
               ),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                            tooltip: 'Przywróć',
-                            onPressed: () {
-                              context
-                                  .read<DataAndSelectionManager>()
-                                  .unarchiveReport(widget.report);
-                            },
-                            icon: const Icon(Icons.close_outlined)),
-                        IconButton(
-                            onPressed: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: const Text(
-                                          'Czy na pewno chcesz usunąć to zgłoszenie?'),
-                                      actions: [
-                                        TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop(false);
-                                            },
-                                            child: const Text('Nie')),
-                                        TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop(true);
-                                            },
-                                            child: const Text('Tak')),
-                                      ],
-                                    );
-                                  }).then((value) {
-                                if (value) {
-                                  context
-                                      .read<DataAndSelectionManager>()
-                                      .moveReportToTrash(
-                                          widget.report, PageType.archivePage);
-                                }
-                              });
-                            },
-                            icon: const Icon(Icons.delete_outline)),
-                        Checkbox(
-                          value: context
-                              .watch<DataAndSelectionManager>()
-                              .isSelected(widget.report),
-                          onChanged: (value) {
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                      tooltip: 'Przywróć',
+                      onPressed: () {
+                        context
+                            .read<DataAndSelectionManager>()
+                            .unarchiveReport(widget.report);
+                      },
+                      icon: const Icon(Icons.close_outlined)),
+                  IconButton(
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text(
+                                    'Czy na pewno chcesz usunąć to zgłoszenie?'),
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(false);
+                                      },
+                                      child: const Text('Nie')),
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(true);
+                                      },
+                                      child: const Text('Tak')),
+                                ],
+                              );
+                            }).then((value) {
+                          if (value) {
                             context
                                 .read<DataAndSelectionManager>()
-                                .toggleSelection(
+                                .moveReportToTrash(
                                     widget.report, PageType.archivePage);
-                          },
-                        )
-                      ],
-                    )
-                  ],
-                ),
+                          }
+                        });
+                      },
+                      icon: const Icon(Icons.delete_outline)),
+                  Checkbox(
+                    value: context
+                        .watch<DataAndSelectionManager>()
+                        .isSelected(widget.report),
+                    onChanged: (value) {
+                      context
+                          .read<DataAndSelectionManager>()
+                          .toggleSelection(
+                              widget.report, PageType.archivePage);
+                    },
+                  )
+                ],
               )
             ],
           ),
@@ -504,6 +498,7 @@ class _TopMenuBarState extends State<TopMenuBar> {
                       ),
                       portalFollower: const FilterPanel(),
                       child: IconButton(
+                        tooltip: 'Filtruj',
                           onPressed: () {
                             toggleFilterMenu();
                           },
