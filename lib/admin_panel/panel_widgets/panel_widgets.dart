@@ -79,18 +79,34 @@ class _ReportListElementState extends State<ReportListElement> {
                       ),
                       Text(
                         "Zgłoszono: ${DateFormat('dd.MM.yyyy').format(widget.report.reportTimestamp)}",
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withAlpha(200)),
                       ),
                       Text(
                         "Data zdarzenia: ${widget.report.incidentData['date'].toString()}",
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.grey),
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withAlpha(200)),
                       ),
                       Divider(),
                       Text(
                         widget.report.incidentData['description'],
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.grey),
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withAlpha(200)),
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,
@@ -122,8 +138,7 @@ class _ReportListElementState extends State<ReportListElement> {
                                   actions: [
                                     TextButton(
                                         onPressed: () {
-                                          Navigator.of(context)
-                                              .pop(false);
+                                          Navigator.of(context).pop(false);
                                         },
                                         child: const Text('Nie')),
                                     TextButton(
@@ -137,8 +152,8 @@ class _ReportListElementState extends State<ReportListElement> {
                             if (value) {
                               context
                                   .read<DataAndSelectionManager>()
-                                  .moveReportToTrash(widget.report,
-                                      PageType.reportsPage);
+                                  .moveReportToTrash(
+                                      widget.report, PageType.reportsPage);
                             }
                           });
                         },
@@ -148,10 +163,8 @@ class _ReportListElementState extends State<ReportListElement> {
                           .watch<DataAndSelectionManager>()
                           .isSelected(widget.report),
                       onChanged: (value) {
-                        context
-                            .read<DataAndSelectionManager>()
-                            .toggleSelection(
-                                widget.report, PageType.reportsPage);
+                        context.read<DataAndSelectionManager>().toggleSelection(
+                            widget.report, PageType.reportsPage);
                       },
                     )
                   ],
@@ -182,92 +195,112 @@ class _TrashListElementState extends State<TrashListElement> {
         context.read<DataAndSelectionManager>().toggleHighlight(widget.report);
       },
       child: Container(
-      decoration: BoxDecoration(
-      borderRadius: const BorderRadius.all(Radius.circular(20)),
-      border: context
-          .read<DataAndSelectionManager>()
-          .isHighlighted(widget.report)
-      ? Border.all(
-      color: Theme.of(context).primaryColor,
-      width: 2,
-      )
-          : null,
-      ),
-      child: Card(
-        surfaceTintColor:
-            context.read<DataAndSelectionManager>().isHighlighted(widget.report)
-                ? Theme.of(context).primaryColor
-                : Theme.of(context).cardTheme.color,
-        elevation:
-            context.read<DataAndSelectionManager>().isHighlighted(widget.report)
-                ? 5
-                : 2,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                flex: 1,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      widget.report.incidentData['category'],
-                      style: Theme.of(context).textTheme.titleLarge,
-                      softWrap: true,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                    ),
-                    Text(
-                      "Zgłoszono: ${DateFormat('dd.MM.yyyy').format(widget.report.reportTimestamp)}",
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
-                    Text(
-                      "Data zdarzenia: ${widget.report.incidentData['date'].toString()}",
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
-                    Divider(),
-                    Text(
-                      widget.report.incidentData['description'],
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                      softWrap: true,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                    )
-                  ],
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(Radius.circular(20)),
+          border: context
+                  .read<DataAndSelectionManager>()
+                  .isHighlighted(widget.report)
+              ? Border.all(
+                  color: Theme.of(context).primaryColor,
+                  width: 2,
+                )
+              : null,
+        ),
+        child: Card(
+          surfaceTintColor: context
+                  .read<DataAndSelectionManager>()
+                  .isHighlighted(widget.report)
+              ? Theme.of(context).primaryColor
+              : Theme.of(context).cardTheme.color,
+          elevation: context
+                  .read<DataAndSelectionManager>()
+                  .isHighlighted(widget.report)
+              ? 5
+              : 2,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        widget.report.incidentData['category'],
+                        style: Theme.of(context).textTheme.titleLarge,
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      ),
+                      Text(
+                        "Zgłoszono: ${DateFormat('dd.MM.yyyy').format(widget.report.reportTimestamp)}",
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withAlpha(200)),
+                      ),
+                      Text(
+                        "Data zdarzenia: ${widget.report.incidentData['date'].toString()}",
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withAlpha(200)),
+                      ),
+                      Divider(),
+                      Text(
+                        widget.report.incidentData['description'],
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withAlpha(200)),
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      )
+                    ],
+                  ),
                 ),
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  IconButton(
-                      tooltip: 'Przywróć',
-                      onPressed: () {
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                        tooltip: 'Przywróć',
+                        onPressed: () {
+                          context
+                              .read<DataAndSelectionManager>()
+                              .restoreFromTrash(widget.report);
+                        },
+                        icon: const Icon(Icons.restore_outlined)),
+                    Checkbox(
+                      value: context
+                          .watch<DataAndSelectionManager>()
+                          .isSelected(widget.report),
+                      onChanged: (value) {
                         context
                             .read<DataAndSelectionManager>()
-                            .restoreFromTrash(widget.report);
+                            .toggleSelection(widget.report, PageType.trashPage);
                       },
-                      icon: const Icon(Icons.restore_outlined)),
-                  Checkbox(
-                    value: context
-                        .watch<DataAndSelectionManager>()
-                        .isSelected(widget.report),
-                    onChanged: (value) {
-                      context
-                          .read<DataAndSelectionManager>()
-                          .toggleSelection(
-                              widget.report, PageType.trashPage);
-                    },
-                  )
-                ],
-              )
-            ],
+                    )
+                  ],
+                )
+              ],
+            ),
           ),
         ),
-      ),),
+      ),
     );
   }
 }
@@ -289,123 +322,142 @@ class _ArchiveListElementState extends State<ArchiveListElement> {
         context.read<DataAndSelectionManager>().toggleHighlight(widget.report);
       },
       child: Container(
-      decoration: BoxDecoration(
-      borderRadius: const BorderRadius.all(Radius.circular(20)),
-      border: context
-          .read<DataAndSelectionManager>()
-          .isHighlighted(widget.report)
-      ? Border.all(
-      color: Theme.of(context).primaryColor,
-      width: 2,
-      )
-          : null,
-      ),
-      child: Card(
-        surfaceTintColor:
-            context.read<DataAndSelectionManager>().isHighlighted(widget.report)
-                ? Theme.of(context).primaryColor
-                : Theme.of(context).cardTheme.color,
-        elevation:
-            context.read<DataAndSelectionManager>().isHighlighted(widget.report)
-                ? 5
-                : 2,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                flex: 1,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(Radius.circular(20)),
+          border: context
+                  .read<DataAndSelectionManager>()
+                  .isHighlighted(widget.report)
+              ? Border.all(
+                  color: Theme.of(context).primaryColor,
+                  width: 2,
+                )
+              : null,
+        ),
+        child: Card(
+          surfaceTintColor: context
+                  .read<DataAndSelectionManager>()
+                  .isHighlighted(widget.report)
+              ? Theme.of(context).primaryColor
+              : Theme.of(context).cardTheme.color,
+          elevation: context
+                  .read<DataAndSelectionManager>()
+                  .isHighlighted(widget.report)
+              ? 5
+              : 2,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        widget.report.incidentData['category'],
+                        style: Theme.of(context).textTheme.titleLarge,
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      ),
+                      Text(
+                        "Zgłoszono: ${DateFormat('dd.MM.yyyy').format(widget.report.reportTimestamp)}",
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withAlpha(200)),
+                      ),
+                      Text(
+                        "Data zdarzenia: ${widget.report.incidentData['date'].toString()}",
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withAlpha(200)),
+                      ),
+                      Divider(),
+                      Text(
+                        widget.report.incidentData['description'],
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.color
+                                ?.withAlpha(200)),
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      )
+                    ],
+                  ),
+                ),
+                Row(
                   mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(
-                      widget.report.incidentData['category'],
-                      style: Theme.of(context).textTheme.titleLarge,
-                      softWrap: true,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                    ),
-                    Text(
-                      "Zgłoszono: ${DateFormat('dd.MM.yyyy').format(widget.report.reportTimestamp)}",
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
-                    Text(
-                      "Data zdarzenia: ${widget.report.incidentData['date'].toString()}",
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
-                    Divider(),
-                    Text(
-                      widget.report.incidentData['description'],
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                      softWrap: true,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
+                    IconButton(
+                        tooltip: 'Przywróć',
+                        onPressed: () {
+                          context
+                              .read<DataAndSelectionManager>()
+                              .unarchiveReport(widget.report);
+                        },
+                        icon: const Icon(Icons.close_outlined)),
+                    IconButton(
+                        onPressed: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: const Text(
+                                      'Czy na pewno chcesz usunąć to zgłoszenie?'),
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(false);
+                                        },
+                                        child: const Text('Nie')),
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(true);
+                                        },
+                                        child: const Text('Tak')),
+                                  ],
+                                );
+                              }).then((value) {
+                            if (value) {
+                              context
+                                  .read<DataAndSelectionManager>()
+                                  .moveReportToTrash(
+                                      widget.report, PageType.archivePage);
+                            }
+                          });
+                        },
+                        icon: const Icon(Icons.delete_outline)),
+                    Checkbox(
+                      value: context
+                          .watch<DataAndSelectionManager>()
+                          .isSelected(widget.report),
+                      onChanged: (value) {
+                        context.read<DataAndSelectionManager>().toggleSelection(
+                            widget.report, PageType.archivePage);
+                      },
                     )
                   ],
-                ),
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  IconButton(
-                      tooltip: 'Przywróć',
-                      onPressed: () {
-                        context
-                            .read<DataAndSelectionManager>()
-                            .unarchiveReport(widget.report);
-                      },
-                      icon: const Icon(Icons.close_outlined)),
-                  IconButton(
-                      onPressed: () {
-                        showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: const Text(
-                                    'Czy na pewno chcesz usunąć to zgłoszenie?'),
-                                actions: [
-                                  TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop(false);
-                                      },
-                                      child: const Text('Nie')),
-                                  TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop(true);
-                                      },
-                                      child: const Text('Tak')),
-                                ],
-                              );
-                            }).then((value) {
-                          if (value) {
-                            context
-                                .read<DataAndSelectionManager>()
-                                .moveReportToTrash(
-                                    widget.report, PageType.archivePage);
-                          }
-                        });
-                      },
-                      icon: const Icon(Icons.delete_outline)),
-                  Checkbox(
-                    value: context
-                        .watch<DataAndSelectionManager>()
-                        .isSelected(widget.report),
-                    onChanged: (value) {
-                      context
-                          .read<DataAndSelectionManager>()
-                          .toggleSelection(
-                              widget.report, PageType.archivePage);
-                    },
-                  )
-                ],
-              )
-            ],
+                )
+              ],
+            ),
           ),
         ),
-      ),),
+      ),
     );
   }
 }
@@ -498,7 +550,7 @@ class _TopMenuBarState extends State<TopMenuBar> {
                       ),
                       portalFollower: const FilterPanel(),
                       child: IconButton(
-                        tooltip: 'Filtruj',
+                          tooltip: 'Filtruj',
                           onPressed: () {
                             toggleFilterMenu();
                           },
@@ -684,7 +736,14 @@ class SideMenuBar extends StatelessWidget {
                   children: [
                     ListTile(
                       leading: const Icon(Icons.home_outlined),
-                      title: const Text("Strona główna"),
+                      title: const FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Strona główna",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ),
                       onTap: () {
                         context
                             .read<DataAndSelectionManager>()
@@ -713,7 +772,14 @@ class SideMenuBar extends StatelessWidget {
                     ),
                     ListTile(
                       leading: const Icon(Icons.check),
-                      title: const Text("Zatwierdzone"),
+                      title: const FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Zatwierdzone",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ),
                       onTap: () {
                         context
                             .read<DataAndSelectionManager>()
@@ -722,13 +788,14 @@ class SideMenuBar extends StatelessWidget {
                           PageRouteBuilder(
                             pageBuilder: (context, animation1, animation2) =>
                                 MultiProvider(
-                                  providers: [
-                                    ChangeNotifierProvider(
-                                      create: (context) =>
-                                          DataAndSelectionManager(),
-                                    ),
-                                  ],
-                                  child: const ArchivePage(),),
+                              providers: [
+                                ChangeNotifierProvider(
+                                  create: (context) =>
+                                      DataAndSelectionManager(),
+                                ),
+                              ],
+                              child: const ArchivePage(),
+                            ),
                             transitionsBuilder: (_, a, __, c) =>
                                 FadeTransition(opacity: a, child: c),
                             transitionDuration:
@@ -741,7 +808,14 @@ class SideMenuBar extends StatelessWidget {
                     ),
                     ListTile(
                       leading: const Icon(Icons.delete_outline),
-                      title: const Text("Kosz"),
+                      title: const FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Kosz",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ),
                       onTap: () {
                         context
                             .read<DataAndSelectionManager>()
@@ -750,13 +824,14 @@ class SideMenuBar extends StatelessWidget {
                           PageRouteBuilder(
                             pageBuilder: (context, animation1, animation2) =>
                                 MultiProvider(
-                                  providers: [
-                                    ChangeNotifierProvider(
-                                      create: (context) =>
-                                          DataAndSelectionManager(),
-                                    ),
-                                  ],
-                                  child: const TrashPage(),),
+                              providers: [
+                                ChangeNotifierProvider(
+                                  create: (context) =>
+                                      DataAndSelectionManager(),
+                                ),
+                              ],
+                              child: const TrashPage(),
+                            ),
                             transitionsBuilder: (_, a, __, c) =>
                                 FadeTransition(opacity: a, child: c),
                             transitionDuration:
@@ -770,7 +845,14 @@ class SideMenuBar extends StatelessWidget {
                     const Divider(),
                     ListTile(
                       leading: const Icon(Icons.document_scanner_outlined),
-                      title: const Text("Generowanie raportu"),
+                      title: const FittedBox(
+                        fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Generowanie raportu",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ),
                       onTap: () {
                         context
                             .read<DataAndSelectionManager>()
@@ -779,13 +861,14 @@ class SideMenuBar extends StatelessWidget {
                           PageRouteBuilder(
                             pageBuilder: (context, animation1, animation2) =>
                                 MultiProvider(
-                                  providers: [
-                                    ChangeNotifierProvider(
-                                      create: (context) =>
-                                          DataAndSelectionManager(),
-                                    ),
-                                  ],
-                                  child: const ReportingPage(),),
+                              providers: [
+                                ChangeNotifierProvider(
+                                  create: (context) =>
+                                      DataAndSelectionManager(),
+                                ),
+                              ],
+                              child: const ReportingPage(),
+                            ),
                             transitionsBuilder: (_, a, __, c) =>
                                 FadeTransition(opacity: a, child: c),
                             transitionDuration:
@@ -799,7 +882,14 @@ class SideMenuBar extends StatelessWidget {
                     const Divider(),
                     ListTile(
                       leading: const Icon(Icons.settings_outlined),
-                      title: const Text("Ustawienia"),
+                      title: const FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Ustawienia",
+                          style: TextStyle(fontSize: 18,),
+                        ),
+                      ),
                       onTap: () {
                         context
                             .read<DataAndSelectionManager>()
@@ -808,13 +898,14 @@ class SideMenuBar extends StatelessWidget {
                           PageRouteBuilder(
                             pageBuilder: (context, animation1, animation2) =>
                                 MultiProvider(
-                                  providers: [
-                                    ChangeNotifierProvider(
-                                      create: (context) =>
-                                          DataAndSelectionManager(),
-                                    ),
-                                  ],
-                                  child: const SettingsPage(),),
+                              providers: [
+                                ChangeNotifierProvider(
+                                  create: (context) =>
+                                      DataAndSelectionManager(),
+                                ),
+                              ],
+                              child: const SettingsPage(),
+                            ),
                             transitionsBuilder: (_, a, __, c) =>
                                 FadeTransition(opacity: a, child: c),
                             transitionDuration:
