@@ -194,6 +194,20 @@ class DataAndSelectionManager extends ChangeNotifier {
           .count();
       numberOfReportsSelectedForReportGeneration =
           await numberOfReportsQuery.get().then((value) => value.count);
+      // find how many reports have a category that is not in the filters
+      AggregateQuery numberOfAllReportsQuery = FirebaseFirestore.instance
+          .collection("archive")
+          .orderBy("report timestamp", descending: true)
+          .where("report timestamp",
+          isGreaterThanOrEqualTo:
+          Timestamp.fromDate(filters.dateRange!.start))
+          .where("report timestamp",
+          isLessThanOrEqualTo: Timestamp.fromDate(filters.dateRange!.end))
+          .limit(1000)
+          .count();
+      int numberOfAllReports = await numberOfAllReportsQuery.get().then((value) => value.count);
+
+      numberOfReportsSelectedForReportGeneration += numberOfAllReports - numberOfReportsSelectedForReportGeneration;
     } catch (e) {
       numberOfReportsSelectedForReportGeneration = 0;
     }
@@ -204,6 +218,8 @@ class DataAndSelectionManager extends ChangeNotifier {
     int numberOfReports = 0;
     try {
       if (category == "inne...") {
+        // gets count of all reports in the time frame, the sum of other categories needs to be subtracted from this!
+        print("checking for other categories");
         AggregateQuery numberOfReportsQuery = FirebaseFirestore.instance
             .collection("archive")
             .orderBy("report timestamp", descending: true)
@@ -212,10 +228,10 @@ class DataAndSelectionManager extends ChangeNotifier {
                     Timestamp.fromDate(filters.dateRange!.start))
             .where("report timestamp",
                 isLessThanOrEqualTo: Timestamp.fromDate(filters.dateRange!.end))
-            .where("incident data.category", whereNotIn: categories)
             .limit(1000)
             .count();
         numberOfReports = await numberOfReportsQuery.get().then((value) => value.count);
+        print(numberOfReports);
       } else {
         AggregateQuery numberOfReportsQuery = FirebaseFirestore.instance
             .collection("archive")
@@ -231,6 +247,7 @@ class DataAndSelectionManager extends ChangeNotifier {
         numberOfReports = await numberOfReportsQuery.get().then((value) => value.count);
       }
     } catch (e) {
+      print(e);
       numberOfReports = 0;
     }
     notifyListeners();
